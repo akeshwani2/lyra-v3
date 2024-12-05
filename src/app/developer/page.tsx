@@ -55,7 +55,7 @@ export default function Page() {
   return (
     <div 
       ref={containerRef}
-      className="min-h-screen flex flex-col relative overflow-hidden group"
+      className="min-h-screen flex flex-col relative overflow-hidden group bg-black"
     >
       <motion.div 
         className="absolute inset-0 bg-black"
@@ -85,19 +85,19 @@ export default function Page() {
 
       {/* Main content */}
       <div className="flex-1 flex items-start justify-start pt-20">
-        <div className="px-4 md:px-20 lg:px-24 w-full relative z-10">
+        <div className="px-4 md:px-20 lg:px-24 w-full relative z-[1]">
           <div className='flex flex-col md:flex-row gap-2 md:gap-32 items-center justify-between'>
             {/* Left side */}
             <div className='flex flex-col gap-4 max-w-3xl'>
-              <h2 className='text-xs sm:text-md md:pb-1 md:text-2xl md:leading-none text-center font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text'>
+              <h2 className='text-xs sm:text-xl md:pb-1 md:text-2xl md:leading-none text-center font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text'>
                 Hello! My name is
               </h2>
-              <h1 className="text-3xl sm:text-6xl text-center md:text-[80px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text">
+              <h1 className="text-3xl sm:text-7xl text-center md:text-[80px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text">
                 Arhaan Keshwani
               </h1>
 
               {/* Added TypeAnimation for role */}
-              <div className="text-xl text-center sm:text-2xl pb-4 md:text-2xl text-white/80">
+              <div className="text-xl text-center sm:text-xl pb-4 md:text-2xl text-white/80">
                 <TypeAnimation
                   sequence={[
                     'Full Stack Developer',
@@ -112,7 +112,7 @@ export default function Page() {
               </div>
 
               {/* Added bio section */}
-              <p className="text-white/70 text-lg leading-relaxed pt-8">
+              <p className="text-white/70 text-lg leading-relaxed pt-8 sm:text-center">
                 I'm a passionate developer based in Atlanta, GA. I have a strong foundation in computer science
                 and about 2 years of experience. I just like learning new things and creating new experiences!
               </p>
@@ -120,25 +120,25 @@ export default function Page() {
               {/* Added achievements/highlights */}
               <div className="flex flex-col gap-2 text-white/70">
                 <p className="flex items-center gap-2">
-                  <GraduationCap size={18} />
+                  <GraduationCap size={32} className='border border-white/15 rounded-lg p-1' />
                   Studying Computer Science at Georgia State University
                 </p>
                 <p className="flex items-center gap-2">
-                  <Briefcase size={18} />
+                  <Briefcase size={30} className='border border-white/15 rounded-lg p-1' />
                   Currently working on Lyra!
                 </p>
                 <p className="flex items-center gap-2">
-                  <Rocket size={18} />
+                  <Rocket size={32} className='border border-white/15 rounded-lg p-1' />
                   Built about 5 production applications including iOS apps
                 </p>
               </div>
 
               {/* Social Links */}
-              <div className="flex gap-6 pt-3">
-                <Link href="https://github.com/yourusername" target="_blank" className="text-white/70 hover:text-white transition-colors">
+              <div className="flex gap-6 pt-3 sm:justify-center">
+                <Link href="https://github.com/akeshwani2" target="_blank" className="text-white/70 hover:text-white transition-colors">
                   <Github size={24} />
                 </Link>
-                <Link href="https://linkedin.com/in/yourusername" target="_blank" className="text-white/70 hover:text-white transition-colors">
+                <Link href="https://linkedin.com/in/arhaan-keshwani" target="_blank" className="text-white/70 hover:text-white transition-colors">
                   <Linkedin size={24} />
                 </Link>
                 <Link href="https://ak-port.vercel.app" target="_blank" className="text-white/70 hover:text-white transition-colors">
@@ -148,7 +148,7 @@ export default function Page() {
             </div>
 
             {/* Right side - Experience Timeline */}
-            <div className='flex flex-col gap-6 bg-[#190d2e]/90 backdrop-blur-xl border border-white/15 p-8 rounded-lg shadow-[0_0_30px_rgba(140,69,255,0.3)] min-w-[400px]'>
+            <div className='flex flex-col sm:mt-10 sm:mb-10 gap-6 bg-[#190d2e]/90  backdrop-blur-xl border border-white/15 p-8 rounded-lg shadow-[0_0_30px_rgba(140,69,255,0.3)] min-w-[400px]'>
             
               <h2 className="text-2xl font-semibold text-white">Experience</h2>
               

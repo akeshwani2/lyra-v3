@@ -87,7 +87,7 @@ export default function Page() {
 
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center">
-        <div className="container relative z-10">
+        <div className="container relative z-[1]">
           <div className='flex flex-col md:flex-row gap-2 md:gap-20 items-center justify-center'>
             {/* Left side */}
             <div className='flex flex-col gap-5'>
