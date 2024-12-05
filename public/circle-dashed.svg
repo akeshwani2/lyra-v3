@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Define gradient -->
+  <defs>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#6366F1"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M12 2a10 10 0 0 1 2.5.32" stroke="url(#purpleGradient)" stroke-dasharray="6 6">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  <path d="M17.6 3.7a10 10 0 0 1 2.7 2.7" stroke="url(#purpleGradient)" stroke-dasharray="8 8">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  <path d="M21.8 9.5a10 10 0 0 1 0 5" stroke="url(#purpleGradient)" stroke-dasharray="6 6">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  <path d="M20.3 17.6a10 10 0 0 1-2.7 2.7" stroke="url(#purpleGradient)" stroke-dasharray="8 8">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  <path d="M14.5 21.8a10 10 0 0 1-5 0" stroke="url(#purpleGradient)" stroke-dasharray="6 6">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  <path d="M6.4 20.3a10 10 0 0 1-2.7-2.7" stroke="url(#purpleGradient)" stroke-dasharray="8 8">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  <path d="M2.2 14.5a10 10 0 0 1 0-5" stroke="url(#purpleGradient)" stroke-dasharray="6 6">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  <path d="M3.7 6.4a10 10 0 0 1 2.7-2.7" stroke="url(#purpleGradient)" stroke-dasharray="8 8">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 12 12"
+      to="360 12 12"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </path>
+  
+  <!-- Center dot -->
+  <circle cx="12" cy="12" r="3" fill="url(#purpleGradient)">
+    <animate
+      attributeName="opacity"
+      values="0.4;1;0.4"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </circle>
+</svg>
