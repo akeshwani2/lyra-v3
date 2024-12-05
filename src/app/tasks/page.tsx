@@ -1,5 +1,6 @@
 'use client'
 import KanbanBoard from '@/components/ui/KanbanBoard'
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 
 const TasksPage = () => {
@@ -30,6 +31,20 @@ const TasksPage = () => {
           <p className='text-gray-400 text-lg'>
             Please visit us on a desktop or laptop computer for the best experience.
           </p>
+          <div className='flex justify-center'>
+            <Link href="/">
+              <button className='bg-white text-black px-4 py-2 rounded-md' >
+              <div className="absolute inset-0">
+                <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+
+                <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+
+                  <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+                </div>
+                Go back
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     );

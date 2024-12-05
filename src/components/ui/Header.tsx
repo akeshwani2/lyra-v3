@@ -63,7 +63,7 @@ const Header = () => {
               >
                 Features
               </button>
-              <a href="https://ak-port.vercel.app" target="_blank" className="hover:text-white transition">
+              <a href="/developer" className="hover:text-white transition">
                 Developer
               </a>
               <Link href="/changelog" className="hover:text-white transition">
@@ -124,7 +124,7 @@ const Header = () => {
               >
                 Features
               </button>
-              <a href="https://ak-port.vercel.app" target="_blank" className="hover:text-white transition">
+              <a href="/developer" className="hover:text-white transition">
                 Developer
               </a>
               <Link href="/changelog" className="hover:text-white transition">

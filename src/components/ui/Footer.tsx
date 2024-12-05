@@ -39,8 +39,7 @@ const Footer = () => {
               Features
             </button>
             <a
-              href="https://ak-port.vercel.app"
-              target="_blank"
+              href="/developer"
               className="text-xs md:text-sm hover:text-white transition text-white/70"
             >
               Developer
