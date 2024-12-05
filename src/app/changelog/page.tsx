@@ -80,7 +80,7 @@ export default function ChangelogPage() {
         <div className="mx-auto space-y-40">
           {/* Header */}
           <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <h1 className="text-6xl md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-1">
+            <h1 className="text-6xl md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center sm:pb-2 pb-1">
               What&apos;s New in Lyra
             </h1>
             <p className="text-xl text-white/70">

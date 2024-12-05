@@ -148,11 +148,10 @@ export default function Page() {
             </div>
 
             {/* Right side - Experience Timeline */}
-            <div className='flex flex-col sm:mt-10 sm:mb-10 gap-6 bg-[#190d2e]/90  backdrop-blur-xl border border-white/15 md:p-8 lg:p-8 sm:p-2 rounded-lg shadow-[0_0_30px_rgba(140,69,255,0.3)] min-w-[400px] lg:px-6'>
-            
+            <div className='flex flex-col sm:mt-10 sm:mb-10 gap-6 bg-[#190d2e]/90 backdrop-blur-xl border border-white/15 md:p-8 lg:p-8 p-4 rounded-lg shadow-[0_0_30px_rgba(140,69,255,0.3)] w-full md:min-w-[400px] mx-4'>
               <h2 className="text-2xl font-semibold text-white">Experience</h2>
               
-              <div className="relative flex flex-col gap-6 max-w-[800px]">
+              <div className="relative flex flex-col gap-6">
                 {/* Vertical Timeline Line */}
                 <div className="absolute left-[7px] top-2 bottom-2 w-[2px] bg-white/20" />
 
