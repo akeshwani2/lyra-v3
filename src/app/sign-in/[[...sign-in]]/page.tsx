@@ -116,7 +116,8 @@ export default function Page() {
             {/* Right side - Sign in component */}
             <div className='flex flex-col gap-4 sm:items-center sm:justify-center min-w-[400px] mb-10'>
               <SignUp 
-                afterSignUpUrl={"/tasks"}
+                afterSignUpUrl="/tasks"
+                redirectUrl="/tasks"
                 appearance={{
                   baseTheme: dark,
                   variables: {

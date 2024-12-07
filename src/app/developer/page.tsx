@@ -97,7 +97,7 @@ export default function Page() {
               </h1>
 
               {/* Added TypeAnimation for role */}
-              <div className="text-xl text-center sm:text-xl pb-4 md:text-2xl text-white/80">
+              <div className="text-xl text-center sm:text-xl pb-4 pt-1 md:text-2xl text-white/80">
                 <TypeAnimation
                   sequence={[
                     'Full Stack Developer',
