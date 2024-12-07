@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, RefObject } from 'react';
 import { useMotionValue, useMotionTemplate } from 'framer-motion';
 import Header from '@/components/ui/Header';
-import { SignIn } from '@clerk/nextjs'
+import { SignIn, SignUp } from '@clerk/nextjs'
 import { dark } from '@clerk/themes';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -92,7 +92,7 @@ export default function Page() {
             {/* Left side */}
             <div className='flex flex-col gap-5'>
               <h1 className="text-3xl sm:text-6xl md:text-[120px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center sm:pb-2 md:pb-5 lg:pb-7 sm:pt-4">
-                Sign in to Lyra
+                Join Lyra today!
               </h1>
               <div className="h-24">
                 <p className="text-white/70 text-2xl text-center tracking-tight">              
@@ -115,8 +115,8 @@ export default function Page() {
 
             {/* Right side - Sign in component */}
             <div className='flex flex-col gap-4 sm:items-center sm:justify-center min-w-[400px] mb-10'>
-              <SignIn 
-                afterSignInUrl={"/tasks"}
+              <SignUp 
+                afterSignUpUrl={"/tasks"}
                 appearance={{
                   baseTheme: dark,
                   variables: {

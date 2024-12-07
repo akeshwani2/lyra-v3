@@ -901,7 +901,7 @@ function KanbanBoard() {
                 </div>
 
                 {showScrollButtons && (
-                    <div className="flex justify-center gap-4 py-4 sticky bottom-4">
+                    <div className="flex justify-center gap-4 pt-10 sticky bottom-4">
                         <Button
                             variant="ghost"
                             size="icon"
