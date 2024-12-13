@@ -93,6 +93,27 @@ export default function ChangelogPage() {
 
           {/* Changelog Entries */}
           <div className="space-y-36">
+          <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+              <div className="space-y-6">
+                <time className="block text-base text-white/50">
+                  December 13, 2024
+                </time>
+                <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text ">
+                  New UI for the tasks page
+                </h2>
+                <p className="text-white/70 leading-relaxed">
+                  I completely redesigned the tasks page to make it more modern and user-friendly. The calendar now shows all of your future assignments. The "Upload Syllabus" button will not work just yet, but it will in the future.
+                </p>
+              </div>
+              <div
+                className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
+                onClick={() => setSelectedImage(productImage.src)}
+              >
+                <Image src={productImage.src} alt="ScribeUIImage" width={800} height={600} />
+              </div>
+            </article>
+            <hr className="border-t border-white/20 my-12" />
+
             <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">

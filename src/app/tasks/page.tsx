@@ -2,7 +2,7 @@
 import KanbanBoard from '@/components/ui/KanbanBoard'
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
-
+import TasksPage2 from '@/components/ui/TasksPage2'
 const TasksPage = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -52,7 +52,7 @@ const TasksPage = () => {
 
   return (
     <div className='h-screen overflow-hidden text-white text-2xl font-bold bg-zinc-950'>
-      <KanbanBoard />
+      <TasksPage2 />  
     </div>
   )
 }

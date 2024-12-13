@@ -33,7 +33,7 @@ const testimonials = [
     avatarImg: avatar1,
   },
   {
-    text: "“Since I began using Lyra, my time management has improved remarkably.”",
+    text: "“Absolutely love the design and the ease of use. It's a game changer for me and my friends.”",
     name: "Alec Whitten",
     title: "Upcoming student @ MIT",
     avatarImg: avatar4,

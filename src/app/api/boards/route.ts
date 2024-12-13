@@ -1,9 +1,9 @@
 import { prisma } from '@/app/lib/prisma'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 
-// Helper function to get existing board or create new one
 async function getOrCreateBoard(userId: string) {
+    // First try to find an existing board for this user
     let board = await prisma.board.findFirst({
         where: { userId },
         include: { 
@@ -11,30 +11,56 @@ async function getOrCreateBoard(userId: string) {
                 include: {
                     cards: {
                         orderBy: {
-                            order: 'asc'  // Order cards within columns
+                            order: 'asc'
                         }
                     }
                 },
                 orderBy: {
-                    order: 'asc'  // Order columns by position
+                    order: 'asc'
                 }
             }
         }
     });
 
-    if (!board) {
-        board = await prisma.board.create({
-            data: {
-                title: "My First Board!",
-                userId,
-            },
-            include: { 
-                columns: {
-                    include: {
-                        cards: true
+    // If no board exists or if it has no columns, create a new one with columns
+    if (!board || board.columns.length === 0) {
+        // Use transaction to ensure atomicity
+        board = await prisma.$transaction(async (tx) => {
+            // Create the board
+            const newBoard = await tx.board.create({
+                data: {
+                    title: "My Tasks",
+                    userId,
+                }
+            });
+
+            // Create default columns
+            await tx.column.createMany({
+                data: [
+                    { title: 'Todo', order: 0, boardId: newBoard.id },
+                    { title: 'In Progress', order: 1, boardId: newBoard.id },
+                    { title: 'Completed', order: 2, boardId: newBoard.id }
+                ]
+            });
+
+            // Return the complete board with columns
+            return await tx.board.findFirst({
+                where: { id: newBoard.id },
+                include: {
+                    columns: {
+                        include: {
+                            cards: {
+                                orderBy: {
+                                    order: 'asc'
+                                }
+                            }
+                        },
+                        orderBy: {
+                            order: 'asc'
+                        }
                     }
                 }
-            }
+            });
         });
     }
 
@@ -44,118 +70,47 @@ async function getOrCreateBoard(userId: string) {
 export async function GET() {
     try {
         const { userId } = await auth();
-        console.log("User ID:", userId);
-
         if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         const board = await getOrCreateBoard(userId);
-        console.log("Board:", board);
         return NextResponse.json(board);
     } catch (error) {
         console.error("Error:", error);
-        return NextResponse.json(
-            { error: "Error loading board" },
-            { status: 500 });
+        return NextResponse.json({ 
+            error: "Error fetching/creating board",
+            details: error instanceof Error ? error.message : "Unknown error"
+        }, { status: 500 });
     }
 }
 
-// ... existing imports and getOrCreateBoard function ...
-
-export async function POST() {
-    try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        const board = await getOrCreateBoard(userId);
-
-        // Create new column and immediately use it in the query
-        await prisma.column.create({
-            data: {
-                title: "New Column",
-                order: board.columns.length,
-                boardId: board.id
-            }
-        });
-
-        // Get updated board with all columns and cards
-        const updatedBoard = await prisma.board.findUnique({
-            where: { id: board.id },
-            include: { 
-                columns: {
-                    include: {
-                        cards: {
-                            orderBy: {
-                                order: 'asc'
-                            }
-                        }
-                    },
-                    orderBy: {
-                        order: 'asc'
-                    }
-                }
-            }
-        });
-
-        return NextResponse.json(updatedBoard);
-    } catch (error) {
-        console.error("Error:", error);
-        return NextResponse.json(
-            { error: "Error creating column" }, 
-            { status: 500 }
-        );
-    }
-}
-
-export async function PATCH(request: NextRequest) {
+export async function POST(request: Request) {
     try {
         const { userId } = await auth();
         if (!userId) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 }
-                
-            );
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         const { title } = await request.json();
-        
-        // Get the current board
-        const board = await prisma.board.findFirst({
-            where: { userId }
-        });
 
-        if (!board) {
-            return NextResponse.json({ error: "Board not found" }, { status: 404 });
+        // Use the same getOrCreateBoard function to ensure consistency
+        const board = await getOrCreateBoard(userId);
+        
+        // Update the board title if provided
+        if (title) {
+            await prisma.board.update({
+                where: { id: board?.id },
+                data: { title }
+            });
         }
 
-        // Update the board title
-        const updatedBoard = await prisma.board.update({
-            where: { id: board.id },
-            data: { title },
-            include: {
-                columns: {
-                    include: {
-                        cards: {
-                            orderBy: { order: 'asc' }
-                        }
-                    },
-                    orderBy: { order: 'asc' }
-                }
-            }
-        });
-
-        return NextResponse.json(updatedBoard);
+        return NextResponse.json(board);
     } catch (error) {
         console.error("Error:", error);
-        return NextResponse.json({ error: "Error updating board title" }, { status: 500 });
+        return NextResponse.json({ 
+            error: "Error creating board",
+            details: error instanceof Error ? error.message : "Unknown error"
+        }, { status: 500 });
     }
 }

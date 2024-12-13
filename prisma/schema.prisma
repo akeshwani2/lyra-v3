@@ -9,11 +9,11 @@ datasource db {
 
 model Board {
   id        String   @id @default(cuid())
-  title     String
+  title     String?
   userId    String
+  columns   Column[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  columns   Column[] @relation("BoardToColumns")
 }
 
 model Column {
@@ -21,12 +21,10 @@ model Column {
   title     String
   order     Int
   boardId   String
+  board     Board    @relation(fields: [boardId], references: [id])
+  cards     Card[]   @relation("ColumnToCards")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  cards     Card[]   @relation("ColumnToCards")
-  board     Board    @relation("BoardToColumns", fields: [boardId], references: [id], onDelete: Cascade)
-
-  @@index([boardId])
 }
 
 model Card {
@@ -47,6 +45,41 @@ model GenNotes {
   userId    String
   title     String
   content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String       @id @default(cuid())
+  name        String
+  color       String
+  userId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  assignments Assignment[]
+
+  @@index([userId])
+}
+
+model Assignment {
+  id        String   @id @default(cuid())
+  title     String
+  dueDate   String
+  type      String
+  courseId  String
+  userId    String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([userId])
+}
+
+model QuickNotes {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  userId    String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

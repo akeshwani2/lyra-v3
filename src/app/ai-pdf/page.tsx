@@ -115,26 +115,28 @@ export default function AiPdf() {
   return (
     <>
         <UserSection />
-      <div className="flex flex-col items-center bg-zinc-950 justify-center min-h-screen">
-        <h1
-          className="bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text text-5xl font-bold"
-          style={{ lineHeight: "1.2" }}
-        >
-          Chat with any PDF
-        </h1>
-        <p className="text-xl text-gray-400 mt-4 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
-          <TypeAnimation
-            sequence={[
-              "Effortlessly Chat with Your PDFs Using Advanced AI Technology",
-              2000,
-              "Ask Questions, Get Answers, and Explore Your PDFs with Ease",
-              2000,
-            ]}
-            wrapper="span"
-            speed={75}
-            repeat={Infinity}
-          />
-        </p>
+      <div className="flex flex-col items-center bg-gradient-to-b from-zinc-950 to-black justify-center min-h-screen p-6">
+        <div className="max-w-4xl text-center space-y-6">
+          <h1 className="text-6xl font-bold tracking-tight">
+            <span className="bg-gradient-to-r from-violet-400 to-blue-400 text-transparent bg-clip-text">
+              Chat with any PDF
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-400 font-light">
+            <TypeAnimation
+              sequence={[
+                "Effortlessly analyze documents using AI",
+                2000,
+                "Get instant answers from your PDFs",
+                2000,
+              ]}
+              wrapper="span"
+              speed={50}
+              repeat={Infinity}
+            />
+          </p>
+        </div>
 
         {!isLoading && hasChats && previewMessages.length > 0 && (
           <PreviousSessionPreview

@@ -21,26 +21,26 @@ const tabs = [
     title: "User-friendly dashboard",
     isNew: false,
     backgroundPositionX: 0,
-    backgroundPositionY: 10,
-    backgroundSizeX: 130,
+    backgroundPositionY: 0,
+    backgroundSizeX: 100,
   },
-
   {
     icon: "/assets/lottie/click.lottie",
-    title: "AI-Enhanced Notes",
+    title: "Organize your daily tasks",
     isNew: true,
-    backgroundPositionX: 100,
+    backgroundPositionX: 50,
     backgroundPositionY: 75,
-    backgroundSizeX: 140,
+    backgroundSizeX: 160,
   },
   {
     icon: "/assets/lottie/stars.lottie",
-    title: "Focus Areas",
+    title: "Track Assignments at a Glance",
     isNew: false,
-    backgroundPositionX: 19,
-    backgroundPositionY: 60,
-    backgroundSizeX: 135,
+    backgroundPositionX: 100,
+    backgroundPositionY: 0,
+    backgroundSizeX: 140,
   },
+
 ];
 
 const FeatureTab = (
