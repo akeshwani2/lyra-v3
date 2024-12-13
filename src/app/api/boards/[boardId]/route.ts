@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 
 export async function GET(
     request: Request,
-    { params }: { params: { boardId: string } }
+    { params }: { params: { boardId: string } } & { searchParams: { [key: string]: string | string[] | undefined } }
 ) {
     try {
         const { userId } = await auth();
