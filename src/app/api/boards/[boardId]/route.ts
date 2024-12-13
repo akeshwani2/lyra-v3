@@ -1,12 +1,9 @@
 import { prisma } from '@/app/lib/prisma'
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { NextRequest } from 'next/server'
 
-export async function GET(
-    request: NextRequest,
-    { params }: { params: { boardId: string } }
-) {
+export async function GET(request: Request) {
+    const boardId = request.url.split('/').pop();
     try {
         const { userId } = await auth();
         if (!userId) {
@@ -15,7 +12,7 @@ export async function GET(
 
         const board = await prisma.board.findFirst({
             where: {
-                id: params.boardId,
+                id: boardId,
                 userId
             },
             include: {
