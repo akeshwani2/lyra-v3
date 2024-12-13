@@ -1100,44 +1100,44 @@ const TasksPage = () => {
       }
     };
 
-    const handleFileUpload = async (file: File) => {
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('courseId', selectedCourse); // Make sure selectedCourse is defined
+    // const handleFileUpload = async (file: File) => {
+    //   try {
+    //     const formData = new FormData();
+    //     formData.append('file', file);
+    //     formData.append('courseId', selectedCourse); // Make sure selectedCourse is defined
 
-        const response = await axios.post('/api/syllabus/parse', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+    //     const response = await axios.post('/api/syllabus/parse', formData, {
+    //       headers: {
+    //         'Content-Type': 'multipart/form-data',
+    //       },
+    //     });
 
-        // Handle response...
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        toast.error('Failed to upload file');
-      }
-    };
+    //     // Handle response...
+    //   } catch (error) {
+    //     console.error('Error uploading file:', error);
+    //     toast.error('Failed to upload file');
+    //   }
+    // };
 
-    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+    // const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //   const file = e.target.files?.[0];
+    //   if (!file) return;
 
-      // Validate file type
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!allowedTypes.includes(file.type)) {
-        toast.error('Please upload a PDF or Word document');
-        return;
-      }
+    //   // Validate file type
+    //   const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    //   if (!allowedTypes.includes(file.type)) {
+    //     toast.error('Please upload a PDF or Word document');
+    //     return;
+    //   }
 
-      // Validate file size (10MB max)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('File size must be less than 10MB');
-        return;
-      }
+    //   // Validate file size (10MB max)
+    //   if (file.size > 10 * 1024 * 1024) {
+    //     toast.error('File size must be less than 10MB');
+    //     return;
+    //   }
 
-      handleFileUpload(file);
-    };
+    //   handleFileUpload(file);
+    // };
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
