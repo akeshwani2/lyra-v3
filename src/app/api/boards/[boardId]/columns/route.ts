@@ -1,10 +1,9 @@
 import { prisma } from '@/app/lib/prisma'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 
 export async function GET(
-    request: Request,
-    { params }: { params: { boardId: string } }
+    request: NextRequest
 ) {
     try {
         const { userId } = await auth();
@@ -12,10 +11,14 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        // Extract boardId from URL
+        const url = new URL(request.url);
+        const boardId = url.pathname.split('/').reverse()[1];
+
         // Add check for board ownership and include columns
         const board = await prisma.board.findFirst({
             where: {
-                id: params.boardId,
+                id: boardId,
                 userId
             },
             include: {
@@ -29,7 +32,7 @@ export async function GET(
 
         const columns = await prisma.column.findMany({
             where: {
-                boardId: params.boardId
+                boardId: boardId
             },
             include: {
                 cards: {
@@ -51,14 +54,17 @@ export async function GET(
 }
 
 export async function POST(
-    request: Request,
-    { params }: { params: { boardId: string } }
+    request: NextRequest
 ) {
     try {
         const { userId } = await auth();
         if (!userId) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+
+        // Extract boardId from URL
+        const url = new URL(request.url);
+        const boardId = url.pathname.split('/').reverse()[1];
 
         const { columns } = await request.json();
 
@@ -67,13 +73,13 @@ export async function POST(
             data: columns.map((col: { title: string; order: number }) => ({
                 title: col.title,
                 order: col.order,
-                boardId: params.boardId
+                boardId: boardId
             }))
         });
 
         // Fetch and return the created columns
         const allColumns = await prisma.column.findMany({
-            where: { boardId: params.boardId },
+            where: { boardId: boardId },
             include: { cards: true },
             orderBy: { order: 'asc' }
         });

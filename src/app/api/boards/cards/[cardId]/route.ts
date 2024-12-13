@@ -2,21 +2,22 @@ import { prisma } from '@/app/lib/prisma'
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 
-export async function PATCH(
-    request: Request,
-    { params }: { params: { cardId: string } }
-) {
+export async function PATCH(request: Request) {
     try {
         const { userId } = await auth();
         if (!userId) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        // Extract cardId from URL
+        const url = new URL(request.url);
+        const cardId = url.pathname.split('/').pop() || '';
+
         const { columnId, targetCardId, position, content } = await request.json();
 
         // First get the current card to verify ownership
         const currentCard = await prisma.card.findUnique({
-            where: { id: params.cardId },
+            where: { id: cardId },
             include: {
                 column: {
                     include: {
@@ -61,7 +62,7 @@ export async function PATCH(
 
         // Update the card
         const updatedCard = await prisma.card.update({
-            where: { id: params.cardId },
+            where: { id: cardId },
             data: {
                 columnId: column.id,
                 order: newOrder,
@@ -73,7 +74,7 @@ export async function PATCH(
         await prisma.card.updateMany({
             where: {
                 columnId: column.id,
-                NOT: { id: params.cardId },
+                NOT: { id: cardId },
                 order: { gte: newOrder }
             },
             data: {
@@ -91,18 +92,19 @@ export async function PATCH(
     }
 }
 
-export async function DELETE(
-    request: Request,
-    { params }: { params: { cardId: string } }
-) {
+export async function DELETE(request: Request) {
     try {
         const { userId } = await auth();
         if (!userId) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        // Extract cardId from URL
+        const url = new URL(request.url);
+        const cardId = url.pathname.split('/').pop() || '';
+
         await prisma.card.delete({
-            where: { id: params.cardId }
+            where: { id: cardId }
         });
 
         return NextResponse.json({ success: true });

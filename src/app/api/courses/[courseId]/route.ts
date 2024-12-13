@@ -2,15 +2,16 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/app/lib/prisma";
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { courseId: string } }
-) {
+export async function PATCH(req: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Extract courseId from URL
+    const url = new URL(req.url);
+    const courseId = url.pathname.split('/').pop() || '';
 
     const body = await req.json();
     const { name, color } = body;
@@ -24,7 +25,7 @@ export async function PATCH(
 
     const course = await prisma.course.update({
       where: {
-        id: params.courseId,
+        id: courseId,
         userId,
       },
       data: {
@@ -42,27 +43,28 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { courseId: string } }
-) {
+export async function DELETE(req: Request) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Extract courseId from URL
+    const url = new URL(req.url);
+    const courseId = url.pathname.split('/').pop() || '';
+
     // First delete all assignments associated with this course
     await prisma.assignment.deleteMany({
       where: {
-        courseId: params.courseId,
+        courseId: courseId,
       },
     });
 
     // Then delete the course
     const deletedCourse = await prisma.course.delete({
       where: {
-        id: params.courseId,
+        id: courseId,
         userId,
       },
     });

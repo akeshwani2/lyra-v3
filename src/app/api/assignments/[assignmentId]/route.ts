@@ -1,10 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { assignmentId: string } }
+  req: NextRequest
 ) {
   try {
     const { userId } = await auth();
@@ -15,6 +14,10 @@ export async function PATCH(
     const body = await req.json();
     const { title, dueDate, type, courseId } = body;
 
+    // Extract assignmentId from the URL
+    const url = new URL(req.url);
+    const assignmentId = url.pathname.split('/').pop() || '';
+
     // Validate required fields
     if (!title || !dueDate || !type || !courseId) {
       return new NextResponse('Missing required fields', { status: 400 });
@@ -23,7 +26,7 @@ export async function PATCH(
     // Verify that both the assignment and the new course belong to the user
     const assignment = await prisma.assignment.findFirst({
       where: {
-        id: params.assignmentId,
+        id: assignmentId,
         userId
       }
     });
@@ -46,7 +49,7 @@ export async function PATCH(
     // Update the assignment
     const updatedAssignment = await prisma.assignment.update({
       where: {
-        id: params.assignmentId,
+        id: assignmentId,
         userId
       },
       data: {
@@ -76,8 +79,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { assignmentId: string } }
+  request: NextRequest
 ) {
   try {
     const { userId } = await auth();
@@ -85,10 +87,14 @@ export async function DELETE(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
+    // Extract assignmentId from the URL
+    const url = new URL(request.url);
+    const assignmentId = url.pathname.split('/').pop() || '';
+
     // Verify the assignment belongs to the user
     const assignment = await prisma.assignment.findFirst({
       where: {
-        id: params.assignmentId,
+        id: assignmentId,
         userId
       }
     });
@@ -100,7 +106,7 @@ export async function DELETE(
     // Delete the assignment
     const deletedAssignment = await prisma.assignment.delete({
       where: {
-        id: params.assignmentId,
+        id: assignmentId,
         userId
       }
     });

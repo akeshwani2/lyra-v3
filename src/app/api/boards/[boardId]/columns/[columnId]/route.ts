@@ -1,10 +1,10 @@
 import { prisma } from '@/app/lib/prisma'
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
+import { NextRequest } from 'next/server'
 
 export async function PATCH(
-    request: Request,
-    { params }: { params: { columnId: string } }
+    request: NextRequest
 ) {
     try {
         const { userId } = await auth();
@@ -12,12 +12,16 @@ export async function PATCH(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        // Extract columnId from URL
+        const url = new URL(request.url);
+        const columnId = url.pathname.split('/').reverse()[1];
+
         const { title, order } = await request.json();
 
         // If changing order, update other columns' orders
         if (order !== undefined) {
             const currentColumn = await prisma.column.findUnique({
-                where: { id: params.columnId }
+                where: { id: columnId }
             });
 
             if (currentColumn) {
@@ -30,7 +34,7 @@ export async function PATCH(
                                 lte: order
                             },
                             NOT: {
-                                id: params.columnId
+                                id: columnId
                             }
                         },
                         data: {
@@ -46,7 +50,7 @@ export async function PATCH(
                                 lt: currentColumn.order
                             },
                             NOT: {
-                                id: params.columnId
+                                id: columnId
                             }
                         },
                         data: {
@@ -59,7 +63,7 @@ export async function PATCH(
 
         // Update the column
         const updatedColumn = await prisma.column.update({
-            where: { id: params.columnId },
+            where: { id: columnId },
             data: {
                 title: title?.trim() || undefined,
                 order: order !== undefined ? order : undefined
@@ -81,8 +85,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-    request: Request,
-    { params }: { params: { columnId: string } }
+    request: NextRequest
 ) {
     try {
         const { userId } = await auth();
@@ -90,9 +93,13 @@ export async function DELETE(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        // Extract columnId from URL
+        const url = new URL(request.url);
+        const columnId = url.pathname.split('/').reverse()[1];
+
         // Get the column to be deleted
         const columnToDelete = await prisma.column.findUnique({
-            where: { id: params.columnId }
+            where: { id: columnId }
         });
 
         if (!columnToDelete) {
@@ -101,7 +108,7 @@ export async function DELETE(
 
         // Delete the column and its cards (cascade delete should handle cards)
         await prisma.column.delete({
-            where: { id: params.columnId }
+            where: { id: columnId }
         });
 
         // Update order of remaining columns
