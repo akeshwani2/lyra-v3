@@ -1,10 +1,11 @@
 import { prisma } from '@/app/lib/prisma'
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
+import { NextRequest } from 'next/server'
 
 export async function GET(
-    request: Request,
-    { params }: { params: { boardId: string } } & { searchParams: { [key: string]: string | string[] | undefined } }
+    request: NextRequest,
+    { params }: { params: { boardId: string } }
 ) {
     try {
         const { userId } = await auth();
@@ -12,23 +13,32 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const columns = await prisma.column.findMany({
+        const board = await prisma.board.findFirst({
             where: {
-                boardId: params.boardId
+                id: params.boardId,
+                userId
             },
             include: {
-                cards: {
+                columns: {
+                    include: {
+                        cards: {
+                            orderBy: {
+                                order: 'asc'
+                            }
+                        }
+                    },
                     orderBy: {
                         order: 'asc'
                     }
                 }
-            },
-            orderBy: {
-                order: 'asc'
             }
         });
 
-        return NextResponse.json(columns);
+        if (!board) {
+            return NextResponse.json({ error: "Board not found" }, { status: 404 });
+        }
+
+        return NextResponse.json(board.columns);
     } catch (error) {
         console.error("Error:", error);
         return NextResponse.json({ error: "Error fetching columns" }, { status: 500 });
