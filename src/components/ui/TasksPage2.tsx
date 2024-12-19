@@ -96,6 +96,18 @@ interface ParsedAssignment {
   weight: number | null;
 }
 
+// Add this shared color palette at the top of the file, outside any components
+const COURSE_COLORS = [
+  '#8B5CF6', // Purple
+  '#3B82F6', // Blue
+  '#10B981', // Emerald
+  '#F59E0B', // Amber
+  '#EF4444', // Red
+  '#F5F5F5', // Pearl White
+  '#EC4899', // Pink
+  '#6366F1', // Indigo
+];
+
 const TasksPage = () => {
   const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
@@ -544,23 +556,11 @@ const TasksPage = () => {
 
   const AddCourseModal = () => {
     const [courseName, setCourseName] = useState("");
-    const [selectedColor, setSelectedColor] = useState(
-      `hsl(${Math.random() * 360}, 70%, 50%)`
-    );
+    const [selectedColor, setSelectedColor] = useState(`hsl(${Math.random() * 360}, 70%, 50%)`);
     const [recentlyAdded, setRecentlyAdded] = useState<Course[]>([]);
 
-    const colors = [
-      "hsl(170, 70%, 50%)", // Teal
-      "hsl(100, 70%, 50%)", // Green
-      "hsl(30, 70%, 50%)",  // Orange
-      "hsl(240, 70%, 50%)", // Indigo
-      "hsl(280, 70%, 50%)", // Violet
-      "hsl(190, 70%, 50%)", // Sky Blue
-      "hsl(150, 70%, 50%)", // Emerald
-      "hsl(60, 70%, 50%)",  // Yellow
-      "hsl(330, 70%, 50%)", // Pink
-      "hsl(220, 70%, 50%)", // Royal Blue
-    ];
+    // Minimal, carefully chosen color palette
+    const colors = COURSE_COLORS;
 
     // Add ref for the modal content
     const modalRef = useRef<HTMLDivElement>(null);
@@ -641,23 +641,23 @@ const TasksPage = () => {
               />
             </div>
 
-            {/* Color selection */}
+            {/* Minimalistic color selection */}
             <div className="space-y-2 mb-8">
-              <label className="text-sm text-zinc-400">Course Color</label>
-              <div className="flex gap-2 flex-wrap">
+              <label className="text-sm text-zinc-400">Color</label>
+              <div className="flex items-center gap-4">
                 {colors.map((color) => (
                   <button
                     key={color}
                     type="button"
                     onClick={() => setSelectedColor(color)}
-                    className={`w-8 h-8 rounded-full transition-transform 
-                      ${
-                        selectedColor === color
-                          ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-900 scale-110"
-                          : "hover:scale-110"
-                      }`}
-                    style={{ backgroundColor: color }}
-                  />
+                    className="group relative"
+                  >
+                    <div 
+                      className={`w-3 h-3 rounded-full transition-transform duration-200
+                        ${selectedColor === color ? 'scale-150 ring-2 ring-white/20' : 'hover:scale-125'}`}
+                      style={{ backgroundColor: color }}
+                    />
+                  </button>
                 ))}
               </div>
             </div>
@@ -955,20 +955,7 @@ const TasksPage = () => {
     );
     const modalRef = useRef<HTMLDivElement>(null);
 
-    const colors = [
-      "hsl(270, 70%, 50%)", // Purple
-      "hsl(200, 70%, 50%)", // Blue
-      "hsl(170, 70%, 50%)", // Teal
-      "hsl(100, 70%, 50%)", // Green
-      "hsl(30, 70%, 50%)",  // Orange
-      "hsl(240, 70%, 50%)", // Indigo
-      "hsl(280, 70%, 50%)", // Violet
-      "hsl(190, 70%, 50%)", // Sky Blue
-      "hsl(150, 70%, 50%)", // Emerald
-      "hsl(60, 70%, 50%)",  // Yellow
-      "hsl(330, 70%, 50%)", // Pink
-      "hsl(220, 70%, 50%)", // Royal Blue
-    ];
+    const colors = COURSE_COLORS;
 
     const handleBackdropClick = (e: React.MouseEvent) => {
       if (e.target === e.currentTarget) {
@@ -1019,21 +1006,21 @@ const TasksPage = () => {
             </div>
 
             <div className="space-y-2 mb-8">
-              <label className="text-sm text-zinc-400">Course Color</label>
-              <div className="flex gap-2 flex-wrap">
+              <label className="text-sm text-zinc-400">Color</label>
+              <div className="flex items-center gap-4">
                 {colors.map((color) => (
                   <button
                     key={color}
                     type="button"
                     onClick={() => setSelectedColor(color)}
-                    className={`w-8 h-8 rounded-full transition-transform 
-                      ${
-                        selectedColor === color
-                          ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-900 scale-110"
-                          : "hover:scale-110"
-                      }`}
-                    style={{ backgroundColor: color }}
-                  />
+                    className="group relative"
+                  >
+                    <div 
+                      className={`w-3 h-3 rounded-full transition-transform duration-200
+                        ${selectedColor === color ? 'scale-150 ring-2 ring-white/20' : 'hover:scale-125'}`}
+                      style={{ backgroundColor: color }}
+                    />
+                  </button>
                 ))}
               </div>
             </div>
