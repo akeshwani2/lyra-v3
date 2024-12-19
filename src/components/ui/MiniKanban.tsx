@@ -1,13 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Check, XCircle } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+interface Comment {
+  id: string;
+  content: string;
+  timestamp: Date;
+}
+
 interface Task {
   id: string;
   content: string;
   status: 'todo' | 'inProgress' | 'completed';
   order: number;
+  comments: Comment[];
 }
 
 interface Column {
@@ -42,6 +49,7 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
     taskId?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [initialFocus, setInitialFocus] = useState(true);
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -252,6 +260,7 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
             boardId,
             columnTitle,
             content: 'New Task'
+            
         });
 
         // Optimistically update UI
@@ -304,6 +313,7 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
   
     setEditingTaskId(taskId);
     setEditingContent(task.content);
+    setInitialFocus(true);
   };
 
   const handleSaveEdit = async (taskId: string) => {
@@ -333,14 +343,83 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
         setEditingTaskId(null);
         setEditingContent("");
     } catch (error) {
-        toast.error('Failed to update task');
+        toast.error('Failed to update task', {
+            style: {
+                background: "#18181b",
+                boxShadow: "none",
+                fontSize: "14px",
+                color: "white",
+                border: "1px solid rgba(255,255,255,0.1)",
+                textAlign: "center",
+            },
+        });
     }
 };
+
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      // Find which column the task is in
+      const task = [...todoTasks, ...inProgressTasks].find(t => t.id === taskId);
+      if (!task) return;
+
+      const response = await axios.patch(`/api/boards/cards/${taskId}`, {
+        columnId: 'Completed'
+      });
+
+      const updatedTask = response.data;
+
+      // Remove from other columns
+      setTodoTasks(prev => prev.filter(t => t.id !== taskId));
+      setInProgressTasks(prev => prev.filter(t => t.id !== taskId));
+      
+      // Add to completed column
+      setCompletedTasks(prev => [updatedTask, ...prev]);
+    } catch (error) {
+      console.error('Error completing task:', error);
+      toast.error('Failed to complete task', {
+        style: {
+          background: "#18181b",
+          boxShadow: "none",
+          fontSize: "14px",
+          color: "white",
+          border: "1px solid rgba(255,255,255,0.1)",
+          textAlign: "center",
+        },
+      });
+    }
+  };
+
+  const handleClearCompleted = async () => {
+    try {
+      // Delete all completed tasks
+      for (const task of completedTasks) {
+        await axios.delete(`/api/boards/cards/${task.id}`);
+      }
+      
+      // Update state to remove all completed tasks
+      setCompletedTasks([]);
+      
+      // Show success toast
+      toast.success('Tasks successfully cleared!', {
+        style: {
+          background: "#18181b",
+          boxShadow: "none",
+          fontSize: "14px",
+          color: "white",
+          border: "1px solid rgba(255,255,255,0.1)",
+          textAlign: "center",
+        },
+      });
+    } catch (error) {
+      console.error('Error clearing completed tasks:', error);
+      toast.error('Failed to clear completed tasks');
+    }
+  };
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-3 gap-3 h-[calc(100%-3rem)]">
-        {['Todo', 'In Progress', 'Completed'].map((title) => (
+        {['To Do', 'In Progress', 'Completed'].map((title) => (
           <div key={title} className="flex flex-col bg-zinc-800/50 rounded-lg border border-white/5 overflow-hidden">
             <div className="p-2 border-b border-white/10 flex items-center justify-between flex-shrink-0">
               <span className="text-sm font-medium">{title}</span>
@@ -356,10 +435,10 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
 
   return (
     <div className="grid grid-cols-3 gap-3 h-[calc(100%-3rem)]">
-      {/* Todo Column */}
+      {/* To Do Column */}
       <div className="flex flex-col bg-zinc-800/50 rounded-lg border border-white/5 overflow-hidden">
         <div className="p-2 border-b border-white/10 flex items-center justify-between flex-shrink-0">
-          <span className="text-sm font-medium">Todo</span>
+          <span className="text-sm font-medium">To Do</span>
           <button
             onClick={() => handleAddCard("todo")}
             className="p-1 hover:bg-white/10 rounded-lg transition-colors"
@@ -389,7 +468,10 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
                     <input
                       type="text"
                       value={editingContent}
-                      onChange={(e) => setEditingContent(e.target.value)}
+                      onChange={(e) => {
+                        setEditingContent(e.target.value);
+                        setInitialFocus(false);
+                      }}
                       onBlur={() => handleSaveEdit(task.id)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleSaveEdit(task.id);
@@ -400,17 +482,32 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
                       }}
                       className="bg-zinc-800 text-sm p-1 rounded-md outline-none focus:ring-1 focus:ring-purple-500/50 w-full"
                       autoFocus
+                      ref={(input) => {
+                        if (input && initialFocus) {
+                          input.focus();
+                          input.select();
+                          setInitialFocus(false);
+                        }
+                      }}
                     />
                   ) : (
                     <span className="text-sm">{task.content}</span>
                   )}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                    <button
+                  <button
                       onClick={() => handleEditTask(task.id)}
                       className="p-1 hover:text-purple-400"
                     >
                       <Pencil size={12} />
                     </button>
+                    <button
+                      onClick={() => handleCompleteTask(task.id)}
+                      className="p-1 hover:text-green-400"
+                      title="Mark as completed"
+                    >
+                      <Check size={14} />
+                    </button>
+
                     <button
                       onClick={() => handleDeleteTask(task.id)}
                       className="p-1 hover:text-red-400"
@@ -461,7 +558,10 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
                     <input
                       type="text"
                       value={editingContent}
-                      onChange={(e) => setEditingContent(e.target.value)}
+                      onChange={(e) => {
+                        setEditingContent(e.target.value);
+                        setInitialFocus(false);
+                      }}
                       onBlur={() => handleSaveEdit(task.id)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleSaveEdit(task.id);
@@ -472,16 +572,31 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
                       }}
                       className="bg-zinc-800 text-sm p-1 rounded-md outline-none focus:ring-1 focus:ring-purple-500/50 w-full"
                       autoFocus
+                      ref={(input) => {
+                        if (input && initialFocus) {
+                          input.focus();
+                          input.select();
+                          setInitialFocus(false);
+                        }
+                      }}
                     />
                   ) : (
                     <span className="text-sm">{task.content}</span>
                   )}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+
                     <button
                       onClick={() => handleEditTask(task.id)}
                       className="p-1 hover:text-purple-400"
                     >
                       <Pencil size={12} />
+                    </button>
+                    <button
+                      onClick={() => handleCompleteTask(task.id)}
+                      className="p-1 hover:text-green-400"
+                      title="Mark as completed"
+                    >
+                      <Check size={12} />
                     </button>
                     <button
                       onClick={() => handleDeleteTask(task.id)}
@@ -504,12 +619,26 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
       <div className="flex flex-col bg-zinc-800/50 rounded-lg border border-white/5 overflow-hidden">
         <div className="p-2 border-b border-white/10 flex items-center justify-between flex-shrink-0">
           <span className="text-sm font-medium">Completed</span>
-          <button
-            onClick={() => handleAddCard("completed")}
-            className="p-1 hover:bg-white/10 rounded-lg transition-colors"
-          >
-            <Plus size={14} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleClearCompleted}
+              className={`p-1 rounded-lg transition-colors ${
+                completedTasks.length > 0 
+                  ? "hover:bg-white/10 text-zinc-400 hover:text-red-400" 
+                  : "text-zinc-700 cursor-not-allowed"
+              }`}
+              title="Clear all completed tasks"
+              disabled={completedTasks.length === 0}
+            >
+              <XCircle size={14} />
+            </button>
+            <button
+              onClick={() => handleAddCard("completed")}
+              className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
         </div>
         <div 
           className="p-2 overflow-y-auto flex-1"
@@ -533,7 +662,10 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
                     <input
                       type="text"
                       value={editingContent}
-                      onChange={(e) => setEditingContent(e.target.value)}
+                      onChange={(e) => {
+                        setEditingContent(e.target.value);
+                        setInitialFocus(false);
+                      }}
                       onBlur={() => handleSaveEdit(task.id)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleSaveEdit(task.id);
@@ -544,9 +676,16 @@ const MiniKanban = ({ onTaskCountsChange }: MiniKanbanProps) => {
                       }}
                       className="bg-zinc-800 text-sm p-1 rounded-md outline-none focus:ring-1 focus:ring-purple-500/50 w-full"
                       autoFocus
+                      ref={(input) => {
+                        if (input && initialFocus) {
+                          input.focus();
+                          input.select();
+                          setInitialFocus(false);
+                        }
+                      }}
                     />
                   ) : (
-                    <span className="text-sm">{task.content}</span>
+                    <span className="text-sm line-through opacity-50">{task.content}</span>
                   )}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                     <button

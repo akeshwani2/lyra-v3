@@ -3,8 +3,7 @@ import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Trash2 } from 'lucide-react';
 import { Note } from '@/types';
-
-
+import { toast } from 'react-hot-toast';
 
 const NotesHistory = forwardRef(({ 
   onSelectNote, 
@@ -33,7 +32,6 @@ const NotesHistory = forwardRef(({
     }
   };
 
-  // Expose loadNotes function through ref
   useImperativeHandle(ref, () => ({
     loadNotes
   }));
@@ -45,11 +43,37 @@ const NotesHistory = forwardRef(({
   const handleDelete = async (noteId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     
-    try {
-      onDeleteNote(noteId);
-    } catch (error) {
-      console.error('Error deleting note:', error);
-    }
+    toast((t) => (
+      <div className="flex items-center gap-4">
+        <p className="text-sm">Delete this note?</p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              onDeleteNote(noteId);
+            }}
+            className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+          >
+            Delete
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      position: 'top-center',
+      style: {
+        background: 'rgba(0, 0, 0, 0.8)',
+        color: 'white',
+        backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      },
+    });
   };
 
   const handleNoteSelect = (note: Note) => {

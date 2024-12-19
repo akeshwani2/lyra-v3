@@ -630,10 +630,10 @@ const ScribePage = () => {
       setIsSaving(true);
 
       // Show confirmation dialog only once
-      if (!confirm("Are you sure you want to delete this note?")) {
-        setIsSaving(false);
-        return;
-      }
+      // if (!confirm("Are you sure you want to delete this note?")) {
+      //   setIsSaving(false);
+      //   return;
+      // }
 
       // Delete the note
       const deleteResponse = await fetch("/api/notes/delete", {
@@ -659,7 +659,13 @@ const ScribePage = () => {
         await notesHistoryRef.current.loadNotes();
       }
 
-      toast.success("Note deleted successfully");
+      toast.success("Note deleted successfully", {
+        style: {
+          background: "rgba(147, 51, 234, 0.1)",
+          border: "1px solid rgba(147, 51, 234, 0.2)",
+          color: "#fff",
+        },
+      });
     } catch (error) {
       console.error("Error deleting note:", error);
       toast.error("Failed to delete note");
@@ -742,7 +748,13 @@ const ScribePage = () => {
         await notesHistoryRef.current.loadNotes();
       }
 
-      toast.success("New note created");
+      toast.success("New note created", {
+        style: {
+          background: "rgba(147, 51, 234, 0.1)",
+          border: "1px solid rgba(147, 51, 234, 0.2)",
+          color: "#fff",
+        },
+      });
     } catch (error) {
       console.error("Error creating new note:", error);
       toast.error("Failed to create new note");

@@ -109,9 +109,9 @@ const PomodoroTimer = () => {
       <>
         {/* Minimized view */}
         {!isFullscreen && (
-          <div className="w-full h-full flex flex-col items-center justify-center space-y-8 p-6">
+          <div className="w-full h-full flex flex-col items-center justify-center space-y-6 p-6">
             {/* Title and description */}
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-1">
               <h2 className="text-xl font-semibold text-white tracking-tight">Eliminate Distractions</h2>
               <p className="text-zinc-400 text-sm tracking-tight">Start a focus session and get all of your work done</p>
             </div>

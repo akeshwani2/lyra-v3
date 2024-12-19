@@ -16,6 +16,7 @@ import {
   CheckCircle,
   MessageCircle,
   MessageCircleQuestionIcon,
+  Loader2,
 } from "lucide-react";
 import { dark } from "@clerk/themes";
 import { UserButton, useUser } from "@clerk/nextjs";
@@ -28,6 +29,7 @@ import { Toaster } from "react-hot-toast";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import PomodoroTimer from "@/components/ui/PomodoroTimer";
 import MiniKanban from "@/components/ui/MiniKanban";
+import PDFViewer from "@/components/ui/PDFViewer";
 
 interface Task {
   id: string;
@@ -82,6 +84,18 @@ interface Note {
   userId: string;
 }
 
+interface FileUploadProps {
+  onFileSelect: (file: File) => void;
+}
+
+// Add this interface
+interface ParsedAssignment {
+  title: string;
+  dueDate: string;
+  type: "Assignment" | "Exam" | "Quiz" | "Project" | "Other";
+  weight: number | null;
+}
+
 const TasksPage = () => {
   const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
@@ -125,6 +139,14 @@ const TasksPage = () => {
 
   // Add state for task modal
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+
+  // Add these state variables
+  const [parsedAssignments, setParsedAssignments] = useState<ParsedAssignment[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Add these state variables at the top of your component
+  const [pdfUrl, setPdfUrl] = useState<string>("");
+  const [selectedAssignments, setSelectedAssignments] = useState<Set<number>>(new Set());
 
   // Add this function at the beginning of your TasksPage component
   const initializeUserResources = async () => {
@@ -831,7 +853,7 @@ const TasksPage = () => {
     return (
       <div
         id="course-overview"
-        className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[42.5%] overflow-hidden flex flex-col"
+        className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[45%] overflow-hidden flex flex-col"
       >
         <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
           <h2 className="text-lg font-semibold tracking-tight">My Courses</h2>
@@ -902,11 +924,20 @@ const TasksPage = () => {
 
         {/* Edit Course Modal */}
         {editingCourse && !showDemoData && (
-          <EditCourseModal
-            course={editingCourse}
-            onClose={() => setEditingCourse(null)}
-            onSave={handleEditSave}
-          />
+          <div className="flex gap-4">
+            <div className="w-1/2">
+              <EditCourseModal
+                course={editingCourse}
+                onClose={() => setEditingCourse(null)}
+                onSave={handleEditSave}
+              />
+            </div>
+            {pdfUrl && (
+              <div className="w-1/2 h-[600px]">
+                <PDFViewer pdfUrl={pdfUrl} />
+              </div>
+            )}
+          </div>
         )}
       </div>
     );
@@ -1048,6 +1079,23 @@ const TasksPage = () => {
     const [selectedCourse, setSelectedCourse] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Add these state variables
+    const [parsedAssignments, setParsedAssignments] = useState<ParsedAssignment[]>([]);
+    const [selectedAssignments, setSelectedAssignments] = useState<Set<number>>(new Set());
+    const [isProcessing, setIsProcessing] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Add ref for the modal content
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    // Handle clicking outside
+    const handleBackdropClick = (e: React.MouseEvent) => {
+      // Check if click was on the backdrop (not the modal content)
+      if (e.target === e.currentTarget) {
+        setIsAddAssignmentOpen(false);
+      }
+    };
+
     const handleBulkImport = async () => {
       if (!bulkText.trim()) return;
 
@@ -1100,44 +1148,87 @@ const TasksPage = () => {
       }
     };
 
-    // const handleFileUpload = async (file: File) => {
-    //   try {
-    //     const formData = new FormData();
-    //     formData.append('file', file);
-    //     formData.append('courseId', selectedCourse); // Make sure selectedCourse is defined
+    const handleFileUpload = async (file: File) => {
+      if (!selectedCourse) {
+        toast.error('Please select a course first');
+        return;
+      }
 
-    //     const response = await axios.post('/api/syllabus/parse', formData, {
-    //       headers: {
-    //         'Content-Type': 'multipart/form-data',
-    //       },
-    //     });
+      setIsProcessing(true);
 
-    //     // Handle response...
-    //   } catch (error) {
-    //     console.error('Error uploading file:', error);
-    //     toast.error('Failed to upload file');
-    //   }
-    // };
+      try {
+        // Validate file type and size
+        const allowedTypes = ['application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+          toast.error('Please upload a PDF file');
+          return;
+        }
 
-    // const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //   const file = e.target.files?.[0];
-    //   if (!file) return;
+        if (file.size > 10 * 1024 * 1024) {
+          toast.error('File size must be less than 10MB');
+          return;
+        }
 
-    //   // Validate file type
-    //   const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    //   if (!allowedTypes.includes(file.type)) {
-    //     toast.error('Please upload a PDF or Word document');
-    //     return;
-    //   }
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('courseId', selectedCourse);
 
-    //   // Validate file size (10MB max)
-    //   if (file.size > 10 * 1024 * 1024) {
-    //     toast.error('File size must be less than 10MB');
-    //     return;
-    //   }
+        const response = await axios.post('/api/syllabus/parse', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
-    //   handleFileUpload(file);
-    // };
+        if (response.data.assignments && response.data.assignments.length > 0) {
+          setParsedAssignments(response.data.assignments);
+          setSelectedAssignments(new Set(response.data.assignments.map((_: ParsedAssignment, i: number) => i)));
+          
+          // Set the PDF URL from the response
+          if (response.data.fileUrl) {
+            setPdfUrl(response.data.fileUrl);
+          }
+
+          toast.success(`Found ${response.data.total} assignments!`, {
+            style: {
+              background: "#18181b",
+              boxShadow: "none",
+              fontSize: "14px",
+              color: "white",
+              border: "1px solid rgba(255,255,255,0.1)",
+            },
+          });
+        } else {
+          toast.error('No assignments found in the syllabus');
+        }
+
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        
+        if (axios.isAxiosError(error)) {
+          const errorMessage = error.response?.data?.error || 'Failed to process syllabus';
+          toast.error(errorMessage);
+        } else {
+          toast.error('Failed to process syllabus');
+        }
+      } finally {
+        setIsProcessing(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    };
+
+    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      console.log("File input change triggered"); // Debug log
+      const file = e.target.files?.[0];
+      if (!file) {
+        console.log("No file selected"); // Debug log
+        return;
+      }
+
+      console.log("File selected:", file.name, file.type); // Debug log
+      handleFileUpload(file);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -1184,9 +1275,26 @@ const TasksPage = () => {
       }
     };
 
+    // Add this helper function
+    const toggleAssignment = (index: number) => {
+      const newSelected = new Set(selectedAssignments);
+      if (newSelected.has(index)) {
+        newSelected.delete(index);
+      } else {
+        newSelected.add(index);
+      }
+      setSelectedAssignments(newSelected);
+    };
+
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-zinc-900 rounded-xl w-full max-w-2xl border border-white/10">
+      <div 
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        onClick={handleBackdropClick}  // Add click handler here
+      >
+        <div 
+          ref={modalRef}
+          className="bg-zinc-900 rounded-xl w-full max-w-md border border-white/10"
+        >
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">Add Assignments</h2>
@@ -1347,13 +1455,14 @@ const TasksPage = () => {
               </form>
             )}
 
-            {/* {importMethod === "upload" && (
+            {importMethod === "upload" && (
               <div className="space-y-4">
                 <div
                   className="border-2 border-dashed border-white/10 rounded-lg p-8
                   text-center hover:border-purple-500/50 transition-colors"
                 >
                   <input
+                    ref={fileInputRef}
                     type="file"
                     accept=".pdf,.doc,.docx"
                     onChange={handleFileInputChange}
@@ -1362,7 +1471,7 @@ const TasksPage = () => {
                   />
                   <label
                     htmlFor="syllabus-upload"
-                    className="cursor-pointer space-y-2"
+                    className="cursor-pointer space-y-2 block" // Added block display
                   >
                     <Upload className="w-8 h-8 mx-auto text-zinc-400" />
                     <p className="text-sm text-zinc-400">
@@ -1373,8 +1482,130 @@ const TasksPage = () => {
                     </p>
                   </label>
                 </div>
+
+                {/* Show processing state */}
+                {isProcessing && (
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <Loader2 className="w-8 h-8 animate-spin text-purple-500 mb-4" />
+                    <p className="text-zinc-400 text-sm">Processing syllabus...</p>
+                  </div>
+                )}
+
+                {/* Show parsed assignments if available */}
+                {!isProcessing && parsedAssignments.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <p className="text-sm text-zinc-400">
+                        Select assignments to import
+                      </p>
+                      <button
+                        onClick={() => {
+                          if (selectedAssignments.size === parsedAssignments.length) {
+                            setSelectedAssignments(new Set());
+                          } else {
+                            setSelectedAssignments(new Set(parsedAssignments.map((_: ParsedAssignment, i: number) => i)));
+                          }
+                        }}
+                        className="text-sm text-purple-400 hover:text-purple-300"
+                      >
+                        {selectedAssignments.size === parsedAssignments.length ? 
+                          "Deselect All" : "Select All"}
+                      </button>
+                    </div>
+
+                    <div className="max-h-[400px] overflow-y-auto space-y-2">
+                      {parsedAssignments.map((assignment, index) => (
+                        <div
+                          key={index}
+                          onClick={() => toggleAssignment(index)}
+                          className={`p-4 rounded-lg border transition-colors cursor-pointer
+                            ${
+                              selectedAssignments.has(index)
+                                ? "bg-purple-500/20 border-purple-500/40"
+                                : "bg-zinc-800/50 border-white/5 hover:bg-zinc-800"
+                            }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">{assignment.title}</span>
+                                <span className="text-xs text-zinc-400">
+                                  {new Date(assignment.dueDate).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-purple-400">{assignment.type}</span>
+                                {assignment.weight && (
+                                  <span className="text-xs text-zinc-500">
+                                    {assignment.weight} points
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4 border-t border-white/10">
+                      <span className="text-sm text-zinc-400">
+                        {selectedAssignments.size} of {parsedAssignments.length} selected
+                      </span>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => {
+                            setParsedAssignments([]);
+                            setSelectedAssignments(new Set());
+                            setImportMethod("manual");
+                          }}
+                          className="px-4 py-2 text-sm text-zinc-400"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (selectedAssignments.size === 0) {
+                              toast.error("Please select at least one assignment");
+                              return;
+                            }
+
+                            try {
+                              const selectedItems = Array.from(selectedAssignments).map(
+                                index => parsedAssignments[index]
+                              );
+
+                              await Promise.all(
+                                selectedItems.map(assignment =>
+                                  axios.post("/api/assignments", {
+                                    ...assignment,
+                                    courseId: selectedCourse,
+                                  })
+                                )
+                              );
+                              
+                              toast.success(`Added ${selectedItems.length} assignments!`);
+                              setIsAddAssignmentOpen(false);
+                            } catch (error) {
+                              console.error("Failed to import assignments:", error);
+                              toast.error("Failed to import assignments");
+                            }
+                          }}
+                          disabled={selectedAssignments.size === 0}
+                          className={`px-4 py-2 text-sm rounded-lg
+                            ${
+                              selectedAssignments.size > 0
+                                ? "bg-purple-500 hover:bg-purple-600"
+                                : "bg-zinc-700 cursor-not-allowed text-zinc-400"
+                            }`}
+                        >
+                          Import Selected
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            )} */}
+            )}
           </div>
         </div>
       </div>
@@ -1617,7 +1848,7 @@ const TasksPage = () => {
     return (
       <div
         id="upcoming-deadlines"
-        className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(57.5%-1.5rem)] overflow-hidden flex flex-col"
+        className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(55%-1.5rem)] overflow-hidden flex flex-col"
       >
         <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
           <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -1872,7 +2103,7 @@ const TasksPage = () => {
             {/* Study Sessions - Mini Kanban */}
             <div
               id="study-sessions"
-              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[42.5%] overflow-hidden flex flex-col"
+              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[45%] overflow-hidden flex flex-col"
             >
               <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
                 <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
@@ -1896,7 +2127,7 @@ const TasksPage = () => {
             {/* Calendar */}
             <div
               id="calendar-view"
-              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[42.5%] overflow-hidden flex flex-col"
+              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[45%] overflow-hidden flex flex-col"
             >
               <div className="flex justify-between items-center mb-4 flex-shrink-0 border-b border-white/10 pb-2">
                 <h2 className="text-lg font-semibold tracking-tight">Calendar</h2>
@@ -2032,7 +2263,7 @@ const TasksPage = () => {
             {/* Study Progress */}
             <div
               id="study-progress"
-              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(57.5%-1.5rem)] overflow-hidden flex flex-col"
+              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(55%-1.5rem)] overflow-hidden flex flex-col"
             >
               <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
                 <h2 className="text-lg font-semibold tracking-tight flex-shrink-0">
@@ -2138,7 +2369,7 @@ const QuickNotes = () => {
   }, [newNote]);
 
   return (
-    <div className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(57.5%-1.5rem)] overflow-hidden flex flex-col">
+    <div className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(55%-1.5rem)] overflow-hidden flex flex-col">
       <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
         <h2 className="text-lg font-semibold tracking-tight">Quick Notes</h2>
         {/* Replace the old status indicator with the new one */}
