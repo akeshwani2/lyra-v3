@@ -2127,7 +2127,7 @@ const TasksPage = () => {
             {/* Calendar */}
             <div
               id="calendar-view"
-              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[45%] overflow-hidden flex flex-col"
+              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 flex flex-col"
             >
               <div className="flex justify-between items-center mb-4 flex-shrink-0 border-b border-white/10 pb-2">
                 <h2 className="text-lg font-semibold tracking-tight">Calendar</h2>
@@ -2138,132 +2138,135 @@ const TasksPage = () => {
                   })}
                 </span>
               </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                  (day) => (
-                    <div key={`header-${day}`} className="text-zinc-400">
-                      {day[0]}
-                    </div>
-                  )
-                )}
-                {Array.from({
-                  length: new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth(),
-                    1
-                  ).getDay(),
-                }).map((_, i) => (
-                  <div key={`empty-${i}`} className="aspect-square" />
-                ))}
-                {Array.from({
-                  length: new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth() + 1,
-                    0
-                  ).getDate(),
-                }).map((_, i) => {
-                  const dayNumber = i + 1;
-                  const currentDate = new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth(),
-                    dayNumber
-                  )
-                    .toISOString()
-                    .split("T")[0];
-                  const isToday = dayNumber === new Date().getDate();
+              {/* Add a wrapper div with flex-1 to allow proper scaling */}
+              <div className="flex-1">
+                <div className="grid grid-cols-7 gap-1 text-center text-xs">
+                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                    (day) => (
+                      <div key={`header-${day}`} className="text-zinc-400">
+                        {day[0]}
+                      </div>
+                    )
+                  )}
+                  {Array.from({
+                    length: new Date(
+                      new Date().getFullYear(),
+                      new Date().getMonth(),
+                      1
+                    ).getDay(),
+                  }).map((_, i) => (
+                    <div key={`empty-${i}`} className="aspect-square" />
+                  ))}
+                  {Array.from({
+                    length: new Date(
+                      new Date().getFullYear(),
+                      new Date().getMonth() + 1,
+                      0
+                    ).getDate(),
+                  }).map((_, i) => {
+                    const dayNumber = i + 1;
+                    const currentDate = new Date(
+                      new Date().getFullYear(),
+                      new Date().getMonth(),
+                      dayNumber
+                    )
+                      .toISOString()
+                      .split("T")[0];
+                    const isToday = dayNumber === new Date().getDate();
 
-                  // Get all assignments for this date
-                  const dayAssignments = assignments.filter(
-                    (assignment) => assignment.dueDate === currentDate
-                  );
+                    // Get all assignments for this date
+                    const dayAssignments = assignments.filter(
+                      (assignment) => assignment.dueDate === currentDate
+                    );
 
-                  return (
-                    <Tooltip.Provider key={`day-${i}`}>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div
-                            onClick={() => setSelectedDate(currentDate)}
-                            className={`aspect-square flex flex-col items-center justify-center rounded relative
-                              ${
-                                isToday
-                                  ? "bg-purple-500/20 text-purple-400 font-semibold"
-                                  : "hover:bg-white/5"
-                              }
-                              ${
-                                dayAssignments.length > 0
-                                  ? "cursor-pointer"
-                                  : ""
-                              }
-                            `}
-                          >
-                            {dayNumber}
-                            {dayAssignments.length > 0 && (
-                              <div
-                                className="absolute bottom-1 w-1.5 h-1.5 rounded-full"
-                                style={
-                                  dayAssignments.length === 1
-                                    ? {
-                                        backgroundColor: courses.find(
-                                          (c) =>
-                                            c.id === dayAssignments[0].courseId
-                                        )?.color,
-                                      }
-                                    : { backgroundColor: "rgb(239, 68, 68)" }
-                                } // Changed to red-500
-                              />
-                            )}
-                          </div>
-                        </Tooltip.Trigger>
-                        {dayAssignments.length > 0 && (
-                          <Tooltip.Portal>
-                            <Tooltip.Content
-                              className="bg-zinc-900 px-3 py-2 rounded-lg border border-white/10 shadow-lg"
-                              sideOffset={5}
+                    return (
+                      <Tooltip.Provider key={`day-${i}`}>
+                        <Tooltip.Root>
+                          <Tooltip.Trigger asChild>
+                            <div
+                              onClick={() => setSelectedDate(currentDate)}
+                              className={`aspect-square flex flex-col items-center justify-center rounded relative
+                                ${
+                                  isToday
+                                    ? "bg-purple-500/20 text-purple-400 font-semibold"
+                                    : "hover:bg-white/5"
+                                }
+                                ${
+                                  dayAssignments.length > 0
+                                    ? "cursor-pointer"
+                                    : ""
+                                }
+                              `}
                             >
-                              <div className="text-xs">
-                                <p className="text-zinc-400 mb-1">
-                                  {dayAssignments.length}{" "}
-                                  {dayAssignments.length === 1
-                                    ? "assignment"
-                                    : "assignments"}
-                                </p>
-                                {dayAssignments.map((assignment, index) => {
-                                  const course = courses.find(
-                                    (c) => c.id === assignment.courseId
-                                  );
-                                  return (
-                                    <div
-                                      key={assignment.id}
-                                      className="flex items-center gap-2"
-                                    >
+                              {dayNumber}
+                              {dayAssignments.length > 0 && (
+                                <div
+                                  className="absolute bottom-1 w-1.5 h-1.5 rounded-full"
+                                  style={
+                                    dayAssignments.length === 1
+                                      ? {
+                                          backgroundColor: courses.find(
+                                            (c) =>
+                                              c.id === dayAssignments[0].courseId
+                                          )?.color,
+                                        }
+                                      : { backgroundColor: "rgb(239, 68, 68)" }
+                                  } // Changed to red-500
+                                />
+                              )}
+                            </div>
+                          </Tooltip.Trigger>
+                          {dayAssignments.length > 0 && (
+                            <Tooltip.Portal>
+                              <Tooltip.Content
+                                className="bg-zinc-900 px-3 py-2 rounded-lg border border-white/10 shadow-lg"
+                                sideOffset={5}
+                              >
+                                <div className="text-xs">
+                                  <p className="text-zinc-400 mb-1">
+                                    {dayAssignments.length}{" "}
+                                    {dayAssignments.length === 1
+                                      ? "assignment"
+                                      : "assignments"}
+                                  </p>
+                                  {dayAssignments.map((assignment, index) => {
+                                    const course = courses.find(
+                                      (c) => c.id === assignment.courseId
+                                    );
+                                    return (
                                       <div
-                                        className="w-1.5 h-1.5 rounded-full"
-                                        style={{
-                                          backgroundColor: course?.color,
-                                        }}
-                                      />
-                                      <span className="text-white">
-                                        {course?.name}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                              <Tooltip.Arrow className="fill-zinc-900" />
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        )}
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
-                  );
-                })}
+                                        key={assignment.id}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <div
+                                          className="w-1.5 h-1.5 rounded-full"
+                                          style={{
+                                            backgroundColor: course?.color,
+                                          }}
+                                        />
+                                        <span className="text-white">
+                                          {course?.name}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <Tooltip.Arrow className="fill-zinc-900" />
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          )}
+                        </Tooltip.Root>
+                      </Tooltip.Provider>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
             {/* Study Progress */}
             <div
               id="study-progress"
-              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(55%-1.5rem)] overflow-hidden flex flex-col"
+              className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(56.23%-1.5rem)] overflow-hidden flex flex-col"
             >
               <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
                 <h2 className="text-lg font-semibold tracking-tight flex-shrink-0">
