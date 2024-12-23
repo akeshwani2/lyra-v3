@@ -7,6 +7,7 @@ import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import {
   Save,
@@ -19,12 +20,25 @@ import {
   FeatherIcon,
   Wand2,
   Pencil,
+  Trash2,
+  Clock,
+  History,
+  MessageCircleQuestionIcon,
+  Loader2,
 } from "lucide-react";
 import NotesHistory from "@/components/ui/NotesHistory";
-import { Note } from "@/types";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import debounce from "lodash/debounce";
 import { TypeAnimation } from "react-type-animation";
+import { format } from "date-fns";
+
+// Add this type extension to the Note interface (you may need to update your types file)
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+}
 
 const ScribePage = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -37,6 +51,7 @@ const ScribePage = () => {
   const [processingStatus, setProcessingStatus] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const { user } = useUser();
+  const router = useRouter();
   const [audioData, setAudioData] = useState<number[]>(new Array(50).fill(0));
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -49,9 +64,11 @@ const ScribePage = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isNewNote, setIsNewNote] = useState(true);
   const [currentNoteId, setCurrentNoteId] = useState<string>();
-  const notesHistoryRef = useRef<{ loadNotes: () => Promise<void> } | null>(
-    null
-  );
+  const notesHistoryRef = useRef<{
+    loadNotes: () => Promise<void>;
+    setNotes: (notes: Note[]) => void;
+    setIsOpen: (isOpen: boolean) => void;
+  } | null>(null);
   const [isCancelled, setIsCancelled] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "saved" | "saving" | "error" | ""
@@ -59,6 +76,28 @@ const ScribePage = () => {
   const MAX_RECORDING_TIME = 300; // 5 minutes in seconds
   const [recordingTime, setRecordingTime] = useState(0);
   const recordingTimerRef = useRef<NodeJS.Timeout>();
+  const [notesHistory, setNotesHistory] = useState<Note[]>([]);
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
+
+  useEffect(() => {
+    const loadInitialNotes = async () => {
+      setIsLoadingNotes(true);
+      try {
+        const response = await fetch("/api/notes");
+        if (!response.ok) throw new Error("Failed to load notes");
+        const data = await response.json();
+        setNotesHistory(data);
+      } catch (error) {
+        console.error("Error loading initial notes:", error);
+        toast.error("Failed to load notes");
+      } finally {
+        setIsLoadingNotes(false);
+      }
+    };
+
+    loadInitialNotes();
+  }, []);
 
   // Disable the exhaustive-deps warning for this specific hook
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,12 +250,12 @@ const ScribePage = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.pause();
       setIsPaused(true);
-      
+
       // Stop the recording timer
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
       }
-      
+
       // Stop audio visualization
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -228,7 +267,7 @@ const ScribePage = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.resume();
       setIsPaused(false);
-      
+
       // Resume the recording timer
       recordingTimerRef.current = setInterval(() => {
         setRecordingTime((prevTime) => {
@@ -248,7 +287,7 @@ const ScribePage = () => {
           return prevTime + 1;
         });
       }, 1000);
-      
+
       // Resume audio visualization
       visualizeAudio();
     }
@@ -267,17 +306,20 @@ const ScribePage = () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      
+
       // Add check before closing AudioContext
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      if (
+        audioContextRef.current &&
+        audioContextRef.current.state !== "closed"
+      ) {
         audioContextRef.current.close();
       }
-      
+
       // Clean up stream tracks
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
-      
+
       setAudioData(new Array(50).fill(0));
     }
   };
@@ -371,6 +413,7 @@ const ScribePage = () => {
         body: JSON.stringify({
           title: newTitle,
           content: formattedNotes,
+          isRecorded: true,
         }),
       });
 
@@ -395,7 +438,13 @@ const ScribePage = () => {
         await notesHistoryRef.current.loadNotes();
       }
 
-      toast.success("Recording processed and saved successfully!");
+      toast.success("Notes generated successfully!", {
+        style: {
+          background: "rgba(147, 51, 234, 0.1)",
+          border: "1px solid rgba(147, 51, 234, 0.2)",
+          color: "#fff",
+        },
+      });
     } catch (err) {
       // Only show error if not cancelled
       if (!isCancelled) {
@@ -433,13 +482,13 @@ const ScribePage = () => {
   };
 
   const AudioVisualizer = ({ data }: { data: number[] }) => (
-    <div className="flex items-center justify-center h-12 gap-[2px] px-4">
-      {data.map((value, index) => (
+    <div className="flex items-center justify-center h-6 gap-[1px]">
+      {data.slice(0, 32).map((value, index) => (
         <div
           key={index}
-          className="w-1 bg-gradient-to-t from-purple-500 to-blue-500 rounded-full transition-all duration-[50ms]"
+          className="w-[2px] bg-gradient-to-t from-purple-500 to-blue-500 rounded-full transition-all duration-[50ms]"
           style={{
-            height: `${Math.max(4, (isPaused ? 4 : value * 100))}%`,
+            height: `${Math.max(2, isPaused ? 2 : value * 100)}%`,
             transform: `scaleY(${isPaused ? 1 : 1 + value * 0.5})`,
             opacity: isPaused ? 0.3 : 0.7 + value * 0.3,
           }}
@@ -596,7 +645,7 @@ const ScribePage = () => {
     }
   };
 
-  const resetNote = () => {
+  const resetNote = async () => {
     setNotes("");
     setTitle("");
     setCurrentNoteId(undefined);
@@ -604,6 +653,19 @@ const ScribePage = () => {
     setIsTitleSaved(false);
     setIsNewNote(true);
     setSavedTitle("");
+    
+    // Refresh notes list
+    setIsLoadingNotes(true);
+    try {
+      const response = await fetch("/api/notes");
+      if (!response.ok) throw new Error("Failed to load notes");
+      const data = await response.json();
+      setNotesHistory(data);
+    } catch (error) {
+      console.error("Error refreshing notes:", error);
+    } finally {
+      setIsLoadingNotes(false);
+    }
   };
 
   const handleSelectNote = (note: Note) => {
@@ -623,19 +685,55 @@ const ScribePage = () => {
       return;
     }
 
-    // Prevent multiple deletion attempts
-    if (isSaving) return;
+    // Create a promise that resolves based on user interaction with the toast
+    const userConfirmed = await new Promise((resolve) => {
+      toast(
+        (t) => (
+          <div className="flex flex-col gap-2">
+            <p className="font-medium text-white text-center">
+              Are you sure you want to delete this note?
+            </p>
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  resolve(true);
+                }}
+                className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-500 
+                       rounded-lg transition-colors duration-200"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  resolve(false);
+                }}
+                className="px-3 py-1 bg-gray-500/20 hover:bg-gray-500/30 text-gray-300 
+                       rounded-lg transition-colors duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: 5000, // 5 seconds
+          style: {
+            background: "rgba(0, 0, 0, 0.8)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: "0.75rem",
+            padding: "1rem",
+          },
+        }
+      );
+    });
+
+    if (!userConfirmed) return;
 
     try {
       setIsSaving(true);
 
-      // Show confirmation dialog only once
-      // if (!confirm("Are you sure you want to delete this note?")) {
-      //   setIsSaving(false);
-      //   return;
-      // }
-
-      // Delete the note
       const deleteResponse = await fetch("/api/notes/delete", {
         method: "DELETE",
         headers: {
@@ -647,6 +745,11 @@ const ScribePage = () => {
       if (!deleteResponse.ok) {
         throw new Error("Failed to delete note");
       }
+
+      // Update the notesHistory state immediately by filtering out the deleted note
+      setNotesHistory((prevNotes) =>
+        prevNotes.filter((note) => note.id !== noteIdToDelete)
+      );
 
       // Only reset if we're deleting the currently displayed note
       if (noteIdToDelete === currentNoteId) {
@@ -661,14 +764,25 @@ const ScribePage = () => {
 
       toast.success("Note deleted successfully", {
         style: {
-          background: "rgba(147, 51, 234, 0.1)",
-          border: "1px solid rgba(147, 51, 234, 0.2)",
+          background: "rgba(34, 197, 94, 0.1)",
+          border: "1px solid rgba(34, 197, 94, 0.2)",
           color: "#fff",
+          borderRadius: "0.75rem",
         },
+        position: "bottom-center", // Add this to center the toast
+        duration: 3000,
       });
     } catch (error) {
       console.error("Error deleting note:", error);
-      toast.error("Failed to delete note");
+      toast.error("Failed to delete note", {
+        style: {
+          background: "rgba(239, 68, 68, 0.1)",
+          border: "1px solid rgba(239, 68, 68, 0.2)",
+          color: "#fff",
+          borderRadius: "0.75rem",
+        },
+        duration: 3000,
+      });
     } finally {
       setIsSaving(false);
     }
@@ -725,6 +839,7 @@ const ScribePage = () => {
         body: JSON.stringify({
           title: newTitle,
           content: "",
+          isRecorded: false,
         }),
       });
 
@@ -781,8 +896,7 @@ const ScribePage = () => {
     }
 
     try {
-      setIsProcessing(true);
-      setProcessingStatus("Enhancing notes with AI...");
+      setIsEnhancing(true);
 
       const response = await fetch("/api/enhance-notes", {
         method: "POST",
@@ -822,15 +936,14 @@ const ScribePage = () => {
       console.error("Error enhancing notes:", error);
       toast.error("Failed to enhance notes");
     } finally {
-      setIsProcessing(false);
-      setProcessingStatus("");
+      setIsEnhancing(false);
     }
   };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -840,66 +953,56 @@ const ScribePage = () => {
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
       </div>
 
-      {/* Main content - add flex-col and min-h-screen */}
-      <div className="absolute inset-0 flex flex-col min-h-screen">
-        {/* Header bar - adjust the right padding and user button container */}
-        <div className="flex justify-between items-center w-full px-8 py-8">
+      {/* Main content - make this a flex container with h-screen */}
+      <div className="absolute inset-0 flex flex-col h-screen">
+        {/* Header bar - add flex-shrink-0 to prevent shrinking */}
+        <div className="flex justify-between items-center w-full px-8 py-8 flex-shrink-0">
           <h1 className="text-2xl sm:text-4xl pb-1 font-bold bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text pl-2">
             {savedTitle || "Scribe"}
           </h1>
 
-          <div className="flex items-center gap-8">
-            {notes && (
+          <div className="flex items-center gap-4">
+            {(currentNoteId || notes) && (
               <div className="relative flex gap-2">
-                {!isRecording ? (
-                  <>
-                    <Button
-                      onClick={() => {
-                        startRecording();
-                        resetNote();
-                      }}
-                      className="group relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
-                    >
-                      <span className="relative z-10 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-white rounded-full" />
-                        New Recording
-                      </span>
-                    </Button>
-                    <Button
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        await startNewNote();
-                      }}
-                      className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
-                    >
-                      <span className="relative z-10 flex items-center gap-2">
-                        <FeatherIcon className="w-4 h-4" />
-                        New Note
-                      </span>
-                    </Button>
-                  </>
-                ) : isPaused ? (
-                  <Button
-                    onClick={resumeRecording}
-                    className="bg-green-500/20 hover:bg-green-500/30 text-green-500 transition-all duration-300 px-6 py-2 rounded-lg flex items-center gap-2"
-                  >
-                    <Play className="w-4 h-4" />
-                    Resume
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={stopRecording}
-                    className="bg-red-500/20 hover:bg-red-500/30 text-red-500 transition-all duration-300 px-6 py-2 rounded-lg flex items-center gap-2"
-                  >
-                    <CircleDashed className="w-4 h-4 animate-spin" />
-                    Stop
-                  </Button>
-                )}
+                <Button
+                  onClick={() => {
+                    startRecording();
+                    resetNote();
+                  }}
+                  className="group relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-white rounded-full" />
+                    New Recording
+                  </span>
+                </Button>
+                <Button
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await startNewNote();
+                  }}
+                  className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <FeatherIcon className="w-4 h-4" />
+                    New Note
+                  </span>
+                </Button>
+                <Button
+                  onClick={() => notesHistoryRef.current?.setIsOpen(true)}
+                  className="group relative bg-white/5 hover:bg-white/10 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <History className="w-4 h-4" />
+                    History
+                  </span>
+                </Button>
               </div>
             )}
 
-            {/* Update user button container positioning */}
-            <div className="flex items-center gap-2 border border-white/15 rounded-xl px-2 md:right-8 flex items-center gap-2 z-10 tracking-tight">
+            {/* User button container */}
+            <div className="flex items-center gap-4">
+        
               <span className="bg-gradient-to-t from-zinc-600 tracking-tight via-zinc-300 to-white text-transparent bg-clip-text text-lg md:text-xl font-bold">
                 {user?.username || user?.firstName || ""}
               </span>
@@ -908,9 +1011,9 @@ const ScribePage = () => {
                 appearance={{
                   baseTheme: dark,
                   elements: {
-                    avatarBox: "w-8 h-8 md:w-10 md:h-10",
-                    userButtonTrigger: "p-1 md:p-2",
-                    userButtonPopoverCard: "min-w-[240px]",
+                    avatarBox: "w-10 h-10 rounded-lg ring-offset-0",
+                    userButtonTrigger: "p-0.5 rounded-lg",
+                    userButtonPopoverCard: "min-w-[240px] rounded-lg",
                   },
                 }}
               />
@@ -918,228 +1021,398 @@ const ScribePage = () => {
           </div>
         </div>
 
-        {/* Notes display - add loader */}
+        {/* Notes display - update with overflow-y-auto and flex-1 */}
         <div className="flex-1 overflow-y-auto px-4 pb-8">
           {isProcessing ? (
-            <div className="max-w-3xl w-full mx-auto mt-12 flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-              <div className="text-white/80 text-lg font-medium animate-pulse">
-                {processingStatus}
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
+                <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-lg font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+                    Feeding audio to AI...
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Converting your speech into structured notes
+                  </p>
+                </div>
               </div>
             </div>
           ) : currentNoteId || notes ? (
-            <div className="max-w-[109rem] w-full mx-auto h-full bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-white/10 flex flex-col">
-              <div className="flex flex-col gap-4 mb-6 flex-shrink-0">
-                {/* Title section - with actions aligned */}
-                <div className="flex items-center justify-between">
-                  {/* Title and edit button */}
-                  <div className="flex items-center justify-center gap-2">
-                    {isEditingTitle ? (
-                      <input
-                        type="text"
-                        value={title}
-                        onChange={handleTitleChange}
-                        onBlur={handleTitleBlur}
-                        onKeyDown={handleTitleKeyDown}
-                        placeholder="Enter title..."
-                        className="bg-transparent border-b border-purple-500/30 focus:border-purple-500 outline-none px-2 py-1 text-white placeholder:text-gray-400 transition-all duration-300 w-full max-w-[400px] text-2xl text-center items-center"
-                        autoFocus
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center gap-2">
-                        <h3
-                          className="text-white text-2xl font-medium text-center items-center cursor-pointer "
-                          onClick={() => {
-                            setIsEditingTitle(true);
-                            setIsTitleSaved(false);
-                          }}
-                        >
-                          {savedTitle || "Untitled Note"}
-                        </h3>
-                        <button
-                          onClick={() => {
-                            setIsEditingTitle(true);
-                            setIsTitleSaved(false);
-                          }}
-                          className="text-purple-400 hover:text-purple-300 transition-colors"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Right side actions */}
-                  <div className="flex items-center gap-4">
-                    {/* Auto-save status indicator */}
-                    <div className="text-sm">
-                      {autoSaveStatus === "saving" && (
-                        <div className="flex items-center gap-1 text-yellow-500">
-                          <CircleDashed className="w-3 h-3 animate-spin" />
-                          Saving...
-                        </div>
-                      )}
-                      {autoSaveStatus === "saved" && (
-                        <div className="flex items-center gap-1 text-green-500">
-                          <div className="w-2 h-2 rounded-full bg-green-500" />
-                          Saved
-                        </div>
-                      )}
-                      {autoSaveStatus === "error" && (
-                        <div className="flex items-center gap-1 text-red-500">
-                          <X className="w-3 h-3" />
-                          Error saving
+            <div className="relative pt-6">
+              <div className="max-w-[109rem] w-full mx-auto h-full bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-white/10 flex flex-col">
+                <div className="flex flex-col gap-4 mb-6 flex-shrink-0">
+                  {/* Title section - with actions aligned */}
+                  <div className="flex items-center justify-between">
+                    {/* Title and edit button */}
+                    <div className="flex items-center justify-center gap-2">
+                      {isEditingTitle ? (
+                        <input
+                          type="text"
+                          value={title}
+                          onChange={handleTitleChange}
+                          onBlur={handleTitleBlur}
+                          onKeyDown={handleTitleKeyDown}
+                          placeholder="Enter title..."
+                          className="bg-transparent border-b border-purple-500/30 focus:border-purple-500 outline-none px-2 py-1 text-white placeholder:text-gray-400 transition-all duration-300 w-full max-w-[400px] text-2xl text-center items-center"
+                          autoFocus
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center gap-2">
+                          <h3
+                            className="text-white text-2xl font-medium text-center items-center cursor-pointer "
+                            onClick={() => {
+                              setIsEditingTitle(true);
+                              setIsTitleSaved(false);
+                            }}
+                          >
+                            {savedTitle || "Untitled Note"}
+                          </h3>
+                          <button
+                            onClick={() => {
+                              setIsEditingTitle(true);
+                              setIsTitleSaved(false);
+                            }}
+                            className="text-purple-400 hover:text-purple-300 transition-colors"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
                         </div>
                       )}
                     </div>
 
-                    {/* Enhance button */}
-                    {notes && !isProcessing && (
-                      <Button
-                        onClick={enhanceNotes}
-                        className="group relative bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 transition-all duration-300 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(167,139,250,0.8)]"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">
-                          <Wand2 className="w-4 h-4" />
-                          Enhance with AI
-                        </span>
-                      </Button>
-                    )}
+                    {/* Right side actions */}
+                    <div className="flex items-center gap-4">
+                      {/* Auto-save status indicator */}
+                      <div className="text-sm">
+                        {autoSaveStatus === "saving" && (
+                          <div className="flex items-center gap-1 text-yellow-500">
+                            <CircleDashed className="w-3 h-3 animate-spin" />
+                            Saving...
+                          </div>
+                        )}
+                        {autoSaveStatus === "saved" && (
+                          <div className="flex items-center gap-1 text-green-500">
+                            <div className="w-2 h-2 rounded-full bg-green-500" />
+                            Saved
+                          </div>
+                        )}
+                        {autoSaveStatus === "error" && (
+                          <div className="flex items-center gap-1 text-red-500">
+                            <X className="w-3 h-3" />
+                            Error saving
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Enhance button */}
+                      {notes && !isProcessing && (
+                        <Button
+                          onClick={enhanceNotes}
+                          className="group relative bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 transition-all duration-300 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(167,139,250,0.8)]"
+                        >
+                          <span className="relative z-10 flex items-center gap-2">
+                            <Wand2 className="w-4 h-4" />
+                            Enhance with AI
+                          </span>
+                        </Button>
+                      )}
+                    </div>
                   </div>
+                </div>
+
+                <div className="prose prose-invert max-w-none flex-1 overflow-hidden">
+                  <RichTextEditor
+                    content={notes}
+                    onChange={handleNotesChange}
+                    noteId={currentNoteId}
+                  />
                 </div>
               </div>
 
-              <div className="prose prose-invert max-w-none flex-1 overflow-hidden">
-                <RichTextEditor
-                  content={notes}
-                  onChange={handleNotesChange}
-                  noteId={currentNoteId}
-                />
-              </div>
+              {/* NotesHistory with explicit z-index */}
+              <NotesHistory
+                ref={notesHistoryRef}
+                onSelectNote={handleSelectNote}
+                currentNoteId={currentNoteId}
+                onDeleteNote={handleDeleteNote}
+                className="z-50"
+              />
             </div>
           ) : (
-            // Welcome screen
-            <div className="max-w-3xl w-full mx-auto mt-48 flex flex-col items-center gap-8">
-              <div className="flex gap-8">
-                {/* Voice Recording Button */}
-                <div className="relative w-32 h-32">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full hover:opacity-50 animate-pulse"></div>
-                  <Image
-                    onClick={() => {
-                      if (isRecording) {
-                        stopRecording();
-                      } else {
-                        startRecording();
-                        resetNote();
-                      }
-                    }}
-                    src={isRecording ? "/circle-dashed.svg" : "/microphone.svg"}
-                    alt={isRecording ? "Recording" : "Microphone"}
-                    width={256}
-                    height={256}
-                    className="relative z-10 p-6 cursor-pointer transition-all duration-300 hover:scale-110"
-                  />
+            <div className="max-w-4xl w-full mx-auto mt-6">
+              {isLoadingNotes ? (
+                <div className="flex flex-col items-center justify-center gap-4 py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-500/50" />
+                  <p className="text-sm text-gray-500">Loading your notes...</p>
                 </div>
-
-                {/* Manual Notes Button */}
-                <div className="relative w-32 h-32">
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full hover:opacity-50 animate-pulse"></div>
-                  <div
-                    onClick={startNewNote}
-                    className="relative z-10 w-full h-full p-6 cursor-pointer transition-all duration-300 hover:scale-110 flex items-center justify-center"
-                  >
-                    <FeatherIcon className="w-16 h-16 text-white" />
+              ) : notesHistory.length > 0 ? (
+                <div className="w-full space-y-4">
+                  {/* Make the notes list container scrollable */}
+                  <div className="flex items-center justify-between mb-6 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 py-4">
+                    <h2 className="text-2xl font-semibold text-white/90">
+                      Recent Notes
+                    </h2>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          startRecording();
+                          resetNote();
+                        }}
+                        className="group relative bg-gradient-to-r from-purple-500 to-blue-500 
+                                 hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 
+                                 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
+                                 hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
+                      >
+                        <span className="relative z-10 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                          New Recording
+                        </span>
+                      </Button>
+                      <Button
+                        onClick={startNewNote}
+                        className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 
+                                 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 
+                                 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
+                                 hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
+                      >
+                        <span className="relative z-10 flex items-center gap-2">
+                          <FeatherIcon className="w-4 h-4" />
+                          New Note
+                        </span>
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Notes list will scroll within the container */}
+                  <div className="space-y-4">
+                    {notesHistory.map((note) => (
+                      <div
+                        key={note.id}
+                        className="group p-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 
+                                  transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div
+                            onClick={() => handleSelectNote(note)}
+                            className="flex-1 cursor-pointer flex items-center gap-2"
+                          >
+                            <h3 className="text-lg font-medium text-white/90 group-hover:text-white">
+                              {note.title}
+                            </h3>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsEditingTitle(true);
+                                setTitle(note.title);
+                                setCurrentNoteId(note.id);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                        text-green-400 hover:text-green-300 p-1 rounded-lg hover:bg-green-500/10"
+                              aria-label="Edit title"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteNote(note.id);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                        text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10"
+                              aria-label="Delete note"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-sm text-white/50">
+                              {format(new Date(note.createdAt), "MMM d, yyyy")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center space-y-8 max-w-3xl mx-auto">
+                  {/* Hero Section */}
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <div className="text-md font-bold text-gray-400 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
+                        Welcome to
+                      </div>
+                      <span className="bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] 
+                                  text-transparent bg-clip-text text-6xl font-bold block">
+                        Scribe
+                      </span>
+                      <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        Your AI-powered note-taking assistant. Record your thoughts, meetings, or lectures 
+                        and let AI transform them into well-structured notes.
+                      </p>
+                    </div>
 
-              <div className="text-center">
-                <div className="text-md font-bold text-gray-400 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
-                  Welcome to
+                    {/* Action Buttons */}
+                    <div className="flex gap-4 justify-center">
+                      <Button
+                        onClick={() => {
+                          startRecording();
+                          resetNote();
+                        }}
+                        className="group relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-violet-600 
+                                 hover:to-cyan-500 transition-all duration-300 ease-in-out rounded-xl px-6 py-3 
+                                 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)] duration-1000 hover:animate-pulse"
+                      >
+                        <span className="relative z-10 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                          Start Recording
+                        </span>
+                      </Button>
+
+                      <Button
+                        onClick={startNewNote}
+                        className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 
+                                 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 
+                                 ease-in-out rounded-xl px-6 py-3 text-base font-medium shadow-lg 
+                                 hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)] hover:animate-pulse duration-1000"
+                      >
+                        <span className="relative z-10 flex items-center gap-2">
+                          <FeatherIcon className="w-4 h-4" />
+                          New Note
+                        </span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Features Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                      <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
+                        <MessageCircleQuestionIcon className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Voice to Notes</h3>
+                      <p className="text-gray-400">Record your voice and watch as AI transforms it into well-structured, organized notes.</p>
+                    </div>
+
+                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
+                        <Wand2 className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2">AI Enhancement</h3>
+                      <p className="text-gray-400">Let AI help organize, format, and enhance your notes with additional context and structure.</p>
+                    </div>
+
+                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4">
+                        <History className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Note History</h3>
+                      <p className="text-gray-400">Access all your past notes with automatic saving and easy organization.</p>
+                    </div>
+                  </div>
+
+                  {/* Getting Started Guide */}
+                  <div className="text-left p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                    <h3 className="text-xl font-semibold text-white mb-4">Getting Started</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 text-gray-400">
+                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">1</div>
+                        <p>Click "Start Recording" to begin capturing your voice</p>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-400">
+                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">2</div>
+                        <p>Speak clearly into your microphone</p>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-400">
+                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">3</div>
+                        <p>Stop recording when finished and let AI process your notes</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <span className="bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-6xl mb-4 font-bold">
-                  Scribe
-                </span>
-                <p className="text-sm sm:text-xl text-gray-400 sm:pb-0 pt-4 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
-                  <TypeAnimation
-                    sequence={[
-                      "Record Lectures and Transform Them into Notes with AI Assistance",
-                      2000,
-                      "Enhance Your Notes with AI for Better Understanding and Clarity",
-                      2000,
-                      "Efficiently Organize Your Notes with AI-Powered Enhancements",
-                      2000,
-                    ]}
-                    wrapper="span"
-                    speed={75}
-                    repeat={Infinity}
-                  />
-                </p>
-              </div>
+              )}
             </div>
           )}
         </div>
       </div>
 
       {isRecording && (
-        <div className="absolute left-1/2 transform -translate-x-1/2 bottom-8 w-96 bg-black/20 backdrop-blur-lg rounded-2xl p-4 border border-white/10">
-          <div className="flex flex-col gap-4">
-            <AudioVisualizer data={audioData} />
-
-            <div className="flex flex-col gap-2">
-              <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                <div 
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-300"
-                  style={{ width: `${(recordingTime / MAX_RECORDING_TIME) * 100}%` }}
-                />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
+            {/* Audio visualizer and controls */}
+            <div className="flex items-center gap-4">
+              {/* Audio visualizer */}
+              <div className="w-32">
+                <AudioVisualizer data={audioData} />
+                <div className="w-full bg-white/10 rounded-full h-1 mt-1 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-300"
+                    style={{
+                      width: `${(recordingTime / MAX_RECORDING_TIME) * 100}%`,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="flex justify-between text-sm text-white/70">
-                <span>{formatTime(recordingTime)}</span>
-                <span className="text-red-400">Max {formatTime(MAX_RECORDING_TIME)}</span>
+
+              {/* Timer */}
+              <div className="text-sm text-white/70 min-w-[80px]">
+                {formatTime(recordingTime)}
+              </div>
+
+              {/* Control buttons */}
+              <div className="flex items-center gap-2">
+                {!isPaused ? (
+                  <button
+                    onClick={pauseRecording}
+                    className="w-8 h-8 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 
+                             flex items-center justify-center transition-all duration-300
+                             hover:shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+                  >
+                    <Pause className="w-4 h-4 text-yellow-500" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={resumeRecording}
+                    className="w-8 h-8 rounded-lg bg-green-500/20 hover:bg-green-500/30 
+                             flex items-center justify-center transition-all duration-300
+                             hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                  >
+                    <Play className="w-4 h-4 text-green-500" />
+                  </button>
+                )}
+
+                <button
+                  onClick={stopRecording}
+                  className="w-8 h-8 rounded-lg bg-red-500/20 hover:bg-red-500/30 
+                           flex items-center justify-center transition-all duration-300
+                           hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                >
+                  <Square className="w-4 h-4 text-red-500" />
+                </button>
               </div>
             </div>
+            
+            {/* Recording status text */}
+            <p className="text-sm text-gray-400">Recording in progress...</p>
+          </div>
+        </div>
+      )}
 
-            {/* Control buttons */}
-            <div className="flex items-center justify-center gap-4">
-              {!isPaused ? (
-                <button
-                  onClick={pauseRecording}
-                  className="w-10 h-10 rounded-full bg-yellow-500/20 hover:bg-yellow-500/30 
-                           flex items-center justify-center transition-all duration-300
-                           hover:shadow-[0_0_15px_rgba(234,179,8,0.3)]"
-                >
-                  <Pause className="w-4 h-4 text-yellow-500" />
-                </button>
-              ) : (
-                <button
-                  onClick={resumeRecording}
-                  className="w-10 h-10 rounded-full bg-green-500/20 hover:bg-green-500/30 
-                           flex items-center justify-center transition-all duration-300
-                           hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]"
-                >
-                  <Play className="w-4 h-4 text-green-500" />
-                </button>
-              )}
-
-              <button
-                onClick={stopRecording}
-                className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/30 
-                         flex items-center justify-center transition-all duration-300
-                         hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-              >
-                <Square className="w-4 h-4 text-red-500" />
-              </button>
+      {isEnhancing && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
+            <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-lg font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+                Enhancing your notes...
+              </p>
+              <p className="text-sm text-gray-500">
+                Adding structure and context to your content
+              </p>
             </div>
           </div>
         </div>
       )}
-      <NotesHistory
-        ref={notesHistoryRef}
-        onSelectNote={handleSelectNote}
-        currentNoteId={currentNoteId}
-        onDeleteNote={handleDeleteNote}
-      />
-      {/* Move footer outside the main content area but inside the container */}
     </div>
   );
 };

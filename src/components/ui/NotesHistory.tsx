@@ -1,18 +1,21 @@
 import React, { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Trash2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Trash2, Clock } from 'lucide-react';
 import { Note } from '@/types';
-import { toast } from 'react-hot-toast';
 
-const NotesHistory = forwardRef(({ 
-  onSelectNote, 
-  currentNoteId,
-  onDeleteNote 
-}: { 
+interface NotesHistoryProps {
   onSelectNote: (note: Note) => void;
   currentNoteId?: string;
   onDeleteNote: (noteId: string) => void;
+  className?: string;
+}
+
+const NotesHistory = forwardRef<any, NotesHistoryProps>(({ 
+  onSelectNote, 
+  currentNoteId,
+  onDeleteNote,
+  className = ''
 }, ref) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +36,8 @@ const NotesHistory = forwardRef(({
   };
 
   useImperativeHandle(ref, () => ({
-    loadNotes
+    loadNotes,
+    setIsOpen
   }));
 
   useEffect(() => {
@@ -42,38 +46,7 @@ const NotesHistory = forwardRef(({
 
   const handleDelete = async (noteId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    toast((t) => (
-      <div className="flex items-center gap-4">
-        <p className="text-sm">Delete this note?</p>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              toast.dismiss(t.id);
-              onDeleteNote(noteId);
-            }}
-            className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-          >
-            Delete
-          </button>
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    ), {
-      duration: 5000,
-      position: 'top-center',
-      style: {
-        background: 'rgba(0, 0, 0, 0.8)',
-        color: 'white',
-        backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-      },
-    });
+    onDeleteNote(noteId);
   };
 
   const handleNoteSelect = (note: Note) => {
@@ -90,22 +63,15 @@ const NotesHistory = forwardRef(({
         />
       )}
       
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed right-0 top-1/2 -translate-y-1/2 bg-white/5 hover:bg-white/10 
-                   backdrop-blur-md p-2 rounded-l-lg z-50"
-      >
-        <div className="rotate-180 text-white bg-clip-text hover:text-gray-500 transition-all duration-300 ease-in-out" style={{ writingMode: 'vertical-rl' }}>
-          History
-        </div>
-      </button>
-
       <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: isOpen ? 300 : 0 }}
+        initial={{ width: 0, opacity: 0 }}
+        animate={{ 
+          width: isOpen ? 300 : 0,
+          opacity: isOpen ? 1 : 0
+        }}
         transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-        className="fixed right-0 top-0 h-full bg-white/5 backdrop-blur-2xl 
-                    overflow-hidden z-50"
+        className={`fixed right-0 top-0 h-full bg-white/5 backdrop-blur-2xl 
+                    overflow-hidden z-50 ${className}`}
       >
         <div className="p-4 h-full overflow-y-auto">
           <h2 className="text-xl font-bold text-white/90 mb-4">History</h2>

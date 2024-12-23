@@ -41,12 +41,12 @@ model Card {
 }
 
 model GenNotes {
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  title      String
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Course {
@@ -83,3 +83,4 @@ model QuickNotes {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+

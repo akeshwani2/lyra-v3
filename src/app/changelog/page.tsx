@@ -9,11 +9,12 @@ import bgImage from "@/assets/new-bg-image.png";
 import scribeImage from "@/assets/scribe.png";
 import noteImage from "@/assets/notemate.png";
 import Footer from "@/components/ui/Footer";
+import scribeImageUi from "../../../public/assets/test.png";
 import Logo from "@/assets/logo.svg";
 import userImage from "@/assets/users.png";
 import dashImage from "@/assets/ui.png";
 import productImage from "../../../public/assets/product-image.png";
-import scribeImage2 from "@/assets/scribe-ui.png"
+import scribeImage2 from "@/assets/scribe-ui.png";
 import { Heart } from "lucide-react";
 import Image from "next/image";
 export default function ChangelogPage() {
@@ -87,13 +88,43 @@ export default function ChangelogPage() {
               All the new updates and improvements to Lyra.
             </p>
             <p className="flex items-center justify-center text-sm gap-1 text-white/70">
-              Made with <Heart className="w-4 h-4 text-white fill-white" /> by Arhaan keshwani
+              Made with <Heart className="w-4 h-4 text-white fill-white" /> by
+              Arhaan keshwani
             </p>
           </div>
 
           {/* Changelog Entries */}
           <div className="space-y-36">
-          <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+            <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+              <div className="space-y-6">
+                <time className="block text-base text-white/50">
+                  December 23, 2024
+                </time>
+                <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text ">
+                  New UI for the Scribe page
+                </h2>
+                <p className="text-white/70 leading-relaxed">
+                  I decided to redesign the Scribe page to make it more modern
+                  and user-friendly. The time limit still exists, but in the
+                  future, I will remove it. Future features will include
+                  document sharing functionalities, no time limit, and a folder structure for your notes.
+                </p>
+              </div>
+              <div
+                className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
+                onClick={() => setSelectedImage(scribeImageUi.src)}
+              >
+                <Image
+                  src={scribeImageUi.src}
+                  alt="ScribeUIImage"
+                  width={800}
+                  height={600}
+                />
+              </div>
+            </article>
+            <hr className="border-t border-white/20 my-12" />
+
+            <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">
                   December 13, 2024
@@ -102,14 +133,22 @@ export default function ChangelogPage() {
                   New UI for the tasks page
                 </h2>
                 <p className="text-white/70 leading-relaxed">
-                  I completely redesigned the tasks page to make it more modern and user-friendly. The calendar now shows all of your future assignments. The "Upload Syllabus" button will not work just yet, but it will in the future.
+                  I completely redesigned the tasks page to make it more modern
+                  and user-friendly. The calendar now shows all of your future
+                  assignments. The "Upload Syllabus" button will not work just
+                  yet, but it will in the future.
                 </p>
               </div>
               <div
                 className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
                 onClick={() => setSelectedImage(productImage.src)}
               >
-                <Image src={productImage.src} alt="ScribeUIImage" width={800} height={600} />
+                <Image
+                  src={productImage.src}
+                  alt="ScribeUIImage"
+                  width={800}
+                  height={600}
+                />
               </div>
             </article>
             <hr className="border-t border-white/20 my-12" />
@@ -125,14 +164,23 @@ export default function ChangelogPage() {
                 <p className="text-white/70 leading-relaxed">
                   I decided to add a 5 minute time limit to Scribe. This is to
                   prevent users from using it for too long and getting
-                  overwhelmed. I understand that 5 minutes is not a lot of time by any means, but I think it&apos;s a good compromise between the user getting a good summary and not having to wait too long. In the near future, I will increase this time limit up to 60 minutes.
+                  overwhelmed. I understand that 5 minutes is not a lot of time
+                  by any means, but I think it&apos;s a good compromise between
+                  the user getting a good summary and not having to wait too
+                  long. In the near future, I will increase this time limit up
+                  to 60 minutes.
                 </p>
               </div>
               <div
                 className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
                 onClick={() => setSelectedImage(scribeImage2.src)}
               >
-                <Image src={scribeImage2.src} alt="ScribeUIImage" width={800} height={600} />
+                <Image
+                  src={scribeImage2.src}
+                  alt="ScribeUIImage"
+                  width={800}
+                  height={600}
+                />
               </div>
             </article>
             <hr className="border-t border-white/20 my-12" />
@@ -155,26 +203,35 @@ export default function ChangelogPage() {
                 className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
                 onClick={() => setSelectedImage(dashImage.src)}
               >
-                <Image src={dashImage.src} alt="dashImage" width={800} height={600} />
+                <Image
+                  src={dashImage.src}
+                  alt="dashImage"
+                  width={800}
+                  height={600}
+                />
               </div>
             </article>
             <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-
-            <div className="space-y-6">
-              <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text">
-                New UI for Scribe
-              </h2>
-              <p className="text-white/70 leading-relaxed">
-                I changed the UI for Scribe to make it more minimalistic and
-                user-friendly. I realized that the old UI was a bit too
-                bright/distracting and made it harder to read.
-              </p>
-            </div>
-            <div
-              className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
-              onClick={() => setSelectedImage(productImage.src)}
-            >
-              <Image src={productImage.src} alt="productImage" width={800} height={600} />
+              <div className="space-y-6">
+                <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text">
+                  New UI for Scribe
+                </h2>
+                <p className="text-white/70 leading-relaxed">
+                  I changed the UI for Scribe to make it more minimalistic and
+                  user-friendly. I realized that the old UI was a bit too
+                  bright/distracting and made it harder to read.
+                </p>
+              </div>
+              <div
+                className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
+                onClick={() => setSelectedImage(productImage.src)}
+              >
+                <Image
+                  src={productImage.src}
+                  alt="productImage"
+                  width={800}
+                  height={600}
+                />
               </div>
             </article>
             <hr className="border-t border-white/20 my-12" />
@@ -199,7 +256,12 @@ export default function ChangelogPage() {
                 className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
                 onClick={() => setSelectedImage(bgImage.src)}
               >
-                <Image src={bgImage.src} alt="bgImage" width={800} height={600} />
+                <Image
+                  src={bgImage.src}
+                  alt="bgImage"
+                  width={800}
+                  height={600}
+                />
               </div>
             </article>
             <hr className="border-t border-white/20 my-12" />
@@ -241,16 +303,21 @@ export default function ChangelogPage() {
                 </h2>
                 <p className="text-white/70 leading-relaxed">
                   I have added a new feature that allows you to take notes using
-                  AI. When stuck on a topic or don&apos;t have time to take notes,
-                  you can use the AI to enhance your notes for you simply by
-                  clicking a button.
+                  AI. When stuck on a topic or don&apos;t have time to take
+                  notes, you can use the AI to enhance your notes for you simply
+                  by clicking a button.
                 </p>
               </div>
               <div
                 className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
                 onClick={() => setSelectedImage(noteImage.src)}
               >
-                <Image src={noteImage.src} alt="noteImage" width={800} height={600} />
+                <Image
+                  src={noteImage.src}
+                  alt="noteImage"
+                  width={800}
+                  height={600}
+                />
               </div>
             </article>
 
@@ -276,7 +343,12 @@ export default function ChangelogPage() {
                 className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
                 onClick={() => setSelectedImage(scribeImage.src)}
               >
-                <Image src={scribeImage.src} alt="scribeImage" width={800} height={600} />
+                <Image
+                  src={scribeImage.src}
+                  alt="scribeImage"
+                  width={800}
+                  height={600}
+                />
               </div>
             </article>
           </div>
