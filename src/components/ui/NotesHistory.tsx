@@ -11,6 +11,7 @@ interface NotesHistoryProps {
   className?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const NotesHistory = forwardRef<any, NotesHistoryProps>(({ 
   onSelectNote, 
   currentNoteId,
