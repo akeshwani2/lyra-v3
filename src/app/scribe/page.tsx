@@ -79,6 +79,7 @@ const ScribePage = () => {
   const [notesHistory, setNotesHistory] = useState<Note[]>([]);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
+  const [editingListItemId, setEditingListItemId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadInitialNotes = async () => {
@@ -946,6 +947,46 @@ const ScribePage = () => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleListItemTitleUpdate = async (noteId: string, newTitle: string) => {
+    try {
+      const response = await fetch("/api/notes/update-title", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          noteId: noteId,
+          title: newTitle,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update title");
+      }
+
+      // Update the notes history state directly
+      setNotesHistory(prevNotes =>
+        prevNotes.map(note =>
+          note.id === noteId ? { ...note, title: newTitle } : note
+        )
+      );
+
+      // Reset editing state
+      setEditingListItemId(null);
+
+      toast.success("Title updated", {
+        duration: 2000,
+        style: {
+          background: "rgba(147, 51, 234, 0.1)",
+          border: "1px solid rgba(147, 51, 234, 0.2)",
+          color: "#fff",
+        },
+      });
+    } catch (error) {
+      toast.error("Failed to update title");
+    }
+  };
+
   return (
     <div className="relative min-h-screen w-full bg-zinc-950">
       {/* Animated background pattern */}
@@ -1188,30 +1229,55 @@ const ScribePage = () => {
                     {notesHistory.map((note) => (
                       <div
                         key={note.id}
+                        onClick={() => handleSelectNote(note)}
                         className="group p-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 
-                                  transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                                  transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]
+                                  cursor-pointer"
                       >
                         <div className="flex items-center justify-between">
-                          <div
-                            onClick={() => handleSelectNote(note)}
-                            className="flex-1 cursor-pointer flex items-center gap-2"
-                          >
-                            <h3 className="text-lg font-medium text-white/90 group-hover:text-white">
-                              {note.title}
-                            </h3>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsEditingTitle(true);
-                                setTitle(note.title);
-                                setCurrentNoteId(note.id);
-                              }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                                        text-green-400 hover:text-green-300 p-1 rounded-lg hover:bg-green-500/10"
-                              aria-label="Edit title"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
+                          <div className="flex-1 flex items-center gap-2">
+                            {editingListItemId === note.id ? (
+                              <input
+                                type="text"
+                                defaultValue={note.title}
+                                autoFocus
+                                ref={(input) => {
+                                  if (input) {
+                                    input.select();
+                                  }
+                                }}
+                                onBlur={(e) => handleListItemTitleUpdate(note.id, e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleListItemTitleUpdate(note.id, e.currentTarget.value);
+                                  } else if (e.key === 'Escape') {
+                                    setEditingListItemId(null);
+                                  }
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="bg-transparent border-b border-purple-500/30 focus:border-purple-500 
+                                         outline-none px-2 py-1 text-white placeholder:text-gray-400 
+                                         transition-all duration-300 w-full max-w-[400px]"
+                              />
+                            ) : (
+                              <>
+                                <h3
+                                  className="text-lg font-medium text-white/90 group-hover:text-white">
+                                  {note.title}
+                                </h3>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingListItemId(note.id);
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                          text-green-400 hover:text-green-300 p-1 rounded-lg hover:bg-green-500/10"
+                                  aria-label="Edit title"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();

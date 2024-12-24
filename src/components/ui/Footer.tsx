@@ -50,6 +50,12 @@ const Footer = () => {
             >
               Changelog
             </Link>
+            <Link
+              href="/faq"
+              className="text-xs md:text-sm hover:text-white transition text-white/70"
+            >
+              FAQ
+            </Link>
             <a
               href="/contact"
               className="text-xs md:text-sm hover:text-white transition text-white/70"
