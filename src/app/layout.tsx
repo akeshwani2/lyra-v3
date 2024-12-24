@@ -69,7 +69,7 @@ export default function RootLayout({
       <html lang="en" className="h-full">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           {children}
-          <Analytics />
+          <Analytics debug={true} />
         </body>
       </html>
     </ClerkProvider>
