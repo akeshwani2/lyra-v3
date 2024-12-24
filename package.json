@@ -44,6 +44,7 @@
     "@tiptap/starter-kit": "^2.10.3",
     "@types/md5": "^2.3.5",
     "@types/pdf-parse": "^1.1.4",
+    "@vercel/analytics": "^1.4.1",
     "ai": "^3.4.33",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.7",

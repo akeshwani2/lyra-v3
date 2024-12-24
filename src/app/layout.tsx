@@ -7,6 +7,8 @@ import { Inter } from 'next/font/google'
 import logo from "@/assets/logo.svg"
 // import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 // import { AppSidebar } from "@/components/ui/app-sidebar"
+import { Analytics } from "@vercel/analytics/react"
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -67,6 +69,7 @@ export default function RootLayout({
       <html lang="en" className="h-full">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           {children}
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
