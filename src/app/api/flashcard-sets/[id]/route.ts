@@ -56,3 +56,22 @@ export async function DELETE(
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { title } = await request.json();
+    const updatedSet = await prisma.flashcardSet.update({
+      where: { id: params.id },
+      data: { title },
+    });
+    return NextResponse.json(updatedSet);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to update flashcard set" },
+      { status: 500 }
+    );
+  }
+}

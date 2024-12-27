@@ -19,11 +19,13 @@ export async function POST(req: Request) {
           1. More detailed explanation
           2. Maybe one brief example if relevant
           3. Fix any grammar issues
+          4. Create a new section if necessary
           
           For partial content enhancement:
           - Keep the same format/style as the input
           - Don't create new sections or headers
           - Maintain the original meaning
+          - If it's a coding question/example, handle it gracefully, use proper indentation and formatting, do not use markdown code blocks.
           
           For full note enhancement:
           - Use <h2> tags for main sections with a class="text-2xl font-semibold mb-4 mt-8"
@@ -31,6 +33,7 @@ export async function POST(req: Request) {
           - Use <p> tags for paragraphs with a class="mb-4"
           - Use <strong> for emphasis
           - Ensure proper spacing between sections
+          - If you need to add any code, use proper indentation and formatting, do not use markdown code blocks.
           
           Return clean, properly spaced HTML without markdown artifacts.`
         },

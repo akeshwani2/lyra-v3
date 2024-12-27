@@ -26,6 +26,7 @@ import {
   MessageCircleQuestionIcon,
   Loader2,
   BookOpenCheck,
+  FileText,
 } from "lucide-react";
 import NotesHistory from "@/components/ui/NotesHistory";
 import RichTextEditor from "@/components/ui/RichTextEditor";
@@ -92,7 +93,9 @@ const ScribePage = () => {
   const [notesHistory, setNotesHistory] = useState<Note[]>([]);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
-  const [editingListItemId, setEditingListItemId] = useState<string | null>(null);
+  const [editingListItemId, setEditingListItemId] = useState<string | null>(
+    null
+  );
   const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [showFlashcards, setShowFlashcards] = useState(false);
@@ -634,6 +637,39 @@ const ScribePage = () => {
             throw new Error("Failed to update title");
           }
 
+          // Update flashcard set titles that match the old title
+          const oldFlashcardTitle = `Flashcards for ${savedTitle}`;
+          const newFlashcardTitle = `Flashcards for ${title.trim()}`;
+
+          // Find and update flashcard sets with matching titles
+          const matchingSets = flashcardSets.filter(
+            (set) => set.title === oldFlashcardTitle
+          );
+
+          for (const set of matchingSets) {
+            const updateResponse = await fetch(
+              `/api/flashcard-sets/${set.id}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  title: newFlashcardTitle,
+                }),
+              }
+            );
+
+            if (updateResponse.ok) {
+              // Update local state
+              setFlashcardSets((prev) =>
+                prev.map((s) =>
+                  s.id === set.id ? { ...s, title: newFlashcardTitle } : s
+                )
+              );
+            }
+          }
+
           // After successful update, refresh the notes list
           if (notesHistoryRef.current) {
             await notesHistoryRef.current.loadNotes();
@@ -675,7 +711,7 @@ const ScribePage = () => {
     setIsTitleSaved(false);
     setIsNewNote(true);
     setSavedTitle("");
-    
+
     // Refresh notes list
     setIsLoadingNotes(true);
     try {
@@ -920,13 +956,24 @@ const ScribePage = () => {
     try {
       setIsEnhancing(true);
 
+      // Create a temporary div to clean HTML
+      const tempDiv = document.createElement("div");
+
+      // If we have selected text, clean it first
+      const contentToEnhance =
+        selectedText ||
+        (() => {
+          tempDiv.innerHTML = notes;
+          return tempDiv.textContent || tempDiv.innerText || "";
+        })();
+
       const response = await fetch("/api/enhance-notes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          content: selectedText || notes,
+          content: contentToEnhance,
           isPartialContent: !!selectedText,
         }),
       });
@@ -939,14 +986,29 @@ const ScribePage = () => {
 
       // If we enhanced selected text, replace just that portion
       if (selectedText && selection && selection.rangeCount > 0) {
+        // Get the editor's HTML content
+        const editor = document.querySelector(".ProseMirror");
+        if (!editor) return;
+
+        // Insert the enhanced content at cursor position
         const range = selection.getRangeAt(0);
         range.deleteContents();
-        range.insertNode(document.createTextNode(enhancedNotes));
 
-        // Trigger save with the updated content
-        const updatedContent = notes.replace(selectedText, enhancedNotes);
-        setNotes(updatedContent);
-        debouncedSave(updatedContent, currentNoteId, title);
+        // Create a temporary container for the enhanced content
+        const tempContainer = document.createElement("div");
+        tempContainer.innerHTML = enhancedNotes;
+
+        // Extract text content
+        const enhancedText =
+          tempContainer.textContent || tempContainer.innerText;
+
+        // Insert the text
+        const textNode = document.createTextNode(enhancedText);
+        range.insertNode(textNode);
+
+        // Update the notes state with the modified content
+        setNotes(editor.innerHTML);
+        debouncedSave(editor.innerHTML, currentNoteId, title);
       } else {
         // Replace entire note content
         setNotes(enhancedNotes);
@@ -975,7 +1037,10 @@ const ScribePage = () => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleListItemTitleUpdate = async (noteId: string, newTitle: string) => {
+  const handleListItemTitleUpdate = async (
+    noteId: string,
+    newTitle: string
+  ) => {
     try {
       const response = await fetch("/api/notes/update-title", {
         method: "PATCH",
@@ -992,9 +1057,43 @@ const ScribePage = () => {
         throw new Error("Failed to update title");
       }
 
+      // Find the old title from the notes history
+      const oldTitle =
+        notesHistory.find((note) => note.id === noteId)?.title || "";
+
+      // Update flashcard set titles that match the old title
+      const oldFlashcardTitle = `Flashcards for ${oldTitle}`;
+      const newFlashcardTitle = `Flashcards for ${newTitle}`;
+
+      // Find and update flashcard sets with matching titles
+      const matchingSets = flashcardSets.filter(
+        (set) => set.title === oldFlashcardTitle
+      );
+
+      for (const set of matchingSets) {
+        const updateResponse = await fetch(`/api/flashcard-sets/${set.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: newFlashcardTitle,
+          }),
+        });
+
+        if (updateResponse.ok) {
+          // Update local state
+          setFlashcardSets((prev) =>
+            prev.map((s) =>
+              s.id === set.id ? { ...s, title: newFlashcardTitle } : s
+            )
+          );
+        }
+      }
+
       // Update the notes history state directly
-      setNotesHistory(prevNotes =>
-        prevNotes.map(note =>
+      setNotesHistory((prevNotes) =>
+        prevNotes.map((note) =>
           note.id === noteId ? { ...note, title: newTitle } : note
         )
       );
@@ -1030,9 +1129,8 @@ const ScribePage = () => {
 
     try {
       setIsGeneratingFlashcards(true);
-      
-      // Create a temporary div to parse HTML and get clean text
-      const tempDiv = document.createElement('div');
+
+      const tempDiv = document.createElement("div");
       tempDiv.innerHTML = notes;
       const cleanText = tempDiv.textContent || tempDiv.innerText || "";
 
@@ -1041,7 +1139,7 @@ const ScribePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: cleanText }), 
+        body: JSON.stringify({ content: cleanText }),
       });
 
       if (!response.ok) {
@@ -1049,41 +1147,27 @@ const ScribePage = () => {
       }
 
       const data = await response.json();
-      setFlashcards(data.cards || []);
-      setShowFlashcards(true);
-    } catch (error) {
-      console.error("Error generating flashcards:", error);
-      toast.error("Failed to generate flashcards", {
-        duration: 2000,
-        style: {
-          background: "rgba(239, 68, 68, 0.1)",
-          border: "1px solid rgba(239, 68, 68, 0.2)",
-          color: "#fff",
-        },
-      });
-    } finally {
-      setIsGeneratingFlashcards(false);
-    }
-  };
 
-  const saveFlashcardSet = async () => {
-    try {
-      const response = await fetch('/api/flashcard-sets', {
-        method: 'POST',
+      // Auto-save the flashcard set immediately after generation
+      const saveResponse = await fetch("/api/flashcard-sets", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: `Flashcards for ${title || 'Untitled Note'}`,
-          cards: flashcards,
+          title: `Flashcards for ${title || "Untitled Note"}`,
+          cards: data.cards,
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to save flashcard set');
+      if (!saveResponse.ok) throw new Error("Failed to save flashcard set");
 
-      const newSet = await response.json();
-      setFlashcardSets(prev => [...prev, newSet]);
-      toast.success('Flashcard set saved!', {
+      const newSet = await saveResponse.json();
+      setFlashcardSets((prev) => [...prev, newSet]);
+      setFlashcards(data.cards || []);
+      setShowFlashcards(true);
+
+      toast.success("Flashcards generated and saved!", {
         duration: 2000,
         style: {
           background: "rgba(147, 51, 234, 0.1)",
@@ -1092,20 +1176,22 @@ const ScribePage = () => {
         },
       });
     } catch (error) {
-      console.error('Error saving flashcard set:', error);
-      toast.error('Failed to save flashcard set');
+      console.error("Error generating flashcards:", error);
+      toast.error("Failed to generate flashcards");
+    } finally {
+      setIsGeneratingFlashcards(false);
     }
   };
 
   const loadFlashcardSets = async () => {
     try {
-      const response = await fetch('/api/flashcard-sets');
-      if (!response.ok) throw new Error('Failed to load flashcard sets');
+      const response = await fetch("/api/flashcard-sets");
+      if (!response.ok) throw new Error("Failed to load flashcard sets");
       const sets = await response.json();
       setFlashcardSets(sets);
     } catch (error) {
-      console.error('Error loading flashcard sets:', error);
-      toast.error('Failed to load flashcard sets');
+      console.error("Error loading flashcard sets:", error);
+      toast.error("Failed to load flashcard sets");
     }
   };
 
@@ -1116,35 +1202,37 @@ const ScribePage = () => {
   const loadFlashcardSet = async (setId: string) => {
     try {
       const response = await fetch(`/api/flashcard-sets/${setId}`);
-      if (!response.ok) throw new Error('Failed to load flashcard set');
+      if (!response.ok) throw new Error("Failed to load flashcard set");
       const set = await response.json();
       setFlashcards(set.cards);
       setCurrentSetId(setId);
       setShowFlashcards(true);
       setShowFlashcardSets(false);
     } catch (error) {
-      console.error('Error loading flashcard set:', error);
-      toast.error('Failed to load flashcard set');
+      console.error("Error loading flashcard set:", error);
+      toast.error("Failed to load flashcard set");
     }
   };
 
   const deleteFlashcardSet = async (setId: string) => {
     try {
       const response = await fetch(`/api/flashcard-sets/${setId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
-      if (!response.ok) throw new Error('Failed to delete flashcard set');
+      if (!response.ok) throw new Error("Failed to delete flashcard set");
 
       // Update the local state to remove the deleted set
-      setFlashcardSets(prev => prev.filter(set => set.id !== setId));
-      toast.success('Flashcard set deleted', {style: {
-        background: "rgba(239, 68, 68, 0.1)",
-        border: "1px solid rgba(239, 68, 68, 0.2)",
-        color: "#fff",
-      }});
+      setFlashcardSets((prev) => prev.filter((set) => set.id !== setId));
+      toast.success("Flashcard set deleted", {
+        style: {
+          background: "rgba(239, 68, 68, 0.1)",
+          border: "1px solid rgba(239, 68, 68, 0.2)",
+          color: "#fff",
+        },
+      });
     } catch (error) {
-      console.error('Error deleting flashcard set:', error);
+      console.error("Error deleting flashcard set:", error);
     }
   };
 
@@ -1190,6 +1278,17 @@ const ScribePage = () => {
                     New Note
                   </span>
                 </Button>
+                <button
+                  onClick={() => {
+                    setShowFlashcards(false);
+                    setShowFlashcardSets(true);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
+                           text-blue-400 transition-colors flex items-center gap-2"
+                >
+                  <BookOpenCheck className="w-4 h-4" />
+                  View Sets
+                </button>
                 <Button
                   onClick={() => notesHistoryRef.current?.setIsOpen(true)}
                   className="group relative bg-white/5 hover:bg-white/10 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium"
@@ -1204,7 +1303,6 @@ const ScribePage = () => {
 
             {/* User button container */}
             <div className="flex items-center gap-4">
-        
               <span className="bg-gradient-to-t from-zinc-600 tracking-tight via-zinc-300 to-white text-transparent bg-clip-text text-lg md:text-xl font-bold">
                 {user?.username || user?.firstName || ""}
               </span>
@@ -1365,9 +1463,9 @@ const ScribePage = () => {
                 </div>
               ) : notesHistory.length > 0 ? (
                 <div className="w-full space-y-4">
-                  {/* Make the notes list container scrollable */}
-                  <div className="flex items-center justify-between mb-6 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 py-4">
-                    <h2 className="text-2xl font-semibold text-white/90">
+                  {/* Header section with gradient text and backdrop blur */}
+                  <div className="flex items-center justify-between mb-4 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 py-4">
+                    <h2 className="text-3xl font-semibold text-white/90">
                       Recent Notes
                     </h2>
                     <div className="flex gap-2">
@@ -1376,13 +1474,14 @@ const ScribePage = () => {
                           startRecording();
                           resetNote();
                         }}
-                        className="group relative bg-gradient-to-r from-purple-500 to-blue-500 
+                        className="group relative overflow-hidden bg-gradient-to-r from-purple-500 to-blue-500 
                                  hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 
                                  ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
                                  hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
                       >
+                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
                         <span className="relative z-10 flex items-center gap-2">
-                          <div className="w-2 h-2 bg-white rounded-full" />
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                           New Recording
                         </span>
                       </Button>
@@ -1398,20 +1497,44 @@ const ScribePage = () => {
                           New Note
                         </span>
                       </Button>
+                      <button
+                        onClick={() => {
+                          setShowFlashcards(false);
+                          setShowFlashcardSets(true);
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
+                                 text-blue-400 transition-colors flex items-center gap-2"
+                      >
+                        <BookOpenCheck className="w-4 h-4" />
+                        View Sets
+                      </button>
                     </div>
                   </div>
-                  
-                  {/* Notes list will scroll within the container */}
+
+                  {/* Notes list with enhanced styling */}
                   <div className="space-y-4">
-                    {notesHistory.map((note) => (
+                    {notesHistory.map((note, index) => (
                       <div
                         key={note.id}
                         onClick={() => handleSelectNote(note)}
-                        className="group p-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 
-                                  transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]
+                        className="group relative p-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-xl 
+                                  border border-white/10 transition-all duration-300 
+                                  hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]
+                                  hover:border-purple-500/30
                                   cursor-pointer"
+                        style={{
+                          transform: `translateY(${index * 2}px)`,
+                          opacity: 1 - index * 0.03,
+                        }}
                       >
-                        <div className="flex items-center justify-between">
+                        {/* Gradient overlay on hover */}
+                        <div
+                          className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-purple-500/0 
+                                      group-hover:from-purple-500/5 group-hover:via-purple-500/10 group-hover:to-purple-500/5 
+                                      transition-all duration-300 rounded-xl"
+                        />
+
+                        <div className="relative flex items-center justify-between">
                           <div className="flex-1 flex items-center gap-2">
                             {editingListItemId === note.id ? (
                               <input
@@ -1423,11 +1546,19 @@ const ScribePage = () => {
                                     input.select();
                                   }
                                 }}
-                                onBlur={(e) => handleListItemTitleUpdate(note.id, e.target.value)}
+                                onBlur={(e) =>
+                                  handleListItemTitleUpdate(
+                                    note.id,
+                                    e.target.value
+                                  )
+                                }
                                 onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    handleListItemTitleUpdate(note.id, e.currentTarget.value);
-                                  } else if (e.key === 'Escape') {
+                                  if (e.key === "Enter") {
+                                    handleListItemTitleUpdate(
+                                      note.id,
+                                      e.currentTarget.value
+                                    );
+                                  } else if (e.key === "Escape") {
                                     setEditingListItemId(null);
                                   }
                                 }}
@@ -1438,139 +1569,60 @@ const ScribePage = () => {
                               />
                             ) : (
                               <>
-                                <h3
-                                  className="text-lg font-medium text-white/90 group-hover:text-white">
+                                <h3 className="text-lg font-medium text-white/90 group-hover:text-white">
                                   {note.title}
                                 </h3>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditingListItemId(note.id);
-                                  }}
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                                          text-green-400 hover:text-green-300 p-1 rounded-lg hover:bg-green-500/10"
-                                  aria-label="Edit title"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </button>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditingListItemId(note.id);
+                                    }}
+                                    className="text-green-400 hover:text-green-300 p-1 rounded-lg hover:bg-green-500/10
+                                             transition-colors duration-200"
+                                    aria-label="Edit title"
+                                  >
+                                    <Pencil className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteNote(note.id);
+                                    }}
+                                    className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10
+                                             transition-colors duration-200"
+                                    aria-label="Delete note"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </>
                             )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteNote(note.id);
-                              }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                                        text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10"
-                              aria-label="Delete note"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
                           </div>
-                          <div className="flex items-center gap-4">
-                            <span className="text-sm text-white/50">
-                              {format(new Date(note.createdAt), "MMM d, yyyy")}
-                            </span>
-                          </div>
+                          <span className="text-sm text-white/50 group-hover:text-white/70 transition-colors duration-200">
+                            {format(new Date(note.createdAt), "MMM d, yyyy")}
+                          </span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="text-center space-y-8 max-w-3xl mx-auto">
-                  {/* Hero Section */}
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <div className="text-md font-bold text-gray-400 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
-                        Welcome to
-                      </div>
-                      <span className="bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] 
-                                  text-transparent bg-clip-text text-6xl font-bold block">
-                        Scribe
-                      </span>
-                      <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                        Your AI-powered note-taking assistant. Record your thoughts, meetings, or lectures 
-                        and let AI transform them into well-structured notes.
-                      </p>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-4 justify-center">
-                      <Button
-                        onClick={() => {
-                          startRecording();
-                          resetNote();
-                        }}
-                        className="group relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-violet-600 
-                                 hover:to-cyan-500 transition-all duration-300 ease-in-out rounded-xl px-6 py-3 
-                                 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)] duration-1000 hover:animate-pulse"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">
-                          <div className="w-2 h-2 bg-white rounded-full" />
-                          Start Recording
-                        </span>
-                      </Button>
-
-                      <Button
-                        onClick={startNewNote}
-                        className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 
-                                 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 
-                                 ease-in-out rounded-xl px-6 py-3 text-base font-medium shadow-lg 
-                                 hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)] hover:animate-pulse duration-1000"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">
-                          <FeatherIcon className="w-4 h-4" />
-                          New Note
-                        </span>
-                      </Button>
-                    </div>
+                // Empty state with better styling
+                <div className="flex flex-col items-center justify-center gap-6 py-12">
+                  <div
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 
+                                flex items-center justify-center shadow-lg"
+                  >
+                    <FileText className="w-8 h-8 text-white" />
                   </div>
-
-                  {/* Features Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                      <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
-                        <MessageCircleQuestionIcon className="w-5 h-5 text-purple-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white mb-2">Voice to Notes</h3>
-                      <p className="text-gray-400">Record your voice and watch as AI transforms it into well-structured, organized notes.</p>
-                    </div>
-
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
-                        <Wand2 className="w-5 h-5 text-blue-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white mb-2">AI Enhancement</h3>
-                      <p className="text-gray-400">Let AI help organize, format, and enhance your notes with additional context and structure.</p>
-                    </div>
-
-                    <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4">
-                        <History className="w-5 h-5 text-emerald-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white mb-2">Note History</h3>
-                      <p className="text-gray-400">Access all your past notes with automatic saving and easy organization.</p>
-                    </div>
-                  </div>
-
-                  {/* Getting Started Guide */}
-                  <div className="text-left p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                    <h3 className="text-xl font-semibold text-white mb-4">Getting Started</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-gray-400">
-                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">1</div>
-                        <p>Click "Start Recording" to begin capturing your voice</p>
-                      </div>
-                      <div className="flex items-center gap-3 text-gray-400">
-                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">2</div>
-                        <p>Speak clearly into your microphone</p>
-                      </div>
-                      <div className="flex items-center gap-3 text-gray-400">
-                        <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">3</div>
-                        <p>Stop recording when finished and let AI process your notes</p>
-                      </div>
-                    </div>
+                  <div className="text-center">
+                    <h3 className="text-xl font-medium text-white mb-2">
+                      No notes yet
+                    </h3>
+                    <p className="text-gray-400">
+                      Start by creating a new note or recording
+                    </p>
                   </div>
                 </div>
               )}
@@ -1634,7 +1686,7 @@ const ScribePage = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Recording status text */}
             <p className="text-sm text-gray-400">Recording in progress...</p>
           </div>
@@ -1677,16 +1729,6 @@ const ScribePage = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                {/* Save button */}
-                <button
-                  onClick={saveFlashcardSet}
-                  className="px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 
-                           text-purple-400 transition-colors flex items-center gap-2"
-                >
-                  <Save className="w-4 h-4" />
-                  Save Set
-                </button>
-                
                 {/* View Sets button */}
                 <button
                   onClick={() => {
@@ -1699,7 +1741,7 @@ const ScribePage = () => {
                   <BookOpenCheck className="w-4 h-4" />
                   View Sets
                 </button>
-                
+
                 {/* Close button */}
                 <button
                   onClick={() => {
@@ -1718,24 +1760,36 @@ const ScribePage = () => {
             <div className="relative w-full aspect-[16/9] mb-6">
               <div
                 className={`w-full h-full cursor-pointer transition-all duration-500 preserve-3d
-                           ${isFlipped ? 'rotate-y-180' : ''}`}
+                           ${isFlipped ? "rotate-y-180" : ""}`}
                 onClick={() => setIsFlipped(!isFlipped)}
               >
                 {/* Front of card */}
                 <div className="absolute inset-0 backface-hidden">
-                  <div className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
-                                flex flex-col items-center justify-center text-center">
-                    <span className="text-sm text-purple-400 mb-2">Question</span>
-                    <p className="text-white text-lg">{flashcards[currentCardIndex]?.question}</p>
+                  <div
+                    className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
+                                flex flex-col items-center justify-center text-center"
+                  >
+                    <span className="text-sm text-purple-400 mb-2">
+                      Question
+                    </span>
+                    <p className="text-white text-lg">
+                      {flashcards[currentCardIndex]?.question}
+                    </p>
                   </div>
                 </div>
 
                 {/* Back of card */}
                 <div className="absolute inset-0 rotate-y-180 backface-hidden">
-                  <div className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
-                                flex flex-col items-center justify-center text-center">
-                    <span className="text-sm text-emerald-400 mb-2">Answer</span>
-                    <p className="text-white text-lg">{flashcards[currentCardIndex]?.answer}</p>
+                  <div
+                    className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
+                                flex flex-col items-center justify-center text-center"
+                  >
+                    <span className="text-sm text-emerald-400 mb-2">
+                      Answer
+                    </span>
+                    <p className="text-white text-lg">
+                      {flashcards[currentCardIndex]?.answer}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1775,7 +1829,9 @@ const ScribePage = () => {
 
               <button
                 onClick={() => {
-                  setCurrentCardIndex((prev) => Math.min(flashcards.length - 1, prev + 1));
+                  setCurrentCardIndex((prev) =>
+                    Math.min(flashcards.length - 1, prev + 1)
+                  );
                   setIsFlipped(false);
                 }}
                 disabled={currentCardIndex === flashcards.length - 1}
@@ -1806,7 +1862,9 @@ const ScribePage = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-white">Flashcard Sets</h3>
+              <h3 className="text-xl font-semibold text-white">
+                Flashcard Sets
+              </h3>
               <button
                 onClick={() => setShowFlashcardSets(false)}
                 className="text-gray-400 hover:text-white transition-colors"
@@ -1828,7 +1886,8 @@ const ScribePage = () => {
                       <div>
                         <h4 className="text-white font-medium">{set.title}</h4>
                         <p className="text-sm text-gray-400">
-                          {set.cards.length} cards • Created {new Date(set.createdAt).toLocaleDateString()}
+                          {set.cards.length} cards • Created{" "}
+                          {new Date(set.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                       <button
@@ -1849,7 +1908,9 @@ const ScribePage = () => {
               <div className="text-center py-8 text-gray-400">
                 <BookOpenCheck className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No flashcard sets yet</p>
-                <p className="text-sm mt-2">Generate some flashcards from your notes to get started!</p>
+                <p className="text-sm mt-2">
+                  Generate some flashcards from your notes to get started!
+                </p>
               </div>
             )}
           </div>

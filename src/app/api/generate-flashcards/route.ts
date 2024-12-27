@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       return new NextResponse("Content is required", { status: 400 });
     }
 
-    const prompt = `Create 5-10 flashcards from the following notes. Each flashcard should have a question and answer that tests key concepts and important details:
+    const prompt = `Create 10+ flashcards from the following notes. Each flashcard should have a question and answer that tests key concepts and important details:
 
 ${content}
 
@@ -29,7 +29,7 @@ Format your response as a JSON object with a "cards" array containing objects wi
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that creates concise and effective flashcards from study notes.",
+          content: "You are the smartest flashcard creator in the world. You create concise and effective flashcards from study notes. Create 10+ flashcards based on the notes provided.",
         },
         {
           role: "user",
