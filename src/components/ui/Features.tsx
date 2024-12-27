@@ -25,14 +25,6 @@ const tabs = [
     backgroundSizeX: 100,
   },
   {
-    icon: "/assets/lottie/click.lottie",
-    title: "Organize your daily tasks",
-    isNew: true,
-    backgroundPositionX: 50,
-    backgroundPositionY: 75,
-    backgroundSizeX: 160,
-  },
-  {
     icon: "/assets/lottie/stars.lottie",
     title: "Track Assignments at a Glance",
     isNew: false,
@@ -40,6 +32,16 @@ const tabs = [
     backgroundPositionY: 0,
     backgroundSizeX: 140,
   },
+
+  {
+    icon: "/assets/lottie/click.lottie",
+    title: "Organize your daily tasks",
+    isNew: true,
+    backgroundPositionX: 50,
+    backgroundPositionY: 75,
+    backgroundSizeX: 160,
+  },
+
 
 ];
 
@@ -135,13 +137,13 @@ export const Features = () => {
     animate(
       backgroundSizeX,
       [backgroundSizeX.get(), 100, tabs[index].backgroundSizeX],
-      { duration: 2, ease: "easeInOut" }
+      { duration: 0.8, ease: "easeInOut" }
     );
 
     animate(
       backgroundPositionX,
       [backgroundPositionX.get(), tabs[index].backgroundPositionX],
-      { duration: 2, ease: "easeInOut" }
+      { duration: 0.8, ease: "easeInOut" }
     );
   };
   return (

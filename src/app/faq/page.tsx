@@ -153,7 +153,7 @@ export default function ChangelogPage() {
         <div className="flex justify-center items-center pt-12">
           <div className="flex items-center gap-2">
             <Link href="/">
-              <Logo className="h-6 w-6" />
+              <Logo className="h-6 w-6 border border-white/20 rounded-md" />
             </Link>
             <div className="">Lyra. All Rights Reserved.</div>
           </div>

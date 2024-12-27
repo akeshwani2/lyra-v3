@@ -84,3 +84,26 @@ model QuickNotes {
   updatedAt DateTime @updatedAt
 }
 
+model FlashcardSet {
+  id        String      @id @default(cuid())
+  userId    String
+  title     String
+  cards     Flashcard[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([userId])
+}
+
+model Flashcard {
+  id            String       @id @default(cuid())
+  question      String
+  answer        String
+  setId         String
+  set           FlashcardSet @relation(fields: [setId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([setId])
+}
+

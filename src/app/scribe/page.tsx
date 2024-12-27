@@ -25,6 +25,7 @@ import {
   History,
   MessageCircleQuestionIcon,
   Loader2,
+  BookOpenCheck,
 } from "lucide-react";
 import NotesHistory from "@/components/ui/NotesHistory";
 import RichTextEditor from "@/components/ui/RichTextEditor";
@@ -38,6 +39,18 @@ interface Note {
   title: string;
   content: string;
   createdAt: string;
+}
+
+interface Flashcard {
+  question: string;
+  answer: string;
+}
+
+interface FlashcardSet {
+  id: string;
+  title: string;
+  createdAt: string;
+  cards: Flashcard[];
 }
 
 const ScribePage = () => {
@@ -80,6 +93,14 @@ const ScribePage = () => {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
   const [editingListItemId, setEditingListItemId] = useState<string | null>(null);
+  const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [showFlashcards, setShowFlashcards] = useState(false);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
+  const [showFlashcardSets, setShowFlashcardSets] = useState(false);
+  const [currentSetId, setCurrentSetId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadInitialNotes = async () => {
@@ -932,7 +953,14 @@ const ScribePage = () => {
         debouncedSave(enhancedNotes, currentNoteId, title);
       }
 
-      toast.success("Notes enhanced successfully!");
+      toast.success("Notes enhanced successfully!", {
+        duration: 2000,
+        style: {
+          background: "rgba(147, 51, 234, 0.1)",
+          border: "1px solid rgba(147, 51, 234, 0.2)",
+          color: "#fff",
+        },
+      });
     } catch (error) {
       console.error("Error enhancing notes:", error);
       toast.error("Failed to enhance notes");
@@ -984,6 +1012,139 @@ const ScribePage = () => {
       });
     } catch (error) {
       toast.error("Failed to update title");
+    }
+  };
+
+  const generateFlashcards = async () => {
+    if (!notes) {
+      toast.error("Please add some notes first", {
+        duration: 2000,
+        style: {
+          background: "rgba(239, 68, 68, 0.1)",
+          border: "1px solid rgba(239, 68, 68, 0.2)",
+          color: "#fff",
+        },
+      });
+      return;
+    }
+
+    try {
+      setIsGeneratingFlashcards(true);
+      
+      // Create a temporary div to parse HTML and get clean text
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = notes;
+      const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+
+      const response = await fetch("/api/generate-flashcards", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: cleanText }), 
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate flashcards");
+      }
+
+      const data = await response.json();
+      setFlashcards(data.cards || []);
+      setShowFlashcards(true);
+    } catch (error) {
+      console.error("Error generating flashcards:", error);
+      toast.error("Failed to generate flashcards", {
+        duration: 2000,
+        style: {
+          background: "rgba(239, 68, 68, 0.1)",
+          border: "1px solid rgba(239, 68, 68, 0.2)",
+          color: "#fff",
+        },
+      });
+    } finally {
+      setIsGeneratingFlashcards(false);
+    }
+  };
+
+  const saveFlashcardSet = async () => {
+    try {
+      const response = await fetch('/api/flashcard-sets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: `Flashcards for ${title || 'Untitled Note'}`,
+          cards: flashcards,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to save flashcard set');
+
+      const newSet = await response.json();
+      setFlashcardSets(prev => [...prev, newSet]);
+      toast.success('Flashcard set saved!', {
+        duration: 2000,
+        style: {
+          background: "rgba(147, 51, 234, 0.1)",
+          border: "1px solid rgba(147, 51, 234, 0.2)",
+          color: "#fff",
+        },
+      });
+    } catch (error) {
+      console.error('Error saving flashcard set:', error);
+      toast.error('Failed to save flashcard set');
+    }
+  };
+
+  const loadFlashcardSets = async () => {
+    try {
+      const response = await fetch('/api/flashcard-sets');
+      if (!response.ok) throw new Error('Failed to load flashcard sets');
+      const sets = await response.json();
+      setFlashcardSets(sets);
+    } catch (error) {
+      console.error('Error loading flashcard sets:', error);
+      toast.error('Failed to load flashcard sets');
+    }
+  };
+
+  useEffect(() => {
+    loadFlashcardSets();
+  }, []);
+
+  const loadFlashcardSet = async (setId: string) => {
+    try {
+      const response = await fetch(`/api/flashcard-sets/${setId}`);
+      if (!response.ok) throw new Error('Failed to load flashcard set');
+      const set = await response.json();
+      setFlashcards(set.cards);
+      setCurrentSetId(setId);
+      setShowFlashcards(true);
+      setShowFlashcardSets(false);
+    } catch (error) {
+      console.error('Error loading flashcard set:', error);
+      toast.error('Failed to load flashcard set');
+    }
+  };
+
+  const deleteFlashcardSet = async (setId: string) => {
+    try {
+      const response = await fetch(`/api/flashcard-sets/${setId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete flashcard set');
+
+      // Update the local state to remove the deleted set
+      setFlashcardSets(prev => prev.filter(set => set.id !== setId));
+      toast.success('Flashcard set deleted', {style: {
+        background: "rgba(239, 68, 68, 0.1)",
+        border: "1px solid rgba(239, 68, 68, 0.2)",
+        color: "#fff",
+      }});
+    } catch (error) {
+      console.error('Error deleting flashcard set:', error);
     }
   };
 
@@ -1154,6 +1315,22 @@ const ScribePage = () => {
                           <span className="relative z-10 flex items-center gap-2">
                             <Wand2 className="w-4 h-4" />
                             Enhance with AI
+                          </span>
+                        </Button>
+                      )}
+
+                      {/* Flashcard button */}
+                      {notes && !isProcessing && (
+                        <Button
+                          onClick={generateFlashcards}
+                          className="group relative bg-gradient-to-r from-orange-500 to-amber-500 
+                                   hover:from-orange-600 hover:to-amber-600 transition-all duration-300 
+                                   ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
+                                   hover:shadow-[0_0_2rem_-0.5rem_rgba(249,115,22,0.8)]"
+                        >
+                          <span className="relative z-10 flex items-center gap-2">
+                            <BookOpenCheck className="w-4 h-4" />
+                            Generate Flashcards
                           </span>
                         </Button>
                       )}
@@ -1476,6 +1653,205 @@ const ScribePage = () => {
                 Adding structure and context to your content
               </p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isGeneratingFlashcards && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
+            <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
+            <p className="text-sm text-gray-400">Generating flashcards...</p>
+          </div>
+        </div>
+      )}
+
+      {showFlashcards && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-4">
+                <h3 className="text-xl font-semibold text-white">Flashcards</h3>
+                <span className="text-sm text-gray-400">
+                  {currentCardIndex + 1} / {flashcards.length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Save button */}
+                <button
+                  onClick={saveFlashcardSet}
+                  className="px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 
+                           text-purple-400 transition-colors flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  Save Set
+                </button>
+                
+                {/* View Sets button */}
+                <button
+                  onClick={() => {
+                    setShowFlashcards(false);
+                    setShowFlashcardSets(true);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
+                           text-blue-400 transition-colors flex items-center gap-2"
+                >
+                  <BookOpenCheck className="w-4 h-4" />
+                  View Sets
+                </button>
+                
+                {/* Close button */}
+                <button
+                  onClick={() => {
+                    setShowFlashcards(false);
+                    setCurrentCardIndex(0);
+                    setIsFlipped(false);
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Flashcard container */}
+            <div className="relative w-full aspect-[16/9] mb-6">
+              <div
+                className={`w-full h-full cursor-pointer transition-all duration-500 preserve-3d
+                           ${isFlipped ? 'rotate-y-180' : ''}`}
+                onClick={() => setIsFlipped(!isFlipped)}
+              >
+                {/* Front of card */}
+                <div className="absolute inset-0 backface-hidden">
+                  <div className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
+                                flex flex-col items-center justify-center text-center">
+                    <span className="text-sm text-purple-400 mb-2">Question</span>
+                    <p className="text-white text-lg">{flashcards[currentCardIndex]?.question}</p>
+                  </div>
+                </div>
+
+                {/* Back of card */}
+                <div className="absolute inset-0 rotate-y-180 backface-hidden">
+                  <div className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
+                                flex flex-col items-center justify-center text-center">
+                    <span className="text-sm text-emerald-400 mb-2">Answer</span>
+                    <p className="text-white text-lg">{flashcards[currentCardIndex]?.answer}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation controls */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => {
+                  setCurrentCardIndex((prev) => Math.max(0, prev - 1));
+                  setIsFlipped(false);
+                }}
+                disabled={currentCardIndex === 0}
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50
+                         disabled:cursor-not-allowed transition-all duration-200"
+              >
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">
+                  Click card to flip
+                </span>
+              </div>
+
+              <button
+                onClick={() => {
+                  setCurrentCardIndex((prev) => Math.min(flashcards.length - 1, prev + 1));
+                  setIsFlipped(false);
+                }}
+                disabled={currentCardIndex === flashcards.length - 1}
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50
+                         disabled:cursor-not-allowed transition-all duration-200"
+              >
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add new modal for flashcard sets */}
+      {showFlashcardSets && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold text-white">Flashcard Sets</h3>
+              <button
+                onClick={() => setShowFlashcardSets(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {flashcardSets.length > 0 ? (
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                {flashcardSets.map((set) => (
+                  <div
+                    key={set.id}
+                    className="group p-4 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 
+                             transition-all duration-200 cursor-pointer"
+                    onClick={() => loadFlashcardSet(set.id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-white font-medium">{set.title}</h4>
+                        <p className="text-sm text-gray-400">
+                          {set.cards.length} cards • Created {new Date(set.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteFlashcardSet(set.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                 text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-400">
+                <BookOpenCheck className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No flashcard sets yet</p>
+                <p className="text-sm mt-2">Generate some flashcards from your notes to get started!</p>
+              </div>
+            )}
           </div>
         </div>
       )}
