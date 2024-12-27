@@ -60,13 +60,17 @@ export async function DELETE(
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest
 ) {
   try {
     const { title } = await request.json();
+    
+    // Extract id from the URL
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop() || '';
+
     const updatedSet = await prisma.flashcardSet.update({
-      where: { id: params.id },
+      where: { id },
       data: { title },
     });
     return NextResponse.json(updatedSet);
