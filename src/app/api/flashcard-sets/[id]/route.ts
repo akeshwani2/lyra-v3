@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
+import { NextRequest } from 'next/server';
 
 export async function GET(request: Request) {
     const id = request.url.split('/').pop();
@@ -32,8 +33,7 @@ export async function GET(request: Request) {
 }
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest
 ) {
   try {
     const { userId } = await auth();
@@ -41,9 +41,13 @@ export async function DELETE(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
+    // Extract id from the URL
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop() || '';
+
     await prisma.flashcardSet.delete({
       where: {
-        id: params.id,
+        id,
         userId,
       },
     });
