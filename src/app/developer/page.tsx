@@ -173,121 +173,52 @@ export default function Page() {
                 {/* Vertical Timeline Line */}
                 <div className="absolute left-[7px] top-2 bottom-2 w-[2px] bg-white/20" />
 
-                {/* Experience Item 1 */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
-                  className="relative flex gap-4"
-                >
-                  <div className="w-4 h-4 rounded-full bg-purple-500 shrink-0 mt-1.5" />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-white/50 text-sm">
-                      Nov 2024 - Present
-                    </span>
-                    <h3 className="text-white font-medium text-lg">
-                      Founder/CEO & Lead Developer
-                    </h3>
-                    <p className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
-                      Lyra
-                    </p>
-                    <p className="text-white/60 text-sm">
-                      Enhanced backend systems for seamless reservations,
-                      implemented real-time API integrations, and developed
-                      performance monitoring tools. Supported scalability and
-                      collaborated with teams to drive platform stability and
-                      improvements.
-                    </p>
-                  </div>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
-                  className="relative flex gap-4"
-                >
-                  <div className="w-4 h-4 rounded-full bg-purple-500 shrink-0 mt-1.5" />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-white/50 text-sm">
-                      Sep 2024 - Oct 2024
-                    </span>
-                    <h3 className="text-white font-medium text-lg">
-                      Software Engineer Intern
-                    </h3>
-                    <p className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
-                      Cita Marketplace
-                    </p>
-                    <p className="text-white/60 text-sm">
-                      Enhanced backend systems for seamless reservations,
-                      implemented real-time API integrations, and developed
-                      performance monitoring tools. Supported scalability and
-                      collaborated with teams to drive platform stability and
-                      improvements.
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* Experience Item 2 */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="relative flex gap-4"
-                >
-                  <div className="w-4 h-4 rounded-full bg-purple-500 shrink-0 mt-1.5" />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-white/50 text-sm">
-                      Jul 2024 - Aug 2024
-                    </span>
-                    <h3 className="text-white font-medium text-lg">
-                      Virtual Software Engineer Intern
-                    </h3>
-                    <p className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
-                      JPMorgan Chase & Co.
-                    </p>
-                    <p className="text-white/60 text-sm">
-                      Set up the development environment, fixed repository
-                      issues, and optimized the web application. Implemented JP
-                      Morgan's Perspective library to create a live,
-                      user-friendly graph for real-time data monitoring and
-                      ensured the graph was clear and visually appealing,
-                      providing traders with an effective tool for monitoring
-                      real-time data.
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* Experience Item 3 */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                  className="relative flex gap-4"
-                >
-                  <div className="w-4 h-4 rounded-full bg-purple-500 shrink-0 mt-1.5" />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-white/50 text-sm">
-                      Mar 2024 - Jul 2024
-                    </span>
-                    <h3 className="text-white font-medium text-lg">
-                      Freelance Software Developer
-                    </h3>
-                    <p className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
-                      Roast
-                    </p>
-                    <p className="text-white/60 text-sm">
-                      Developed a mobile app for a coffee shop using React
-                      Native, integrating Apple Pay, Face ID, and secure
-                      sign-in/sign-up. Enhanced customer engagement with
-                      ordering, payments, and personalized promotions, improving
-                      operational efficiency.
-                    </p>
-                  </div>
-                </motion.div>
+                {/* Experience Items */}
+                {[
+                  {
+                    date: "Nov 2024 - Present",
+                    title: "Founder/CEO & Lead Developer",
+                    company: "Lyra",
+                    description: "Built a productivity platform for students with AI-driven tools for task organization and note enhancement. Secured $5K seed funding and led full-stack development."
+                  },
+                  {
+                    date: "Sep 2024 - Oct 2024",
+                    title: "Software Engineer Intern",
+                    company: "Cita Marketplace",
+                    description: "Enhanced backend systems, implemented API integrations, and developed monitoring tools. Improved platform stability and scalability."
+                  },
+                  {
+                    date: "Jul 2024 - Aug 2024",
+                    title: "Virtual Software Engineer Intern",
+                    company: "JPMorgan Chase & Co.",
+                    description: "Implemented JP Morgan's Perspective library for real-time data visualization. Optimized web application and resolved repository issues."
+                  },
+                  {
+                    date: "Mar 2024 - Jul 2024",
+                    title: "Freelance Software Developer",
+                    company: "Roast",
+                    description: "Developed React Native coffee shop app with Apple Pay, Face ID, and secure authentication. Enhanced customer engagement through personalized features."
+                  }
+                ].map((exp, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.2 }}
+                    className="relative flex gap-4"
+                  >
+                    <div className="w-4 h-4 rounded-full bg-purple-500 shrink-0 mt-1.5" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-white/50 text-sm">{exp.date}</span>
+                      <h3 className="text-white font-medium text-lg">{exp.title}</h3>
+                      <p className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
+                        {exp.company}
+                      </p>
+                      <p className="text-white/60 text-sm">{exp.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </div>
