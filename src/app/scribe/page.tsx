@@ -1170,7 +1170,7 @@ const ScribePage = () => {
       toast.success("Flashcards generated and saved!", {
         duration: 2000,
         style: {
-          background: "rgba(147, 51, 234, 0.1)",
+          background: "rgba(255, 215, 0, 0.1)",
           border: "1px solid rgba(147, 51, 234, 0.2)",
           color: "#fff",
         },
