@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         title,
         userId,
         cards: {
-          create: cards.map((card: any) => ({
+          create: cards.map((card: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
             question: card.question,
             answer: card.answer,
           })),
