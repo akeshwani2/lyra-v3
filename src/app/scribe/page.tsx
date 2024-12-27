@@ -646,49 +646,58 @@ const ScribePage = () => {
             (set) => set.title === oldFlashcardTitle
           );
 
-          for (const set of matchingSets) {
-            const updateResponse = await fetch(
-              `/api/flashcard-sets/${set.id}`,
-              {
-                method: "PATCH",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  title: newFlashcardTitle,
-                }),
-              }
-            );
+          // Use Promise.all to handle multiple flashcard set updates concurrently
+          await Promise.all(
+            matchingSets.map(async (set) => {
+              try {
+                const updateResponse = await fetch(
+                  `/api/flashcard-sets/${set.id}`,
+                  {
+                    method: "PATCH",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      title: newFlashcardTitle,
+                    }),
+                  }
+                );
 
-            if (updateResponse.ok) {
-              // Update local state
-              setFlashcardSets((prev) =>
-                prev.map((s) =>
-                  s.id === set.id ? { ...s, title: newFlashcardTitle } : s
-                )
-              );
-            }
-          }
+                if (updateResponse.ok) {
+                  // Update local state for this specific set
+                  setFlashcardSets((prev) =>
+                    prev.map((s) =>
+                      s.id === set.id ? { ...s, title: newFlashcardTitle } : s
+                    )
+                  );
+                }
+              } catch (error) {
+                console.error(`Failed to update flashcard set ${set.id}:`, error);
+              }
+            })
+          );
 
           // After successful update, refresh the notes list
           if (notesHistoryRef.current) {
             await notesHistoryRef.current.loadNotes();
           }
+
+          // Update saved title state after all updates are complete
+          setSavedTitle(title.trim());
+          setIsTitleSaved(true);
+          setIsEditingTitle(false);
+
+          toast.success("Title updated", {
+            duration: 2000,
+            style: {
+              background: "rgba(147, 51, 234, 0.1)",
+              border: "1px solid rgba(147, 51, 234, 0.2)",
+              color: "#fff",
+            },
+          });
         }
-
-        setSavedTitle(title.trim());
-        setIsTitleSaved(true);
-        setIsEditingTitle(false);
-
-        toast.success("Title updated", {
-          duration: 2000,
-          style: {
-            background: "rgba(147, 51, 234, 0.1)",
-            border: "1px solid rgba(147, 51, 234, 0.2)",
-            color: "#fff",
-          },
-        });
       } catch (error) {
+        console.error("Error updating title:", error);
         toast.error("Failed to update title");
       }
     } else {
