@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo.svg";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import MenuIcon from "@/assets/icon-menu.svg";
 import Link from "next/link";
@@ -12,6 +12,7 @@ const Header = () => {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const handleNavigation = (path: string) => {
     if (!isSignedIn) {
@@ -44,6 +45,10 @@ const Header = () => {
     return () => window.removeEventListener('click', handleClickOutside);
   }, [isMenuOpen]);
 
+  const isActive = (path: string) => {
+    return pathname === path ? "text-white" : "";
+  };
+
   return (
     <header className="py-4 border-b border-white/15 md:border-none sticky top-0 z-10 backdrop-blur md:backdrop-blur-none">
       <div className="container">
@@ -59,17 +64,26 @@ const Header = () => {
             <nav className="flex text-white/70 gap-8 text-sm">
               <button 
                 onClick={() => handleNavigation("/tasks")} 
-                className="hover:text-white transition"
+                className={`hover:text-white transition ${isActive("/tasks")}`}
               >
                 Features
               </button>
-              <a href="/developer" className="hover:text-white transition">
+              <a 
+                href="/developer" 
+                className={`hover:text-white transition ${isActive("/developer")}`}
+              >
                 Developer
               </a>
-              <Link href="/changelog" className="hover:text-white transition">
+              <Link 
+                href="/changelog" 
+                className={`hover:text-white transition ${isActive("/changelog")}`}
+              >
                 Changelog
               </Link>
-              <a href="/contact" className="hover:text-white transition">
+              <a 
+                href="/contact" 
+                className={`hover:text-white transition ${isActive("/contact")}`}
+              >
                 Contact
               </a>
             </nav>
@@ -120,20 +134,32 @@ const Header = () => {
                   handleNavigation("/tasks");
                   setIsMenuOpen(false);
                 }} 
-                className="hover:text-white transition text-left"
+                className={`hover:text-white transition text-left ${isActive("/tasks")}`}
               >
                 Features
               </button>
-              <a href="/developer" className="hover:text-white transition">
+              <a 
+                href="/developer" 
+                className={`hover:text-white transition ${isActive("/developer")}`}
+              >
                 Developer
               </a>
-              <Link href="/changelog" className="hover:text-white transition">
+              <Link 
+                href="/changelog" 
+                className={`hover:text-white transition ${isActive("/changelog")}`}
+              >
                 Changelog
               </Link>
-              <a href="/contact" className="hover:text-white transition">
+              <a 
+                href="/contact" 
+                className={`hover:text-white transition ${isActive("/contact")}`}
+              >
                 Contact
               </a>
-              <Link href="/faq" className="hover:text-white transition">
+              <Link 
+                href="/faq" 
+                className={`hover:text-white transition ${isActive("/faq")}`}
+              >
                 FAQ
               </Link>
             </nav>

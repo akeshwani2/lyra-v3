@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -7,72 +7,65 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    const { content } = await req.json();
+    const { content, isPartialContent } = await req.json();
+
+    const systemPrompt = isPartialContent 
+      ? `You are an expert note enhancer. Enhance the selected text by:
+         1. Expanding with relevant details and examples
+         2. Fixing any grammar issues
+         3. Maintaining the original context
+         4. Return the enhanced content wrapped in a single <p> tag
+         
+         Example:
+         Input: "quantum computers use qubits"
+         Output: <p>quantum computers use qubits (quantum bits), which can exist in multiple states simultaneously due to quantum superposition, unlike classical bits that can only be 0 or 1</p>`
+      : `You are an expert note enhancer. When given a full set of notes, organize them into sections with:
+         - <h3> tags for main sections
+         - Unless the <h3> tag is the first line, any other <h2> tags should have a margin-top of 8px
+         - <p> tags for paragraphs
+         - <strong> for emphasis
+         - Proper spacing between sections
+         - If math is included, just write it out in plain text, just use <strong> tags for emphasis
+         - Expanded details and examples
+         - Fixed grammar issues`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: `You are an expert note enhancer. When given a full set of notes, organize them into sections. 
-          When given a single line or paragraph, simply expand it with:
-          1. More detailed explanation
-          2. Maybe one brief example if relevant
-          3. Fix any grammar issues
-          4. Create a new section if necessary
-          
-          For partial content enhancement:
-          - Keep the same format/style as the input
-          - Don't create new sections or headers
-          - Maintain the original meaning
-          - If it's a coding question/example, handle it gracefully, use proper indentation and formatting, do not use markdown code blocks.
-          
-          For full note enhancement:
-          - Use <h2> tags for main sections with a class="text-2xl font-semibold mb-4 mt-8"
-          - Use <h3> tags for subsections with a class="text-xl font-semibold mb-3 mt-6"
-          - Use <p> tags for paragraphs with a class="mb-4"
-          - Use <strong> for emphasis
-          - Ensure proper spacing between sections
-          - If you need to add any code, use proper indentation and formatting, do not use markdown code blocks.
-          
-          Return clean, properly spaced HTML without markdown artifacts.`
+          content: systemPrompt
         },
         {
           role: "user",
-          content: `Enhance these notes with proper HTML formatting:\n\n${content}`
+          content: `Enhance these notes with proper formatting:\n\n${content}`
         }
       ],
       temperature: 0.7,
       max_tokens: 2000,
     });
 
-    let enhancedNotes = completion.choices[0].message.content || '';
+    let enhancedNotes = completion.choices[0].message.content || "";
 
-    // Clean up and standardize spacing
-    enhancedNotes = enhancedNotes
-      // Remove any markdown artifacts
-      .replace(/^#\s/gm, '')
-      .replace(/^##\s/gm, '')
-      .replace(/^###\s/gm, '')
-      // Add classes to HTML elements
-      .replace(/<h2>/g, '<h2 class="text-2xl font-semibold mb-4 mt-8">')
-      .replace(/<h3>/g, '<h3 class="text-xl font-semibold mb-3 mt-6">')
-      .replace(/<p>/g, '<p class="mb-4">')
-      // Fix double spacing
-      .replace(/\n\n+/g, '\n')
-      // Fix empty paragraphs
-      .replace(/<p>\s*<\/p>/g, '')
-      // Ensure consistent spacing between sections
-      .replace(/<\/h2>\s*<p>/g, '</h2>\n<p>')
-      .replace(/<\/h3>\s*<p>/g, '</h3>\n<p>')
-      .replace(/<\/p>\s*<h2>/g, '</p>\n\n<h2>')
-      .replace(/<\/p>\s*<h3>/g, '</p>\n\n<h3>');
+    // Only apply HTML cleanup for full content enhancement
+    if (!isPartialContent) {
+      enhancedNotes = enhancedNotes
+        .replace(/<h2>/g, '<h2 class="text-2xl font-semibold mb-4 mt-8">')
+        .replace(/<h3>/g, '<h3 class="text-xl font-semibold mb-3 mt-6">')
+        .replace(/<p>/g, '<p class="mb-4">')
+        .replace(/\n\n+/g, "\n")
+        .replace(/<p>\s*<\/p>/g, "")
+        .replace(/<\/h2>\s*<p>/g, "</h2>\n<p>")
+        .replace(/<\/h3>\s*<p>/g, "</h3>\n<p>")
+        .replace(/<\/p>\s*<h2>/g, "</p>\n\n<h2>")
+        .replace(/<\/p>\s*<h3>/g, "</p>\n\n<h3>");
+    }
 
     return NextResponse.json({ enhancedNotes });
   } catch (error) {
-    console.error('Error enhancing notes:', error);
+    console.error("Error enhancing notes:", error);
     return NextResponse.json(
-      { error: 'Failed to enhance notes' },
+      { error: "Failed to enhance notes" },
       { status: 500 }
     );
   }
