@@ -5,9 +5,12 @@ import avatar7 from "@/assets/avatar-7.png";
 import avatar3 from "@/assets/avatar-3.png";
 import avatar4 from "@/assets/avatar-4.png";
 import avatar5 from "@/assets/avatar-5.png";
+import mike1 from "@/assets/mike.png"
+import avatar6 from "@/assets/image.png";
 import Image from "next/image";
 import { motion } from "framer-motion";
 const testimonials = [
+
   {
     text: "“Love what Arhaan has done here. The impact was immediate - it's transformed how I work!”",
     name: "Arya Toufanian",
@@ -21,6 +24,13 @@ const testimonials = [
     avatarImg: avatar5,
   },
   {
+    text: "“I love the UI, it's very modern and I like the AI PDF reader, it's easy to use and very helpful.”",
+    name: "Michael Pressman",
+    title: "Student @ Baylor University/CEO of TCR",
+    avatarImg: mike1,
+  },
+
+  {
     text: "“This tool has greatly assisted me in organizing my tasks and staying on track.”",
     name: "Jamie Lee",
     title: "Student @ UC Berkeley",
@@ -33,10 +43,10 @@ const testimonials = [
     avatarImg: avatar1,
   },
   {
-    text: "“Absolutely love the design and the ease of use. It's a game changer for me and my friends.”",
-    name: "Alec Whitten",
-    title: "Upcoming student @ MIT",
-    avatarImg: avatar4,
+    text: "“I love the Scribe feature! I don't have to worry about taking notes anymore.”",
+    name: "Alex Sanchez",
+    title: "News Editor @ Channel 4 KFOR",
+    avatarImg: avatar6,
   },
 ];
 
