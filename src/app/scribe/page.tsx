@@ -1523,9 +1523,7 @@ const ScribePage = () => {
                     <div className="w-full space-y-4">
                       {/* Header section with gradient text and backdrop blur */}
                       <div className="flex items-center justify-between mb-4 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 py-4">
-                        <h2 className="text-3xl font-semibold text-white/90">
-                          Recent Notes
-                        </h2>
+                        <h2 className="text-3xl font-semibold text-white/90">Recent Notes</h2>
                         <div className="flex gap-2">
                           <Button
                             onClick={() => {
@@ -1580,18 +1578,7 @@ const ScribePage = () => {
                                       hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]
                                       hover:border-purple-500/30
                                       cursor-pointer"
-                            style={{
-                              transform: `translateY(${index * 2}px)`,
-                              opacity: 1 - index * 0.03,
-                            }}
                           >
-                            {/* Gradient overlay on hover */}
-                            <div
-                              className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-purple-500/0 
-                                          group-hover:from-purple-500/5 group-hover:via-purple-500/10 group-hover:to-purple-500/5 
-                                          transition-all duration-300 rounded-xl"
-                            />
-
                             <div className="relative flex items-center justify-between">
                               <div className="flex-1 flex items-center gap-2">
                                 {editingListItemId === note.id ? (
@@ -1599,23 +1586,10 @@ const ScribePage = () => {
                                     type="text"
                                     defaultValue={note.title}
                                     autoFocus
-                                    ref={(input) => {
-                                      if (input) {
-                                        input.select();
-                                      }
-                                    }}
-                                    onBlur={(e) =>
-                                      handleListItemTitleUpdate(
-                                        note.id,
-                                        e.target.value
-                                      )
-                                    }
+                                    onBlur={(e) => handleListItemTitleUpdate(note.id, e.target.value)}
                                     onKeyDown={(e) => {
                                       if (e.key === "Enter") {
-                                        handleListItemTitleUpdate(
-                                          note.id,
-                                          e.currentTarget.value
-                                        );
+                                        handleListItemTitleUpdate(note.id, e.currentTarget.value);
                                       } else if (e.key === "Escape") {
                                         setEditingListItemId(null);
                                       }
@@ -1666,21 +1640,99 @@ const ScribePage = () => {
                       </div>
                     </div>
                   ) : (
-                    // Empty state with better styling
-                    <div className="flex flex-col items-center justify-center gap-6 py-12">
-                      <div
-                        className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 
-                                    flex items-center justify-center shadow-lg"
-                      >
-                        <FileText className="w-8 h-8 text-white" />
+                    // Updated empty state to match design
+                    <div className="max-w-4xl mx-auto px-4 py-4 space-y-12">
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <div className="text-md font-bold text-gray-400 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
+                            Welcome to
+                          </div>
+                          <span className="bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] 
+                                      text-transparent bg-clip-text text-6xl font-bold block">
+                            Scribe
+                          </span>
+                          <p className="text-gray-400 text-lg max-w-2xl">
+                            Your AI-powered note-taking assistant. Record your thoughts, meetings, or lectures 
+                            and let AI transform them into well-structured notes.
+                          </p>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-4 justify-start">
+                          <Button
+                            onClick={() => {
+                              startRecording();
+                              resetNote();
+                            }}
+                            className="group relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-violet-600 
+                                     hover:to-cyan-500 transition-all duration-300 ease-in-out rounded-xl px-6 py-3 
+                                     text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
+                          >
+                            <span className="relative z-10 flex items-center gap-2">
+                              <div className="w-2 h-2 bg-white rounded-full" />
+                              Start Recording
+                            </span>
+                          </Button>
+
+                          <Button
+                            onClick={startNewNote}
+                            className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 
+                                     hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 
+                                     ease-in-out rounded-xl px-6 py-3 text-base font-medium shadow-lg 
+                                     hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
+                          >
+                            <span className="relative z-10 flex items-center gap-2">
+                              <FeatherIcon className="w-4 h-4" />
+                              New Note
+                            </span>
+                          </Button>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <h3 className="text-xl font-medium text-white mb-2">
-                          No notes yet
-                        </h3>
-                        <p className="text-gray-400">
-                          Start by creating a new note or recording
-                        </p>
+
+                      {/* Features Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                          <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
+                            <MessageCircleQuestionIcon className="w-5 h-5 text-purple-400" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-white mb-2">Voice to Notes</h3>
+                          <p className="text-gray-400">Record your voice and watch as AI transforms it into well-structured, organized notes.</p>
+                        </div>
+
+                        <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
+                            <Wand2 className="w-5 h-5 text-blue-400" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-white mb-2">AI Enhancement</h3>
+                          <p className="text-gray-400">Let AI help organize, format, and enhance your notes with additional context and structure.</p>
+                        </div>
+
+                        <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4">
+                            <History className="w-5 h-5 text-emerald-400" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-white mb-2">Note History</h3>
+                          <p className="text-gray-400">Access all your past notes with automatic saving and easy organization.</p>
+                        </div>
+                      </div>
+
+                      {/* Getting Started Guide */}
+                      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                        <h3 className="text-xl font-semibold text-white mb-4">Getting Started</h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 text-gray-400">
+                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">1</div>
+                            <p>Click "Start Recording" to begin capturing your voice</p>
+                          </div>
+                          <div className="flex items-center gap-3 text-gray-400">
+                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">2</div>
+                            <p>Speak clearly into your microphone</p>
+                          </div>
+                          <div className="flex items-center gap-3 text-gray-400">
+                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">3</div>
+                            <p>Stop recording when finished and let AI process your notes</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
