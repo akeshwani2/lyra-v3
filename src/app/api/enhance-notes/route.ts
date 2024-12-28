@@ -21,7 +21,7 @@ export async function POST(req: Request) {
          Output: <p>quantum computers use qubits (quantum bits), which can exist in multiple states simultaneously due to quantum superposition, unlike classical bits that can only be 0 or 1</p>`
       : `You are an expert note enhancer. When given a full set of notes, organize them into sections with:
          - <h3> tags for main sections
-         - Unless the <h3> tag is the first line, any other <h2> tags should have a margin-top of 8px
+         - Unless the <h3> tag is the first line, any other <h3> tags should have a margin-top of 8px
          - <p> tags for paragraphs
          - <strong> for emphasis
          - Proper spacing between sections
