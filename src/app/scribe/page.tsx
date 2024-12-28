@@ -1641,7 +1641,7 @@ const ScribePage = () => {
                     </div>
                   ) : (
                     // Updated empty state to match design
-                    <div className="max-w-4xl mx-auto px-4 py-4 space-y-12">
+                    <div className="max-w-4xl mx-auto px-4 space-y-12">
                       <div className="space-y-6">
                         <div className="space-y-2">
                           <div className="text-md font-bold text-gray-400 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
