@@ -18,6 +18,8 @@ import {
   MessageCircleQuestionIcon,
   Loader2,
   Undo2,
+  CircleSlash,
+  Ban,
 } from "lucide-react";
 import { dark } from "@clerk/themes";
 import { UserButton, useUser } from "@clerk/nextjs";
@@ -1954,19 +1956,20 @@ const TasksPage = () => {
                             onClick={() => setEditingAssignment(assignment)}
                             className="p-1 hover:bg-white/10 rounded-lg"
                           >
-                            <Pencil size={14} className="text-zinc-400 hover:text-white" />
+                            <Pencil size={14} className="text-purple-400 hover:text-purple-300" />
+                          </button>
+
+                          <button
+                            onClick={() => handleComplete(assignment)}
+                            className="p-1 hover:bg-white/10 rounded-lg"
+                          >
+                            <CheckCircle size={14} className="text-green-400 hover:text-green-300" />
                           </button>
                           <button
                             onClick={() => handleDeleteAssignment(assignment.id)}
                             className="p-1 hover:bg-white/10 rounded-lg"
                           >
                             <Trash2 size={14} className="text-red-400 hover:text-red-300" />
-                          </button>
-                          <button
-                            onClick={() => handleComplete(assignment)}
-                            className="p-1 hover:bg-white/10 rounded-lg"
-                          >
-                            <CheckCircle size={14} className="text-green-400 hover:text-green-300" />
                           </button>
                         </div>
                       </div>
@@ -2553,8 +2556,8 @@ const CompletedAssignmentsModal = ({
     >
       <div className="bg-zinc-900 rounded-xl w-full max-w-md border border-white/10">
         <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
+          <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-2">
+            <div className="">
               <h2 className="text-xl font-semibold">Completed Assignments</h2>
               <p className="text-sm text-zinc-400">{assignments.length} completed</p>
             </div>
@@ -2618,14 +2621,14 @@ const CompletedAssignmentsModal = ({
                       <p className="text-sm text-zinc-400 mt-1">
                         {courses.find(c => c.id === assignment.courseId)?.name || "Unknown Course"}
                       </p>
-                      <p className="font-medium">{assignment.title}</p>
+                      <p className="font-medium text-sm mt-1">{assignment.title}</p>
                       <p className="text-sm text-zinc-400 mt-1">
                         Due: {new Date(assignment.dueDate).toLocaleDateString()}
                       </p>
                     </div>
                     <button
                       onClick={() => handleRestore(assignment)}
-                      className="p-1.5 hover:bg-white/10 rounded-lg text-purple-400 hover:text-purple-300"
+                      className="p-1.5 hover:bg-white/10 rounded-lg text-green-400 hover:text-green-300"
                     >
                       <Undo2 size={14} />
                     </button>
@@ -2633,8 +2636,9 @@ const CompletedAssignmentsModal = ({
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-zinc-400">
-                <p>No completed assignments yet</p>
+              <div className="text-center py-4 text-zinc-400 flex flex-col items-center gap-2">
+                <Ban size={56} className="text-red-500 mb-4" />
+                <p className="text-md text-red-500">No completed assignments yet</p>
               </div>
             )}
           </div>
