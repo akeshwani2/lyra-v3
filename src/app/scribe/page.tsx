@@ -9,6 +9,7 @@ import { dark } from "@clerk/themes";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 import {
   Save,
   Plus,
@@ -55,6 +56,7 @@ interface FlashcardSet {
 }
 
 const ScribePage = () => {
+  const [isMobile, setIsMobile] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [notes, setNotes] = useState<string>("");
@@ -105,6 +107,51 @@ const ScribePage = () => {
   const [showFlashcardSets, setShowFlashcardSets] = useState(false);
   const [currentSetId, setCurrentSetId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const renderMobileView = () => {
+    if (isMobile) {
+      return (
+        <div className='min-h-screen w-full fixed inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-gray-900 to-black'>
+          <div className='space-y-6 max-w-md mx-auto'>
+            <div className='text-6xl mb-8'>
+              📱
+            </div>
+            <h1 className='text-3xl font-bold text-white mb-4'>
+              Lyra is not optimized for mobile screens yet
+            </h1>
+            <p className='text-gray-400 text-lg'>
+              Please visit us on a desktop or laptop computer for the best experience.
+            </p>
+            <div className='flex justify-center'>
+              <Link href="/">
+                <button className='bg-white text-black px-4 py-2 rounded-md'>
+                  <div className="absolute inset-0">
+                    <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+                    <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+                    <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+                  </div>
+                  Go back
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // All useEffects should be after state declarations
   useEffect(() => {
     const loadInitialNotes = async () => {
       setIsLoadingNotes(true);
@@ -1247,683 +1294,687 @@ const ScribePage = () => {
 
   return (
     <div className="relative min-h-screen w-full bg-zinc-950">
-      {/* Animated background pattern */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-      </div>
+      {renderMobileView() || (
+        <>
+          {/* Animated background pattern */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+          </div>
 
-      {/* Main content - make this a flex container with h-screen */}
-      <div className="absolute inset-0 flex flex-col h-screen">
-        {/* Header bar - add flex-shrink-0 to prevent shrinking */}
-        <div className="flex justify-between items-center w-full px-8 py-8 flex-shrink-0">
-          <h1 className="text-2xl sm:text-4xl pb-1 font-bold bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text pl-2">
-            {savedTitle || "Scribe"}
-          </h1>
+          {/* Main content - make this a flex container with h-screen */}
+          <div className="absolute inset-0 flex flex-col h-screen">
+            {/* Header bar - add flex-shrink-0 to prevent shrinking */}
+            <div className="flex justify-between items-center w-full px-8 py-8 flex-shrink-0">
+              <h1 className="text-2xl sm:text-4xl pb-1 font-bold bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text pl-2">
+                {savedTitle || "Scribe"}
+              </h1>
 
-          <div className="flex items-center gap-4">
-            {(currentNoteId || notes) && (
-              <div className="relative flex gap-2">
-                <Button
-                  onClick={() => {
-                    startRecording();
-                    resetNote();
-                  }}
-                  className="group relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-white rounded-full" />
-                    New Recording
+              <div className="flex items-center gap-4">
+                {(currentNoteId || notes) && (
+                  <div className="relative flex gap-2">
+                    <Button
+                      onClick={() => {
+                        startRecording();
+                        resetNote();
+                      }}
+                      className="group relative bg-gradient-to-r from-purple-500 to-blue-500 hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
+                    >
+                      <span className="relative z-10 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-white rounded-full" />
+                        New Recording
+                      </span>
+                    </Button>
+                    <Button
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        await startNewNote();
+                      }}
+                      className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
+                    >
+                      <span className="relative z-10 flex items-center gap-2">
+                        <FeatherIcon className="w-4 h-4" />
+                        New Note
+                      </span>
+                    </Button>
+                    <button
+                      onClick={() => {
+                        setShowFlashcards(false);
+                        setShowFlashcardSets(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
+                               text-blue-400 transition-colors flex items-center gap-2"
+                    >
+                      <BookOpenCheck className="w-4 h-4" />
+                      View Sets
+                    </button>
+                    <Button
+                      onClick={() => notesHistoryRef.current?.setIsOpen(true)}
+                      className="group relative bg-white/5 hover:bg-white/10 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium"
+                    >
+                      <span className="relative z-10 flex items-center gap-2">
+                        <History className="w-4 h-4" />
+                        History
+                      </span>
+                    </Button>
+                  </div>
+                )}
+
+                {/* User button container */}
+                <div className="flex items-center gap-4">
+                  <span className="bg-gradient-to-t from-zinc-600 tracking-tight via-zinc-300 to-white text-transparent bg-clip-text text-lg md:text-xl font-bold">
+                    {user?.username || user?.firstName || ""}
                   </span>
-                </Button>
-                <Button
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    await startNewNote();
-                  }}
-                  className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <FeatherIcon className="w-4 h-4" />
-                    New Note
-                  </span>
-                </Button>
-                <button
-                  onClick={() => {
-                    setShowFlashcards(false);
-                    setShowFlashcardSets(true);
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
-                           text-blue-400 transition-colors flex items-center gap-2"
-                >
-                  <BookOpenCheck className="w-4 h-4" />
-                  View Sets
-                </button>
-                <Button
-                  onClick={() => notesHistoryRef.current?.setIsOpen(true)}
-                  className="group relative bg-white/5 hover:bg-white/10 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <History className="w-4 h-4" />
-                    History
-                  </span>
-                </Button>
+                  <UserButton
+                    afterSignOutUrl="/"
+                    appearance={{
+                      baseTheme: dark,
+                      elements: {
+                        avatarBox: "w-10 h-10 rounded-lg ring-offset-0",
+                        userButtonTrigger: "p-0.5 rounded-lg",
+                        userButtonPopoverCard: "min-w-[240px] rounded-lg",
+                      },
+                    }}
+                  />
+                </div>
               </div>
-            )}
+            </div>
 
-            {/* User button container */}
-            <div className="flex items-center gap-4">
-              <span className="bg-gradient-to-t from-zinc-600 tracking-tight via-zinc-300 to-white text-transparent bg-clip-text text-lg md:text-xl font-bold">
-                {user?.username || user?.firstName || ""}
-              </span>
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  baseTheme: dark,
-                  elements: {
-                    avatarBox: "w-10 h-10 rounded-lg ring-offset-0",
-                    userButtonTrigger: "p-0.5 rounded-lg",
-                    userButtonPopoverCard: "min-w-[240px] rounded-lg",
-                  },
-                }}
-              />
+            {/* Notes display - update with overflow-y-auto and flex-1 */}
+            <div className="flex-1 overflow-y-auto px-4 pb-8">
+              {isProcessing ? (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
+                    <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="text-lg font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+                        Feeding audio to AI...
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Converting your speech into structured notes
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : currentNoteId || notes ? (
+                <div className="relative pt-6">
+                  <div className="max-w-[109rem] w-full mx-auto h-full bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-white/10 flex flex-col">
+                    <div className="flex flex-col gap-4 mb-6 flex-shrink-0">
+                      {/* Title section - with actions aligned */}
+                      <div className="flex items-center justify-between">
+                        {/* Title and edit button */}
+                        <div className="flex items-center justify-center gap-2">
+                          {isEditingTitle ? (
+                            <input
+                              type="text"
+                              value={title}
+                              onChange={handleTitleChange}
+                              onBlur={handleTitleBlur}
+                              onKeyDown={handleTitleKeyDown}
+                              placeholder="Enter title..."
+                              className="bg-transparent border-b border-purple-500/30 focus:border-purple-500 outline-none px-2 py-1 text-white placeholder:text-gray-400 transition-all duration-300 w-full max-w-[400px] text-2xl text-center items-center"
+                              autoFocus
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center gap-2">
+                              <h3
+                                className="text-white text-2xl font-medium text-center items-center cursor-pointer "
+                                onClick={() => {
+                                  setIsEditingTitle(true);
+                                  setIsTitleSaved(false);
+                                }}
+                              >
+                                {savedTitle || "Untitled Note"}
+                              </h3>
+                              <button
+                                onClick={() => {
+                                  setIsEditingTitle(true);
+                                  setIsTitleSaved(false);
+                                }}
+                                className="text-purple-400 hover:text-purple-300 transition-colors"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Right side actions */}
+                        <div className="flex items-center gap-4">
+                          {/* Auto-save status indicator */}
+                          <div className="text-sm">
+                            {autoSaveStatus === "saving" && (
+                              <div className="flex items-center gap-1 text-yellow-500">
+                                <CircleDashed className="w-3 h-3 animate-spin" />
+                                Saving...
+                              </div>
+                            )}
+                            {autoSaveStatus === "saved" && (
+                              <div className="flex items-center gap-1 text-green-500">
+                                <div className="w-2 h-2 rounded-full bg-green-500" />
+                                Saved
+                              </div>
+                            )}
+                            {autoSaveStatus === "error" && (
+                              <div className="flex items-center gap-1 text-red-500">
+                                <X className="w-3 h-3" />
+                                Error saving
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Enhance button */}
+                          {notes && !isProcessing && (
+                            <Button
+                              onClick={enhanceNotes}
+                              className="group relative bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 transition-all duration-300 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(167,139,250,0.8)]"
+                            >
+                              <span className="relative z-10 flex items-center gap-2">
+                                <Wand2 className="w-4 h-4" />
+                                Enhance with AI
+                              </span>
+                            </Button>
+                          )}
+
+                          {/* Flashcard button */}
+                          {notes && !isProcessing && (
+                            <Button
+                              onClick={generateFlashcards}
+                              className="group relative bg-gradient-to-r from-orange-500 to-amber-500 
+                                       hover:from-orange-600 hover:to-amber-600 transition-all duration-300 
+                                       ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
+                                       hover:shadow-[0_0_2rem_-0.5rem_rgba(249,115,22,0.8)]"
+                            >
+                              <span className="relative z-10 flex items-center gap-2">
+                                <BookOpenCheck className="w-4 h-4" />
+                                Generate Flashcards
+                              </span>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="prose prose-invert max-w-none flex-1 overflow-hidden">
+                      <RichTextEditor
+                        content={notes}
+                        onChange={handleNotesChange}
+                        noteId={currentNoteId}
+                      />
+                    </div>
+                  </div>
+
+                  {/* NotesHistory with explicit z-index */}
+                  <NotesHistory
+                    ref={notesHistoryRef}
+                    onSelectNote={handleSelectNote}
+                    currentNoteId={currentNoteId}
+                    onDeleteNote={handleDeleteNote}
+                    className="z-50"
+                  />
+                </div>
+              ) : (
+                <div className="max-w-4xl w-full mx-auto mt-6">
+                  {isLoadingNotes ? (
+                    <div className="flex flex-col items-center justify-center gap-4 py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-purple-500/50" />
+                      <p className="text-sm text-gray-500">Loading your notes...</p>
+                    </div>
+                  ) : notesHistory.length > 0 ? (
+                    <div className="w-full space-y-4">
+                      {/* Header section with gradient text and backdrop blur */}
+                      <div className="flex items-center justify-between mb-4 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 py-4">
+                        <h2 className="text-3xl font-semibold text-white/90">
+                          Recent Notes
+                        </h2>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              startRecording();
+                              resetNote();
+                            }}
+                            className="group relative overflow-hidden bg-gradient-to-r from-purple-500 to-blue-500 
+                                     hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 
+                                     ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
+                                     hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
+                          >
+                            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+                            <span className="relative z-10 flex items-center gap-2">
+                              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                              New Recording
+                            </span>
+                          </Button>
+                          <Button
+                            onClick={startNewNote}
+                            className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 
+                                     hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 
+                                     ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
+                                     hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
+                          >
+                            <span className="relative z-10 flex items-center gap-2">
+                              <FeatherIcon className="w-4 h-4" />
+                              New Note
+                            </span>
+                          </Button>
+                          <button
+                            onClick={() => {
+                              setShowFlashcards(false);
+                              setShowFlashcardSets(true);
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
+                                     text-blue-400 transition-colors flex items-center gap-2"
+                          >
+                            <BookOpenCheck className="w-4 h-4" />
+                            View Sets
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Notes list with enhanced styling */}
+                      <div className="space-y-4">
+                        {notesHistory.map((note, index) => (
+                          <div
+                            key={note.id}
+                            onClick={() => handleSelectNote(note)}
+                            className="group relative p-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-xl 
+                                      border border-white/10 transition-all duration-300 
+                                      hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]
+                                      hover:border-purple-500/30
+                                      cursor-pointer"
+                            style={{
+                              transform: `translateY(${index * 2}px)`,
+                              opacity: 1 - index * 0.03,
+                            }}
+                          >
+                            {/* Gradient overlay on hover */}
+                            <div
+                              className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-purple-500/0 
+                                          group-hover:from-purple-500/5 group-hover:via-purple-500/10 group-hover:to-purple-500/5 
+                                          transition-all duration-300 rounded-xl"
+                            />
+
+                            <div className="relative flex items-center justify-between">
+                              <div className="flex-1 flex items-center gap-2">
+                                {editingListItemId === note.id ? (
+                                  <input
+                                    type="text"
+                                    defaultValue={note.title}
+                                    autoFocus
+                                    ref={(input) => {
+                                      if (input) {
+                                        input.select();
+                                      }
+                                    }}
+                                    onBlur={(e) =>
+                                      handleListItemTitleUpdate(
+                                        note.id,
+                                        e.target.value
+                                      )
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleListItemTitleUpdate(
+                                          note.id,
+                                          e.currentTarget.value
+                                        );
+                                      } else if (e.key === "Escape") {
+                                        setEditingListItemId(null);
+                                      }
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="bg-transparent border-b border-purple-500/30 focus:border-purple-500 
+                                             outline-none px-2 py-1 text-white placeholder:text-gray-400 
+                                             transition-all duration-300 w-full max-w-[400px]"
+                                  />
+                                ) : (
+                                  <>
+                                    <h3 className="text-lg font-medium text-white/90 group-hover:text-white">
+                                      {note.title}
+                                    </h3>
+                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEditingListItemId(note.id);
+                                        }}
+                                        className="text-green-400 hover:text-green-300 p-1 rounded-lg hover:bg-green-500/10
+                                                 transition-colors duration-200"
+                                        aria-label="Edit title"
+                                      >
+                                        <Pencil className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteNote(note.id);
+                                        }}
+                                        className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10
+                                                 transition-colors duration-200"
+                                        aria-label="Delete note"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                              <span className="text-sm text-white/50 group-hover:text-white/70 transition-colors duration-200">
+                                {format(new Date(note.createdAt), "MMM d, yyyy")}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    // Empty state with better styling
+                    <div className="flex flex-col items-center justify-center gap-6 py-12">
+                      <div
+                        className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 
+                                    flex items-center justify-center shadow-lg"
+                      >
+                        <FileText className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="text-center">
+                        <h3 className="text-xl font-medium text-white mb-2">
+                          No notes yet
+                        </h3>
+                        <p className="text-gray-400">
+                          Start by creating a new note or recording
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
-        </div>
 
-        {/* Notes display - update with overflow-y-auto and flex-1 */}
-        <div className="flex-1 overflow-y-auto px-4 pb-8">
-          {isProcessing ? (
+          {isRecording && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
+                {/* Audio visualizer and controls */}
+                <div className="flex items-center gap-4">
+                  {/* Audio visualizer */}
+                  <div className="w-32">
+                    <AudioVisualizer data={audioData} />
+                    <div className="w-full bg-white/10 rounded-full h-1 mt-1 overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-300"
+                        style={{
+                          width: `${(recordingTime / MAX_RECORDING_TIME) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Timer */}
+                  <div className="text-sm text-white/70 min-w-[80px]">
+                    {formatTime(recordingTime)}
+                  </div>
+
+                  {/* Control buttons */}
+                  <div className="flex items-center gap-2">
+                    {!isPaused ? (
+                      <button
+                        onClick={pauseRecording}
+                        className="w-8 h-8 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 
+                                 flex items-center justify-center transition-all duration-300
+                                 hover:shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+                      >
+                        <Pause className="w-4 h-4 text-yellow-500" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={resumeRecording}
+                        className="w-8 h-8 rounded-lg bg-green-500/20 hover:bg-green-500/30 
+                                 flex items-center justify-center transition-all duration-300
+                                 hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                      >
+                        <Play className="w-4 h-4 text-green-500" />
+                      </button>
+                    )}
+
+                    <button
+                      onClick={stopRecording}
+                      className="w-8 h-8 rounded-lg bg-red-500/20 hover:bg-red-500/30 
+                               flex items-center justify-center transition-all duration-300
+                               hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                    >
+                      <Square className="w-4 h-4 text-red-500" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recording status text */}
+                <p className="text-sm text-gray-400">Recording in progress...</p>
+              </div>
+            </div>
+          )}
+
+          {isEnhancing && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
               <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
                 <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
                 <div className="flex flex-col items-center gap-1">
                   <p className="text-lg font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
-                    Feeding audio to AI...
+                    Enhancing your notes...
                   </p>
                   <p className="text-sm text-gray-500">
-                    Converting your speech into structured notes
+                    Adding structure and context to your content
                   </p>
                 </div>
               </div>
             </div>
-          ) : currentNoteId || notes ? (
-            <div className="relative pt-6">
-              <div className="max-w-[109rem] w-full mx-auto h-full bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-white/10 flex flex-col">
-                <div className="flex flex-col gap-4 mb-6 flex-shrink-0">
-                  {/* Title section - with actions aligned */}
-                  <div className="flex items-center justify-between">
-                    {/* Title and edit button */}
-                    <div className="flex items-center justify-center gap-2">
-                      {isEditingTitle ? (
-                        <input
-                          type="text"
-                          value={title}
-                          onChange={handleTitleChange}
-                          onBlur={handleTitleBlur}
-                          onKeyDown={handleTitleKeyDown}
-                          placeholder="Enter title..."
-                          className="bg-transparent border-b border-purple-500/30 focus:border-purple-500 outline-none px-2 py-1 text-white placeholder:text-gray-400 transition-all duration-300 w-full max-w-[400px] text-2xl text-center items-center"
-                          autoFocus
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center gap-2">
-                          <h3
-                            className="text-white text-2xl font-medium text-center items-center cursor-pointer "
-                            onClick={() => {
-                              setIsEditingTitle(true);
-                              setIsTitleSaved(false);
-                            }}
-                          >
-                            {savedTitle || "Untitled Note"}
-                          </h3>
-                          <button
-                            onClick={() => {
-                              setIsEditingTitle(true);
-                              setIsTitleSaved(false);
-                            }}
-                            className="text-purple-400 hover:text-purple-300 transition-colors"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
+          )}
+
+          {isGeneratingFlashcards && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
+                <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
+                <p className="text-sm text-gray-400">Generating flashcards...</p>
+              </div>
+            </div>
+          )}
+
+          {showFlashcards && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-xl font-semibold text-white">Flashcards</h3>
+                    <span className="text-sm text-gray-400">
+                      {currentCardIndex + 1} / {flashcards.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* View Sets button */}
+                    <button
+                      onClick={() => {
+                        setShowFlashcards(false);
+                        setShowFlashcardSets(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
+                               text-blue-400 transition-colors flex items-center gap-2"
+                    >
+                      <BookOpenCheck className="w-4 h-4" />
+                      View Sets
+                    </button>
+
+                    {/* Close button */}
+                    <button
+                      onClick={() => {
+                        setShowFlashcards(false);
+                        setCurrentCardIndex(0);
+                        setIsFlipped(false);
+                      }}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Flashcard container */}
+                <div className="relative w-full aspect-[16/9] mb-6">
+                  <div
+                    className={`w-full h-full cursor-pointer transition-all duration-500 preserve-3d
+                               ${isFlipped ? "rotate-y-180" : ""}`}
+                    onClick={() => setIsFlipped(!isFlipped)}
+                  >
+                    {/* Front of card */}
+                    <div className="absolute inset-0 backface-hidden">
+                      <div
+                        className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
+                                    flex flex-col items-center justify-center text-center"
+                      >
+                        <span className="text-sm text-purple-400 mb-2">
+                          Question
+                        </span>
+                        <p className="text-white text-lg">
+                          {flashcards[currentCardIndex]?.question}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Right side actions */}
-                    <div className="flex items-center gap-4">
-                      {/* Auto-save status indicator */}
-                      <div className="text-sm">
-                        {autoSaveStatus === "saving" && (
-                          <div className="flex items-center gap-1 text-yellow-500">
-                            <CircleDashed className="w-3 h-3 animate-spin" />
-                            Saving...
-                          </div>
-                        )}
-                        {autoSaveStatus === "saved" && (
-                          <div className="flex items-center gap-1 text-green-500">
-                            <div className="w-2 h-2 rounded-full bg-green-500" />
-                            Saved
-                          </div>
-                        )}
-                        {autoSaveStatus === "error" && (
-                          <div className="flex items-center gap-1 text-red-500">
-                            <X className="w-3 h-3" />
-                            Error saving
-                          </div>
-                        )}
+                    {/* Back of card */}
+                    <div className="absolute inset-0 rotate-y-180 backface-hidden">
+                      <div
+                        className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
+                                    flex flex-col items-center justify-center text-center"
+                      >
+                        <span className="text-sm text-emerald-400 mb-2">
+                          Answer
+                        </span>
+                        <p className="text-white text-lg">
+                          {flashcards[currentCardIndex]?.answer}
+                        </p>
                       </div>
-
-                      {/* Enhance button */}
-                      {notes && !isProcessing && (
-                        <Button
-                          onClick={enhanceNotes}
-                          className="group relative bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 transition-all duration-300 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(167,139,250,0.8)]"
-                        >
-                          <span className="relative z-10 flex items-center gap-2">
-                            <Wand2 className="w-4 h-4" />
-                            Enhance with AI
-                          </span>
-                        </Button>
-                      )}
-
-                      {/* Flashcard button */}
-                      {notes && !isProcessing && (
-                        <Button
-                          onClick={generateFlashcards}
-                          className="group relative bg-gradient-to-r from-orange-500 to-amber-500 
-                                   hover:from-orange-600 hover:to-amber-600 transition-all duration-300 
-                                   ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
-                                   hover:shadow-[0_0_2rem_-0.5rem_rgba(249,115,22,0.8)]"
-                        >
-                          <span className="relative z-10 flex items-center gap-2">
-                            <BookOpenCheck className="w-4 h-4" />
-                            Generate Flashcards
-                          </span>
-                        </Button>
-                      )}
                     </div>
                   </div>
                 </div>
 
-                <div className="prose prose-invert max-w-none flex-1 overflow-hidden">
-                  <RichTextEditor
-                    content={notes}
-                    onChange={handleNotesChange}
-                    noteId={currentNoteId}
-                  />
+                {/* Navigation controls */}
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => {
+                      setCurrentCardIndex((prev) => Math.max(0, prev - 1));
+                      setIsFlipped(false);
+                    }}
+                    disabled={currentCardIndex === 0}
+                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50
+                             disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">
+                      Click card to flip
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setCurrentCardIndex((prev) =>
+                        Math.min(flashcards.length - 1, prev + 1)
+                      );
+                      setIsFlipped(false);
+                    }}
+                    disabled={currentCardIndex === flashcards.length - 1}
+                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50
+                             disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
                 </div>
               </div>
-
-              {/* NotesHistory with explicit z-index */}
-              <NotesHistory
-                ref={notesHistoryRef}
-                onSelectNote={handleSelectNote}
-                currentNoteId={currentNoteId}
-                onDeleteNote={handleDeleteNote}
-                className="z-50"
-              />
             </div>
-          ) : (
-            <div className="max-w-4xl w-full mx-auto mt-6">
-              {isLoadingNotes ? (
-                <div className="flex flex-col items-center justify-center gap-4 py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-purple-500/50" />
-                  <p className="text-sm text-gray-500">Loading your notes...</p>
+          )}
+
+          {/* Add new modal for flashcard sets */}
+          {showFlashcardSets && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-semibold text-white">
+                    Flashcard Sets
+                  </h3>
+                  <button
+                    onClick={() => setShowFlashcardSets(false)}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-              ) : notesHistory.length > 0 ? (
-                <div className="w-full space-y-4">
-                  {/* Header section with gradient text and backdrop blur */}
-                  <div className="flex items-center justify-between mb-4 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 py-4">
-                    <h2 className="text-3xl font-semibold text-white/90">
-                      Recent Notes
-                    </h2>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => {
-                          startRecording();
-                          resetNote();
-                        }}
-                        className="group relative overflow-hidden bg-gradient-to-r from-purple-500 to-blue-500 
-                                 hover:from-violet-600 hover:to-cyan-500 transition-all duration-300 
-                                 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
-                                 hover:shadow-[0_0_2rem_-0.5rem_rgba(139,92,246,0.8)]"
-                      >
-                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-                        <span className="relative z-10 flex items-center gap-2">
-                          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                          New Recording
-                        </span>
-                      </Button>
-                      <Button
-                        onClick={startNewNote}
-                        className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 
-                                 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 
-                                 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg 
-                                 hover:shadow-[0_0_2rem_-0.5rem_rgba(16,185,129,0.8)]"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">
-                          <FeatherIcon className="w-4 h-4" />
-                          New Note
-                        </span>
-                      </Button>
-                      <button
-                        onClick={() => {
-                          setShowFlashcards(false);
-                          setShowFlashcardSets(true);
-                        }}
-                        className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
-                                 text-blue-400 transition-colors flex items-center gap-2"
-                      >
-                        <BookOpenCheck className="w-4 h-4" />
-                        View Sets
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Notes list with enhanced styling */}
-                  <div className="space-y-4">
-                    {notesHistory.map((note, index) => (
+                {flashcardSets.length > 0 ? (
+                  <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                    {flashcardSets.map((set) => (
                       <div
-                        key={note.id}
-                        onClick={() => handleSelectNote(note)}
-                        className="group relative p-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-xl 
-                                  border border-white/10 transition-all duration-300 
-                                  hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]
-                                  hover:border-purple-500/30
-                                  cursor-pointer"
-                        style={{
-                          transform: `translateY(${index * 2}px)`,
-                          opacity: 1 - index * 0.03,
-                        }}
+                        key={set.id}
+                        className="group p-4 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 
+                                 transition-all duration-200 cursor-pointer"
+                        onClick={() => loadFlashcardSet(set.id)}
                       >
-                        {/* Gradient overlay on hover */}
-                        <div
-                          className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-purple-500/0 
-                                      group-hover:from-purple-500/5 group-hover:via-purple-500/10 group-hover:to-purple-500/5 
-                                      transition-all duration-300 rounded-xl"
-                        />
-
-                        <div className="relative flex items-center justify-between">
-                          <div className="flex-1 flex items-center gap-2">
-                            {editingListItemId === note.id ? (
-                              <input
-                                type="text"
-                                defaultValue={note.title}
-                                autoFocus
-                                ref={(input) => {
-                                  if (input) {
-                                    input.select();
-                                  }
-                                }}
-                                onBlur={(e) =>
-                                  handleListItemTitleUpdate(
-                                    note.id,
-                                    e.target.value
-                                  )
-                                }
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") {
-                                    handleListItemTitleUpdate(
-                                      note.id,
-                                      e.currentTarget.value
-                                    );
-                                  } else if (e.key === "Escape") {
-                                    setEditingListItemId(null);
-                                  }
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                                className="bg-transparent border-b border-purple-500/30 focus:border-purple-500 
-                                         outline-none px-2 py-1 text-white placeholder:text-gray-400 
-                                         transition-all duration-300 w-full max-w-[400px]"
-                              />
-                            ) : (
-                              <>
-                                <h3 className="text-lg font-medium text-white/90 group-hover:text-white">
-                                  {note.title}
-                                </h3>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setEditingListItemId(note.id);
-                                    }}
-                                    className="text-green-400 hover:text-green-300 p-1 rounded-lg hover:bg-green-500/10
-                                             transition-colors duration-200"
-                                    aria-label="Edit title"
-                                  >
-                                    <Pencil className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteNote(note.id);
-                                    }}
-                                    className="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10
-                                             transition-colors duration-200"
-                                    aria-label="Delete note"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </>
-                            )}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-white font-medium">{set.title}</h4>
+                            <p className="text-sm text-gray-400">
+                              {set.cards.length} cards • Created{" "}
+                              {new Date(set.createdAt).toLocaleDateString()}
+                            </p>
                           </div>
-                          <span className="text-sm text-white/50 group-hover:text-white/70 transition-colors duration-200">
-                            {format(new Date(note.createdAt), "MMM d, yyyy")}
-                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteFlashcardSet(set.id);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                     text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              ) : (
-                // Empty state with better styling
-                <div className="flex flex-col items-center justify-center gap-6 py-12">
-                  <div
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 
-                                flex items-center justify-center shadow-lg"
-                  >
-                    <FileText className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="text-xl font-medium text-white mb-2">
-                      No notes yet
-                    </h3>
-                    <p className="text-gray-400">
-                      Start by creating a new note or recording
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    <BookOpenCheck className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No flashcard sets yet</p>
+                    <p className="text-sm mt-2">
+                      Generate some flashcards from your notes to get started!
                     </p>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
-        </div>
-      </div>
-
-      {isRecording && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
-            {/* Audio visualizer and controls */}
-            <div className="flex items-center gap-4">
-              {/* Audio visualizer */}
-              <div className="w-32">
-                <AudioVisualizer data={audioData} />
-                <div className="w-full bg-white/10 rounded-full h-1 mt-1 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-300"
-                    style={{
-                      width: `${(recordingTime / MAX_RECORDING_TIME) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Timer */}
-              <div className="text-sm text-white/70 min-w-[80px]">
-                {formatTime(recordingTime)}
-              </div>
-
-              {/* Control buttons */}
-              <div className="flex items-center gap-2">
-                {!isPaused ? (
-                  <button
-                    onClick={pauseRecording}
-                    className="w-8 h-8 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 
-                             flex items-center justify-center transition-all duration-300
-                             hover:shadow-[0_0_15px_rgba(234,179,8,0.3)]"
-                  >
-                    <Pause className="w-4 h-4 text-yellow-500" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={resumeRecording}
-                    className="w-8 h-8 rounded-lg bg-green-500/20 hover:bg-green-500/30 
-                             flex items-center justify-center transition-all duration-300
-                             hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]"
-                  >
-                    <Play className="w-4 h-4 text-green-500" />
-                  </button>
-                )}
-
-                <button
-                  onClick={stopRecording}
-                  className="w-8 h-8 rounded-lg bg-red-500/20 hover:bg-red-500/30 
-                           flex items-center justify-center transition-all duration-300
-                           hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-                >
-                  <Square className="w-4 h-4 text-red-500" />
-                </button>
-              </div>
-            </div>
-
-            {/* Recording status text */}
-            <p className="text-sm text-gray-400">Recording in progress...</p>
-          </div>
-        </div>
-      )}
-
-      {isEnhancing && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
-            <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
-            <div className="flex flex-col items-center gap-1">
-              <p className="text-lg font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
-                Enhancing your notes...
-              </p>
-              <p className="text-sm text-gray-500">
-                Adding structure and context to your content
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isGeneratingFlashcards && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
-            <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
-            <p className="text-sm text-gray-400">Generating flashcards...</p>
-          </div>
-        </div>
-      )}
-
-      {showFlashcards && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <h3 className="text-xl font-semibold text-white">Flashcards</h3>
-                <span className="text-sm text-gray-400">
-                  {currentCardIndex + 1} / {flashcards.length}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {/* View Sets button */}
-                <button
-                  onClick={() => {
-                    setShowFlashcards(false);
-                    setShowFlashcardSets(true);
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 
-                           text-blue-400 transition-colors flex items-center gap-2"
-                >
-                  <BookOpenCheck className="w-4 h-4" />
-                  View Sets
-                </button>
-
-                {/* Close button */}
-                <button
-                  onClick={() => {
-                    setShowFlashcards(false);
-                    setCurrentCardIndex(0);
-                    setIsFlipped(false);
-                  }}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Flashcard container */}
-            <div className="relative w-full aspect-[16/9] mb-6">
-              <div
-                className={`w-full h-full cursor-pointer transition-all duration-500 preserve-3d
-                           ${isFlipped ? "rotate-y-180" : ""}`}
-                onClick={() => setIsFlipped(!isFlipped)}
-              >
-                {/* Front of card */}
-                <div className="absolute inset-0 backface-hidden">
-                  <div
-                    className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
-                                flex flex-col items-center justify-center text-center"
-                  >
-                    <span className="text-sm text-purple-400 mb-2">
-                      Question
-                    </span>
-                    <p className="text-white text-lg">
-                      {flashcards[currentCardIndex]?.question}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Back of card */}
-                <div className="absolute inset-0 rotate-y-180 backface-hidden">
-                  <div
-                    className="w-full h-full bg-white/5 rounded-xl border border-white/10 p-8
-                                flex flex-col items-center justify-center text-center"
-                  >
-                    <span className="text-sm text-emerald-400 mb-2">
-                      Answer
-                    </span>
-                    <p className="text-white text-lg">
-                      {flashcards[currentCardIndex]?.answer}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Navigation controls */}
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => {
-                  setCurrentCardIndex((prev) => Math.max(0, prev - 1));
-                  setIsFlipped(false);
-                }}
-                disabled={currentCardIndex === 0}
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50
-                         disabled:cursor-not-allowed transition-all duration-200"
-              >
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-400">
-                  Click card to flip
-                </span>
-              </div>
-
-              <button
-                onClick={() => {
-                  setCurrentCardIndex((prev) =>
-                    Math.min(flashcards.length - 1, prev + 1)
-                  );
-                  setIsFlipped(false);
-                }}
-                disabled={currentCardIndex === flashcards.length - 1}
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-50
-                         disabled:cursor-not-allowed transition-all duration-200"
-              >
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add new modal for flashcard sets */}
-      {showFlashcardSets && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-white">
-                Flashcard Sets
-              </h3>
-              <button
-                onClick={() => setShowFlashcardSets(false)}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {flashcardSets.length > 0 ? (
-              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                {flashcardSets.map((set) => (
-                  <div
-                    key={set.id}
-                    className="group p-4 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 
-                             transition-all duration-200 cursor-pointer"
-                    onClick={() => loadFlashcardSet(set.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-white font-medium">{set.title}</h4>
-                        <p className="text-sm text-gray-400">
-                          {set.cards.length} cards • Created{" "}
-                          {new Date(set.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteFlashcardSet(set.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                                 text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <BookOpenCheck className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No flashcard sets yet</p>
-                <p className="text-sm mt-2">
-                  Generate some flashcards from your notes to get started!
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

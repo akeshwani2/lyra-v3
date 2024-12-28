@@ -30,19 +30,20 @@ const items = [
     hoverColor: "hover:bg-blue-500/5 hover:text-white ",
   },
   {
-    title: "PDF Reader",
-    url: "/ai-pdf",
-    icon: FileText,
-    activeColor: "bg-green-500/10 text-white",
-    hoverColor: "hover:bg-green-500/5 hover:text-white",
-  },
-  {
     title: "Scribe",
     url: "/scribe",
     icon: Feather,
     activeColor: "bg-amber-500/10 text-white",
     hoverColor: "hover:bg-amber-500/5 hover:text-white",
   },
+  {
+    title: "PDF Reader",
+    url: "/ai-pdf",
+    icon: FileText,
+    activeColor: "bg-green-500/10 text-white",
+    hoverColor: "hover:bg-green-500/5 hover:text-white",
+  },
+
   {
     title: "Note Mate",
     url: "/ai-resume",

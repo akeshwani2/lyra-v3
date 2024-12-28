@@ -10,6 +10,7 @@ import { useEffect, useState, useRef } from "react";
 import { Message } from "ai";
 import toast from "react-hot-toast";
 import PreviousSessionPreview from "@/components/ui/PreviousSessionPreview";
+import Link from "next/link";
 
 type FileUploadRef = {
   click: () => void;
@@ -17,6 +18,7 @@ type FileUploadRef = {
 
 export default function AiPdf() {
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
   const [hasChats, setHasChats] = useState<boolean>(false);
   const [firstChatId, setFirstChatId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,8 +26,18 @@ export default function AiPdf() {
   const [pdfName, setPdfName] = useState<string>("");
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState(0);
-
   const fileInputRef = useRef<FileUploadRef>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchPreview = async () => {
@@ -111,6 +123,39 @@ export default function AiPdf() {
       fileInputRef.current?.click();
     }
   };
+
+  if (isMobile) {
+    return (
+      <div className='min-h-screen w-full fixed inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-gray-900 to-black'>
+        <div className='space-y-6 max-w-md mx-auto'>
+          {/* Mobile Icon */}
+          <div className='text-6xl mb-8'>
+            📱
+          </div>
+          <h1 className='text-3xl font-bold text-white mb-4'>
+            Lyra is not optimized for mobile screens yet
+          </h1>
+          <p className='text-gray-400 text-lg'>
+            Please visit us on a desktop or laptop computer for the best experience.
+          </p>
+          <div className='flex justify-center'>
+            <Link href="/">
+              <button className='bg-white text-black px-4 py-2 rounded-md' >
+              <div className="absolute inset-0">
+                <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+
+                <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+
+                  <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+                </div>
+                Go back
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
