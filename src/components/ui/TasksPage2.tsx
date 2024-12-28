@@ -17,6 +17,7 @@ import {
   MessageCircle,
   MessageCircleQuestionIcon,
   Loader2,
+  Undo2,
 } from "lucide-react";
 import { dark } from "@clerk/themes";
 import { UserButton, useUser } from "@clerk/nextjs";
@@ -67,6 +68,8 @@ interface Assignment {
   title: string;
   dueDate: string;
   type: "Assignment" | "Exam" | "Quiz" | "Other";
+  completed?: boolean; // Add this field
+  userId: string; // Add this field
 }
 
 interface EditAssignmentModalProps {
@@ -122,6 +125,8 @@ const TasksPage = () => {
   const [showOptions, setShowOptions] = useState(true);
   const [isAddAssignmentOpen, setIsAddAssignmentOpen] = useState(false);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [isCompletedAssignmentsOpen, setIsCompletedAssignmentsOpen] = useState(false);
+  const [completedAssignments, setCompletedAssignments] = useState<Assignment[]>([]);
   const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(
     null
   );
@@ -214,12 +219,12 @@ const TasksPage = () => {
         setIsLoadingAssignments(true);
         try {
           const response = await axios.get("/api/assignments");
-          setAssignments(response.data);
+          // Split assignments into completed and incomplete
+          const allAssignments = response.data;
+          setAssignments(allAssignments.filter((a: Assignment) => !a.completed));
+          setCompletedAssignments(allAssignments.filter((a: Assignment) => a.completed));
         } catch (error) {
           console.error("Failed to load assignments:", error);
-          if (axios.isAxiosError(error)) {
-            console.error("Error response data:", error.response?.data);
-          }
         } finally {
           setIsLoadingAssignments(false);
         }
@@ -244,6 +249,7 @@ const TasksPage = () => {
 
   const QuickActions = () => (
     <div className="flex items-center gap-2">
+
       <button
         onClick={() => setIsAddCourseOpen(true)}
         className="p-2 hover:bg-white/10 rounded-lg text-sm flex items-center gap-2"
@@ -251,12 +257,20 @@ const TasksPage = () => {
         <PlusCircle size={16} />
         Add Course
       </button>
+
       <button
         onClick={() => setIsAddAssignmentOpen(true)}
         className="p-2 hover:bg-white/10 rounded-lg text-sm flex items-center gap-2"
       >
         <Calendar size={16} />
         Add Deadline
+      </button>
+      <button
+        onClick={() => setIsCompletedAssignmentsOpen(true)}
+        className="p-2 hover:bg-white/10 rounded-lg text-sm flex items-center gap-2"
+      >
+        <CheckCircle size={16} />
+        {completedAssignments.length > 0 ? `Completed Assignments: ${completedAssignments.length}` : "Completed Assignments"}
       </button>
       {/* <button
         onClick={handleStartTour}
@@ -265,13 +279,6 @@ const TasksPage = () => {
         <BookOpen className="w-4 h-4" />
         View Tutorial
       </button> */}
-      <button
-        onClick={() => router.push("/contact")}
-        className="p-2 hover:bg-white/10 rounded-lg text-sm flex items-center gap-2"
-      >
-        <MessageCircleQuestionIcon size={18} />
-        Feedback
-      </button>
     
     </div>
   );
@@ -1803,7 +1810,16 @@ const TasksPage = () => {
         setEditingAssignment(null);
       } catch (error) {
         console.error("Failed to update assignment:", error);
-        toast.error("Failed to update assignment");
+        toast.error("Failed to update assignment", {
+          style: {
+            background: "#18181b",
+            boxShadow: "none",
+            fontSize: "14px",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.1)",
+            textAlign: "center",
+          },
+        });
       }
     };
 
@@ -1827,6 +1843,50 @@ const TasksPage = () => {
       if (diffDays === 1) return "Tomorrow";
       if (diffDays < 0) return "Overdue";
       return `${diffDays}d`;
+    };
+
+    const handleComplete = async (assignment: Assignment) => {
+      try {
+        // First update the database
+        const response = await axios.patch(`/api/assignments/${assignment.id}`, {
+          completed: true,
+          userId: assignment.userId // Make sure userId is included
+        });
+
+        if (response.status === 200) {
+          // Only update state if the API call was successful
+          setCompletedAssignments(prev => [...prev, assignment]);
+          setAssignments(prev => prev.filter(a => a.id !== assignment.id));
+          
+          toast.success("Assignment marked as completed!", {
+            style: {
+              background: "#18181b",
+              boxShadow: "none",
+              fontSize: "14px",
+              color: "white",
+              border: "1px solid rgba(255,255,255,0.1)",
+              textAlign: "center",
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Failed to mark assignment as completed:", error);
+        toast.error("Failed to update assignment status", {
+          style: {
+            background: "#18181b",
+            boxShadow: "none",
+            fontSize: "14px",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.1)",
+            textAlign: "center",
+          },
+        });
+        
+        // Optionally log more detailed error information
+        if (axios.isAxiosError(error)) {
+          console.error("API Error details:", error.response?.data);
+        }
+      }
     };
 
     return (
@@ -1901,6 +1961,12 @@ const TasksPage = () => {
                             className="p-1 hover:bg-white/10 rounded-lg"
                           >
                             <Trash2 size={14} className="text-red-400 hover:text-red-300" />
+                          </button>
+                          <button
+                            onClick={() => handleComplete(assignment)}
+                            className="p-1 hover:bg-white/10 rounded-lg"
+                          >
+                            <CheckCircle size={14} className="text-green-400 hover:text-green-300" />
                           </button>
                         </div>
                       </div>
@@ -2269,6 +2335,20 @@ const TasksPage = () => {
           onClose={() => setSelectedDate(null)}
         />
       )}
+      
+      {isCompletedAssignmentsOpen && (
+        <CompletedAssignmentsModal
+          onClose={() => setIsCompletedAssignmentsOpen(false)}
+          assignments={completedAssignments}
+          onRestore={(assignment) => {
+            setAssignments(prev => [...prev, assignment]);
+            setCompletedAssignments(prev => prev.filter(a => a.id !== assignment.id));
+          }}
+          setAssignments={setAssignments}
+          setCompletedAssignments={setCompletedAssignments}
+          courses={courses} // Add this line
+        />
+      )}
     </div>
   );
 };
@@ -2384,6 +2464,182 @@ const QuickNotes = () => {
         className="flex-1 w-full bg-transparent resize-none text-sm 
           placeholder:text-zinc-600 focus:outline-none"
       />
+    </div>
+  );
+};
+
+// Update the component props interface
+interface CompletedAssignmentsModalProps {
+  onClose: () => void;
+  assignments: Assignment[];
+  onRestore: (assignment: Assignment) => void;
+  setAssignments: React.Dispatch<React.SetStateAction<Assignment[]>>;
+  setCompletedAssignments: React.Dispatch<React.SetStateAction<Assignment[]>>;
+  courses: Course[]; // Add this line
+}
+
+const CompletedAssignmentsModal = ({
+  onClose,
+  assignments,
+  onRestore,
+  setAssignments,
+  setCompletedAssignments,
+  courses, // Add this line
+}: CompletedAssignmentsModalProps) => {
+  const handleRestore = async (assignment: Assignment) => {
+    try {
+      // Update the assignment in the database
+      await axios.patch(`/api/assignments/${assignment.id}`, {
+        completed: false
+      });
+
+      // Update local state
+      setAssignments(prev => [...prev, assignment]);
+      setCompletedAssignments(prev => prev.filter(a => a.id !== assignment.id));
+      
+      toast.success("Assignment restored!", {
+        style: {
+          background: "#18181b",
+          boxShadow: "none",
+          fontSize: "14px",
+          color: "white",
+          border: "1px solid rgba(255,255,255,0.1)",
+          textAlign: "center",
+        },
+      });
+    } catch (error) {
+      console.error("Failed to restore assignment:", error);
+      toast.error("Failed to update assignment");
+    }
+  };
+
+  // Add new clear completed function
+  const handleClearCompleted = async () => {
+    try {
+      // Delete all completed assignments from the database
+      await Promise.all(
+        assignments.map(assignment => 
+          axios.delete(`/api/assignments/${assignment.id}`)
+        )
+      );
+
+      // Update local state
+      setCompletedAssignments([]);
+      
+      toast.success("All completed assignments cleared!", {
+        style: {
+          background: "#18181b",
+          boxShadow: "none",
+          fontSize: "14px",
+          color: "white",
+          border: "1px solid rgba(255,255,255,0.1)",
+          textAlign: "center",
+        },
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Failed to clear completed assignments:", error);
+      toast.error("Failed to clear assignments");
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-zinc-900 rounded-xl w-full max-w-md border border-white/10">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-semibold">Completed Assignments</h2>
+              <p className="text-sm text-zinc-400">{assignments.length} completed</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Add Clear All button */}
+              {assignments.length > 0 && (
+                <button
+                  onClick={() => {
+                    toast((t) => (
+                      <div className="flex flex-col items-center gap-2 bg-zinc-900 rounded-xl p-4 border border-white/10">
+                        <span className="text-white text-sm">Clear all completed assignments?</span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              toast.dismiss(t.id);
+                              handleClearCompleted();
+                            }}
+                            className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 rounded-md transition-colors text-white"
+                          >
+                            Clear All
+                          </button>
+                          <button
+                            onClick={() => toast.dismiss(t.id)}
+                            className="px-3 py-1 text-sm bg-white/10 hover:bg-white/20 rounded-md transition-colors text-white"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ), {
+                      style: {
+                        background: "transparent",
+                        boxShadow: "none",
+                      },
+                    });
+                  }}
+                  className="p-1.5 hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300"
+                  title="Clear all completed assignments"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="p-1.5 hover:bg-white/10 rounded-lg"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+            {assignments.length > 0 ? (
+              assignments.map((assignment) => (
+                <div
+                  key={assignment.id}
+                  className="p-3 bg-zinc-800/50 rounded-lg border border-white/5"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm text-zinc-400 mt-1">
+                        {courses.find(c => c.id === assignment.courseId)?.name || "Unknown Course"}
+                      </p>
+                      <p className="font-medium">{assignment.title}</p>
+                      <p className="text-sm text-zinc-400 mt-1">
+                        Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleRestore(assignment)}
+                      className="p-1.5 hover:bg-white/10 rounded-lg text-purple-400 hover:text-purple-300"
+                    >
+                      <Undo2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-zinc-400">
+                <p>No completed assignments yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

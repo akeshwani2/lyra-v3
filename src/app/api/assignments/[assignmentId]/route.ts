@@ -12,18 +12,13 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { title, dueDate, type, courseId } = body;
+    const { title, dueDate, type, courseId, completed } = body;
 
     // Extract assignmentId from the URL
     const url = new URL(req.url);
     const assignmentId = url.pathname.split('/').pop() || '';
 
-    // Validate required fields
-    if (!title || !dueDate || !type || !courseId) {
-      return new NextResponse('Missing required fields', { status: 400 });
-    }
-
-    // Verify that both the assignment and the new course belong to the user
+    // Verify that the assignment belongs to the user
     const assignment = await prisma.assignment.findFirst({
       where: {
         id: assignmentId,
@@ -35,17 +30,6 @@ export async function PATCH(
       return new NextResponse('Assignment not found', { status: 404 });
     }
 
-    const course = await prisma.course.findFirst({
-      where: {
-        id: courseId,
-        userId
-      }
-    });
-
-    if (!course) {
-      return new NextResponse('Course not found', { status: 404 });
-    }
-
     // Update the assignment
     const updatedAssignment = await prisma.assignment.update({
       where: {
@@ -53,10 +37,11 @@ export async function PATCH(
         userId
       },
       data: {
-        title,
-        dueDate,
-        type,
-        courseId
+        ...(title && { title }),
+        ...(dueDate && { dueDate }),
+        ...(type && { type }),
+        ...(courseId && { courseId }),
+        ...(completed !== undefined && { completed }),
       }
     });
 
