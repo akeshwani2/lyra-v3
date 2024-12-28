@@ -8,6 +8,7 @@ import logo from "@/assets/logo.svg"
 // import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 // import { AppSidebar } from "@/components/ui/app-sidebar"
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 const geistSans = localFont({
@@ -70,6 +71,7 @@ export default function RootLayout({
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           {children}
           <Analytics debug={true} />
+          <SpeedInsights debug={true} />
         </body>
       </html>
     </ClerkProvider>
