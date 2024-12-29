@@ -11,7 +11,7 @@ import noteImage from "@/assets/notemate.png";
 import Footer from "@/components/ui/Footer";
 import scribeImageUi from "../../../public/assets/test.png";
 import Logo from "@/assets/logo.svg";
-import userImage from "@/assets/users.png";
+import userImage from "@/assets/users3.png";
 import dashImage from "@/assets/ui.png";
 import productImage from "../../../public/assets/product-image.png";
 import scribeImage2 from "@/assets/scribe-ui.png";
@@ -96,6 +96,37 @@ export default function ChangelogPage() {
 
           {/* Changelog Entries */}
           <div className="space-y-36">
+            {/* <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+              <div className="space-y-6">
+                <time className="block text-base text-white/50">
+                  December 1, 2024
+                </time>
+                <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text">
+                  A Heartfelt Thank You to the Users
+                </h2>
+                <p className="text-white/70 leading-relaxed">
+                  Thank you to all of you incredible users who have embraced
+                  Lyra! Your support and feedback have been invaluable in
+                  shaping my journey. I am committed to continuously improving
+                  and enhancing your experience, and I couldn&apos;t have done
+                  it without you. Your enthusiasm inspires me every day to
+                  innovate and create a better platform for everyone.
+                </p>
+              </div>
+              <div
+                className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
+                onClick={() => setSelectedImage(userImage.src)}
+              >
+                <Image
+                  src={userImage.src}
+                  alt="userImage"
+                  width={800}
+                  height={600}
+                />
+              </div>
+            </article>
+
+            <hr className="border-t border-white/20 my-12" /> */}
             <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">
@@ -105,9 +136,11 @@ export default function ChangelogPage() {
                   AI-generated flashcards
                 </h2>
                 <p className="text-white/70 leading-relaxed">
-                  I have added AI-generated flashcards to the Scribe page.
-                  This is a great tool for students who want to quickly review
-                  their notes. I will also be adding options to create your own flashcards, and an option to create a quiz to test your knowledge based on your respective notes.
+                  I have added AI-generated flashcards to the Scribe page. This
+                  is a great tool for students who want to quickly review their
+                  notes. I will also be adding options to create your own
+                  flashcards, and an option to create a quiz to test your
+                  knowledge based on your respective notes.
                 </p>
               </div>
               <div
@@ -135,7 +168,8 @@ export default function ChangelogPage() {
                   I decided to redesign the Scribe page to make it more modern
                   and user-friendly. The time limit still exists, but in the
                   future, I will remove it. Future features will include
-                  document sharing functionalities, no time limit, and a folder structure for your notes.
+                  document sharing functionalities, no time limit, and a folder
+                  structure for your notes.
                 </p>
               </div>
               <div
@@ -293,33 +327,6 @@ export default function ChangelogPage() {
               </div>
             </article>
             <hr className="border-t border-white/20 my-12" />
-
-            {/* <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-              <div className="space-y-6">
-                <time className="block text-base text-white/50">
-                  December 1, 2024
-                </time>
-                <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text">
-                  A Heartfelt Thank You to the Users
-                </h2>
-                <p className="text-white/70 leading-relaxed">
-                  Thank you to all of you incredible users who have embraced
-                  Lyra! Your support and feedback have been invaluable in
-                  shaping my journey. I am committed to continuously improving
-                  and enhancing your experience, and I couldn&apos;t have done it
-                  without you. Your enthusiasm inspires me every day to innovate
-                  and create a better platform for everyone.
-                </p>
-              </div>
-              <div
-                className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
-                onClick={() => setSelectedImage(userImage.src)}
-              >
-                <Image src={userImage.src} alt="userImage" />
-              </div>
-            </article>
-
-            <hr className="border-t border-white/20 my-12" /> */}
 
             <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">

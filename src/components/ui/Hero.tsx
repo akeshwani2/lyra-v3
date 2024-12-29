@@ -152,7 +152,7 @@ const Hero = () => {
             <div className="relative w-6 flex items-center justify-center">
               <Dot className="absolute w-8 h-8 font-bold text-green-500 scale-125" />
             </div>
-            Secured $5K in seed funding
+            Secured $5,000 in pre-seed funding
           </div>
 
         </div>

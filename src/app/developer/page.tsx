@@ -179,7 +179,7 @@ export default function Page() {
                     date: "Nov 2024 - Present",
                     title: "Founder/CEO & Lead Developer",
                     company: "Lyra",
-                    description: "Built a productivity platform for students with AI-driven tools for task organization and note enhancement. Secured $5K seed funding and led full-stack development."
+                    description: "Built a productivity platform for students with AI-driven tools for task organization and note enhancement. Secured $5,000 pre-seed funding and led full-stack development."
                   },
                   {
                     date: "Sep 2024 - Oct 2024",
@@ -188,13 +188,13 @@ export default function Page() {
                     description: "Enhanced backend systems, implemented API integrations, and developed monitoring tools. Improved platform stability and scalability."
                   },
                   {
-                    date: "Jul 2024 - Aug 2024",
-                    title: "Virtual Software Engineer Intern",
+                    date: "June 2024 - Aug 2024",
+                    title: "Remote Software Engineer Intern",
                     company: "JPMorgan Chase & Co.",
                     description: "Implemented JP Morgan's Perspective library for real-time data visualization. Optimized web application and resolved repository issues."
                   },
                   {
-                    date: "Mar 2024 - Jul 2024",
+                    date: "Feb 2024 - May 2024",
                     title: "Freelance Software Developer",
                     company: "Roast",
                     description: "Developed React Native coffee shop app with Apple Pay, Face ID, and secure authentication. Enhanced customer engagement through personalized features."
