@@ -20,7 +20,9 @@ import {
   Undo2,
   CircleSlash,
   Ban,
+  XCircle,
 } from "lucide-react";
+import NoAssignments from "@/assets/zzz.svg";
 import { dark } from "@clerk/themes";
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
@@ -103,14 +105,14 @@ interface ParsedAssignment {
 
 // Add this shared color palette at the top of the file, outside any components
 const COURSE_COLORS = [
-  '#8B5CF6', // Purple
-  '#3B82F6', // Blue
-  '#10B981', // Emerald
-  '#F59E0B', // Amber
-  '#EF4444', // Red
-  '#F5F5F5', // Pearl White
-  '#EC4899', // Pink
-  '#6366F1', // Indigo
+  "#8B5CF6", // Purple
+  "#3B82F6", // Blue
+  "#10B981", // Emerald
+  "#F59E0B", // Amber
+  "#EF4444", // Red
+  "#F5F5F5", // Pearl White
+  "#EC4899", // Pink
+  "#6366F1", // Indigo
 ];
 
 const TasksPage = () => {
@@ -127,8 +129,11 @@ const TasksPage = () => {
   const [showOptions, setShowOptions] = useState(true);
   const [isAddAssignmentOpen, setIsAddAssignmentOpen] = useState(false);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [isCompletedAssignmentsOpen, setIsCompletedAssignmentsOpen] = useState(false);
-  const [completedAssignments, setCompletedAssignments] = useState<Assignment[]>([]);
+  const [isCompletedAssignmentsOpen, setIsCompletedAssignmentsOpen] =
+    useState(false);
+  const [completedAssignments, setCompletedAssignments] = useState<
+    Assignment[]
+  >([]);
   const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(
     null
   );
@@ -160,12 +165,16 @@ const TasksPage = () => {
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   // Add these state variables
-  const [parsedAssignments, setParsedAssignments] = useState<ParsedAssignment[]>([]);
+  const [parsedAssignments, setParsedAssignments] = useState<
+    ParsedAssignment[]
+  >([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Add these state variables at the top of your component
   const [pdfUrl, setPdfUrl] = useState<string>("");
-  const [selectedAssignments, setSelectedAssignments] = useState<Set<number>>(new Set());
+  const [selectedAssignments, setSelectedAssignments] = useState<Set<number>>(
+    new Set()
+  );
 
   // Add this function at the beginning of your TasksPage component
   const initializeUserResources = async () => {
@@ -223,8 +232,12 @@ const TasksPage = () => {
           const response = await axios.get("/api/assignments");
           // Split assignments into completed and incomplete
           const allAssignments = response.data;
-          setAssignments(allAssignments.filter((a: Assignment) => !a.completed));
-          setCompletedAssignments(allAssignments.filter((a: Assignment) => a.completed));
+          setAssignments(
+            allAssignments.filter((a: Assignment) => !a.completed)
+          );
+          setCompletedAssignments(
+            allAssignments.filter((a: Assignment) => a.completed)
+          );
         } catch (error) {
           console.error("Failed to load assignments:", error);
         } finally {
@@ -251,7 +264,6 @@ const TasksPage = () => {
 
   const QuickActions = () => (
     <div className="flex items-center gap-2">
-
       <button
         onClick={() => setIsAddCourseOpen(true)}
         className="p-2 hover:bg-white/10 rounded-lg text-sm flex items-center gap-2"
@@ -272,7 +284,9 @@ const TasksPage = () => {
         className="p-2 hover:bg-white/10 rounded-lg text-sm flex items-center gap-2"
       >
         <CheckCircle size={16} />
-        {completedAssignments.length > 0 ? `Completed Assignments: ${completedAssignments.length}` : "Completed Assignments"}
+        {completedAssignments.length > 0
+          ? `Completed Assignments: ${completedAssignments.length}`
+          : "Completed Assignments"}
       </button>
       {/* <button
         onClick={handleStartTour}
@@ -281,7 +295,6 @@ const TasksPage = () => {
         <BookOpen className="w-4 h-4" />
         View Tutorial
       </button> */}
-    
     </div>
   );
 
@@ -565,7 +578,9 @@ const TasksPage = () => {
 
   const AddCourseModal = () => {
     const [courseName, setCourseName] = useState("");
-    const [selectedColor, setSelectedColor] = useState(`hsl(${Math.random() * 360}, 70%, 50%)`);
+    const [selectedColor, setSelectedColor] = useState(
+      `hsl(${Math.random() * 360}, 70%, 50%)`
+    );
     const [recentlyAdded, setRecentlyAdded] = useState<Course[]>([]);
 
     // Minimal, carefully chosen color palette
@@ -622,7 +637,9 @@ const TasksPage = () => {
           <div className="relative h-20 bg-zinc-900">
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 border-b border-white/40" />
             <div className="absolute top-4 left-6 ">
-              <h2 className="text-xl font-semibold tracking-tight">Add New Course</h2>
+              <h2 className="text-xl font-semibold tracking-tight">
+                Add New Course
+              </h2>
               <p className="text-sm text-zinc-400 ">
                 Create a new course to track
               </p>
@@ -638,7 +655,9 @@ const TasksPage = () => {
           <form onSubmit={handleSubmit} className="p-6 pt-4">
             {/* Course name input */}
             <div className="space-y-2 mb-6">
-              <label className="text-sm text-zinc-400 tracking-tight">Course Name</label>
+              <label className="text-sm text-zinc-400 tracking-tight">
+                Course Name
+              </label>
               <input
                 type="text"
                 value={courseName}
@@ -661,9 +680,13 @@ const TasksPage = () => {
                     onClick={() => setSelectedColor(color)}
                     className="group relative"
                   >
-                    <div 
+                    <div
                       className={`w-3 h-3 rounded-full transition-transform duration-200
-                        ${selectedColor === color ? 'scale-150 ring-2 ring-white/20' : 'hover:scale-125'}`}
+                        ${
+                          selectedColor === color
+                            ? "scale-150 ring-2 ring-white/20"
+                            : "hover:scale-125"
+                        }`}
                       style={{ backgroundColor: color }}
                     />
                   </button>
@@ -888,7 +911,9 @@ const TasksPage = () => {
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: course.color }}
                       />
-                      <span className="text-lg tracking-tight">{course.name}</span>
+                      <span className="text-lg tracking-tight">
+                        {course.name}
+                      </span>
                     </div>
 
                     {!showDemoData && (
@@ -990,7 +1015,9 @@ const TasksPage = () => {
           <div className="relative h-20 bg-gradient-to-r from-purple-500/20 via-purple-500/10 to-transparent">
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20" />
             <div className="absolute top-4 left-6">
-              <h2 className="text-xl font-semibold tracking-tight">Edit Course</h2>
+              <h2 className="text-xl font-semibold tracking-tight">
+                Edit Course
+              </h2>
               <p className="text-sm text-zinc-400">Update course details</p>
             </div>
             <button
@@ -1003,7 +1030,9 @@ const TasksPage = () => {
 
           <form onSubmit={handleSubmit} className="p-6 pt-4">
             <div className="space-y-2 mb-6">
-              <label className="text-sm text-zinc-400 tracking-tight">Course Name</label>
+              <label className="text-sm text-zinc-400 tracking-tight">
+                Course Name
+              </label>
               <input
                 type="text"
                 value={courseName}
@@ -1024,9 +1053,13 @@ const TasksPage = () => {
                     onClick={() => setSelectedColor(color)}
                     className="group relative"
                   >
-                    <div 
+                    <div
                       className={`w-3 h-3 rounded-full transition-transform duration-200
-                        ${selectedColor === color ? 'scale-150 ring-2 ring-white/20' : 'hover:scale-125'}`}
+                        ${
+                          selectedColor === color
+                            ? "scale-150 ring-2 ring-white/20"
+                            : "hover:scale-125"
+                        }`}
                       style={{ backgroundColor: color }}
                     />
                   </button>
@@ -1062,19 +1095,31 @@ const TasksPage = () => {
   };
 
   // First, modify the AddAssignmentModal props to accept a prefilled date
-  const AddAssignmentModal = ({ prefilledDate }: { prefilledDate?: string }) => {
-    const [importMethod, setImportMethod] = useState<"manual" | "paste" | "upload">("manual");
+  const AddAssignmentModal = ({
+    prefilledDate,
+  }: {
+    prefilledDate?: string;
+  }) => {
+    const [importMethod, setImportMethod] = useState<
+      "manual" | "paste" | "upload"
+    >("manual");
     const [bulkText, setBulkText] = useState("");
     const [syllabusFile, setSyllabusFile] = useState<File | null>(null);
     const [title, setTitle] = useState("");
     const [dueDate, setDueDate] = useState(prefilledDate || ""); // Use prefilled date if provided
-    const [type, setType] = useState<"Assignment" | "Exam" | "Quiz" | "Other">("Assignment");
+    const [type, setType] = useState<"Assignment" | "Exam" | "Quiz" | "Other">(
+      "Assignment"
+    );
     const [selectedCourse, setSelectedCourse] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Add these state variables
-    const [parsedAssignments, setParsedAssignments] = useState<ParsedAssignment[]>([]);
-    const [selectedAssignments, setSelectedAssignments] = useState<Set<number>>(new Set());
+    const [parsedAssignments, setParsedAssignments] = useState<
+      ParsedAssignment[]
+    >([]);
+    const [selectedAssignments, setSelectedAssignments] = useState<Set<number>>(
+      new Set()
+    );
     const [isProcessing, setIsProcessing] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1143,7 +1188,7 @@ const TasksPage = () => {
 
     const handleFileUpload = async (file: File) => {
       if (!selectedCourse) {
-        toast.error('Please select a course first');
+        toast.error("Please select a course first");
         return;
       }
 
@@ -1151,31 +1196,37 @@ const TasksPage = () => {
 
       try {
         // Validate file type and size
-        const allowedTypes = ['application/pdf'];
+        const allowedTypes = ["application/pdf"];
         if (!allowedTypes.includes(file.type)) {
-          toast.error('Please upload a PDF file');
+          toast.error("Please upload a PDF file");
           return;
         }
 
         if (file.size > 10 * 1024 * 1024) {
-          toast.error('File size must be less than 10MB');
+          toast.error("File size must be less than 10MB");
           return;
         }
 
         const formData = new FormData();
-        formData.append('file', file);
-        formData.append('courseId', selectedCourse);
+        formData.append("file", file);
+        formData.append("courseId", selectedCourse);
 
-        const response = await axios.post('/api/syllabus/parse', formData, {
+        const response = await axios.post("/api/syllabus/parse", formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
 
         if (response.data.assignments && response.data.assignments.length > 0) {
           setParsedAssignments(response.data.assignments);
-          setSelectedAssignments(new Set(response.data.assignments.map((_: ParsedAssignment, i: number) => i)));
-          
+          setSelectedAssignments(
+            new Set(
+              response.data.assignments.map(
+                (_: ParsedAssignment, i: number) => i
+              )
+            )
+          );
+
           // Set the PDF URL from the response
           if (response.data.fileUrl) {
             setPdfUrl(response.data.fileUrl);
@@ -1191,22 +1242,22 @@ const TasksPage = () => {
             },
           });
         } else {
-          toast.error('No assignments found in the syllabus');
+          toast.error("No assignments found in the syllabus");
         }
-
       } catch (error) {
-        console.error('Error uploading file:', error);
-        
+        console.error("Error uploading file:", error);
+
         if (axios.isAxiosError(error)) {
-          const errorMessage = error.response?.data?.error || 'Failed to process syllabus';
+          const errorMessage =
+            error.response?.data?.error || "Failed to process syllabus";
           toast.error(errorMessage);
         } else {
-          toast.error('Failed to process syllabus');
+          toast.error("Failed to process syllabus");
         }
       } finally {
         setIsProcessing(false);
         if (fileInputRef.current) {
-          fileInputRef.current.value = '';
+          fileInputRef.current.value = "";
         }
       }
     };
@@ -1280,11 +1331,11 @@ const TasksPage = () => {
     };
 
     return (
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        onClick={handleBackdropClick}  // Add click handler here
+        onClick={handleBackdropClick} // Add click handler here
       >
-        <div 
+        <div
           ref={modalRef}
           className="bg-zinc-900 rounded-xl w-full max-w-md border border-white/10"
         >
@@ -1312,13 +1363,11 @@ const TasksPage = () => {
                     focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                   required
                 >
-                  <option value="" className="text-zinc-400">Select a course</option>
+                  <option value="" className="text-zinc-400">
+                    Select a course
+                  </option>
                   {courses.map((course) => (
-                    <option 
-                      key={course.id} 
-                      value={course.id}
-                      className="py-2"
-                    >
+                    <option key={course.id} value={course.id} className="py-2">
                       {course.name}
                     </option>
                   ))}
@@ -1399,7 +1448,15 @@ const TasksPage = () => {
                   <div className="relative mt-1">
                     <select
                       value={type}
-                      onChange={(e) => setType(e.target.value as "Assignment" | "Exam" | "Quiz" | "Other")}
+                      onChange={(e) =>
+                        setType(
+                          e.target.value as
+                            | "Assignment"
+                            | "Exam"
+                            | "Quiz"
+                            | "Other"
+                        )
+                      }
                       className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
                         appearance-none text-base
                         border border-white/5 cursor-pointer
@@ -1480,7 +1537,9 @@ const TasksPage = () => {
                 {isProcessing && (
                   <div className="flex flex-col items-center justify-center py-6">
                     <Loader2 className="w-8 h-8 animate-spin text-purple-500 mb-4" />
-                    <p className="text-zinc-400 text-sm">Processing syllabus...</p>
+                    <p className="text-zinc-400 text-sm">
+                      Processing syllabus...
+                    </p>
                   </div>
                 )}
 
@@ -1493,16 +1552,26 @@ const TasksPage = () => {
                       </p>
                       <button
                         onClick={() => {
-                          if (selectedAssignments.size === parsedAssignments.length) {
+                          if (
+                            selectedAssignments.size ===
+                            parsedAssignments.length
+                          ) {
                             setSelectedAssignments(new Set());
                           } else {
-                            setSelectedAssignments(new Set(parsedAssignments.map((_: ParsedAssignment, i: number) => i)));
+                            setSelectedAssignments(
+                              new Set(
+                                parsedAssignments.map(
+                                  (_: ParsedAssignment, i: number) => i
+                                )
+                              )
+                            );
                           }
                         }}
                         className="text-sm text-purple-400 hover:text-purple-300"
                       >
-                        {selectedAssignments.size === parsedAssignments.length ? 
-                          "Deselect All" : "Select All"}
+                        {selectedAssignments.size === parsedAssignments.length
+                          ? "Deselect All"
+                          : "Select All"}
                       </button>
                     </div>
 
@@ -1521,13 +1590,19 @@ const TasksPage = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium">{assignment.title}</span>
+                                <span className="text-sm font-medium">
+                                  {assignment.title}
+                                </span>
                                 <span className="text-xs text-zinc-400">
-                                  {new Date(assignment.dueDate).toLocaleDateString()}
+                                  {new Date(
+                                    assignment.dueDate
+                                  ).toLocaleDateString()}
                                 </span>
                               </div>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs text-purple-400">{assignment.type}</span>
+                                <span className="text-xs text-purple-400">
+                                  {assignment.type}
+                                </span>
                                 {assignment.weight && (
                                   <span className="text-xs text-zinc-500">
                                     {assignment.weight} points
@@ -1542,7 +1617,8 @@ const TasksPage = () => {
 
                     <div className="flex justify-between items-center pt-4 border-t border-white/10">
                       <span className="text-sm text-zinc-400">
-                        {selectedAssignments.size} of {parsedAssignments.length} selected
+                        {selectedAssignments.size} of {parsedAssignments.length}{" "}
+                        selected
                       </span>
                       <div className="flex gap-3">
                         <button
@@ -1558,28 +1634,35 @@ const TasksPage = () => {
                         <button
                           onClick={async () => {
                             if (selectedAssignments.size === 0) {
-                              toast.error("Please select at least one assignment");
+                              toast.error(
+                                "Please select at least one assignment"
+                              );
                               return;
                             }
 
                             try {
-                              const selectedItems = Array.from(selectedAssignments).map(
-                                index => parsedAssignments[index]
-                              );
+                              const selectedItems = Array.from(
+                                selectedAssignments
+                              ).map((index) => parsedAssignments[index]);
 
                               await Promise.all(
-                                selectedItems.map(assignment =>
+                                selectedItems.map((assignment) =>
                                   axios.post("/api/assignments", {
                                     ...assignment,
                                     courseId: selectedCourse,
                                   })
                                 )
                               );
-                              
-                              toast.success(`Added ${selectedItems.length} assignments!`);
+
+                              toast.success(
+                                `Added ${selectedItems.length} assignments!`
+                              );
                               setIsAddAssignmentOpen(false);
                             } catch (error) {
-                              console.error("Failed to import assignments:", error);
+                              console.error(
+                                "Failed to import assignments:",
+                                error
+                              );
                               toast.error("Failed to import assignments");
                             }
                           }}
@@ -1696,7 +1779,9 @@ const TasksPage = () => {
                 <select
                   value={type}
                   onChange={(e) =>
-                    setType(e.target.value as "Assignment" | "Exam" | "Quiz" | "Other")
+                    setType(
+                      e.target.value as "Assignment" | "Exam" | "Quiz" | "Other"
+                    )
                   }
                   className="w-full bg-zinc-800/50 rounded-lg px-4 py-2.5 mt-1
                     border border-white/5"
@@ -1737,10 +1822,17 @@ const TasksPage = () => {
   };
 
   const UpcomingDeadlines = () => {
-    const [editingAssignment, setEditingAssignment] =
+    // Add state for the selected assignment
+    const [selectedAssignment, setSelectedAssignment] =
       useState<Assignment | null>(null);
 
-    const handleDeleteAssignment = async (assignmentId: string) => {
+    const handleDeleteAssignment = async (
+      e: React.MouseEvent,
+      assignmentId: string
+    ) => {
+      // Stop event from bubbling up to parent
+      e.stopPropagation();
+
       toast(
         (t) => (
           <div className="flex flex-col items-center gap-2 bg-zinc-900 rounded-xl p-4 border border-white/10">
@@ -1847,19 +1939,28 @@ const TasksPage = () => {
       return `${diffDays}d`;
     };
 
-    const handleComplete = async (assignment: Assignment) => {
+    const handleComplete = async (
+      e: React.MouseEvent,
+      assignment: Assignment
+    ) => {
+      // Stop event from bubbling up to parent
+      e.stopPropagation();
+
       try {
         // First update the database
-        const response = await axios.patch(`/api/assignments/${assignment.id}`, {
-          completed: true,
-          userId: assignment.userId // Make sure userId is included
-        });
+        const response = await axios.patch(
+          `/api/assignments/${assignment.id}`,
+          {
+            completed: true,
+            userId: assignment.userId,
+          }
+        );
 
         if (response.status === 200) {
           // Only update state if the API call was successful
-          setCompletedAssignments(prev => [...prev, assignment]);
-          setAssignments(prev => prev.filter(a => a.id !== assignment.id));
-          
+          setCompletedAssignments((prev) => [...prev, assignment]);
+          setAssignments((prev) => prev.filter((a) => a.id !== assignment.id));
+
           toast.success("Assignment marked as completed!", {
             style: {
               background: "#18181b",
@@ -1883,8 +1984,7 @@ const TasksPage = () => {
             textAlign: "center",
           },
         });
-        
-        // Optionally log more detailed error information
+
         if (axios.isAxiosError(error)) {
           console.error("API Error details:", error.response?.data);
         }
@@ -1935,10 +2035,15 @@ const TasksPage = () => {
           ) : assignments.length > 0 ? (
             <div className="space-y-3">
               {sortedAssignments.map((assignment, index) => {
-                const course = courses.find((c) => c.id === assignment.courseId);
+                const course = courses.find(
+                  (c) => c.id === assignment.courseId
+                );
                 return (
                   <div key={assignment.id}>
-                    <div className="p-2 hover:bg-white/5 rounded-lg group">
+                    <div
+                      className="p-2 hover:bg-white/5 rounded-lg group cursor-pointer"
+                      onClick={() => setSelectedAssignment(assignment)} // Add this onClick handler
+                    >
                       <div className="flex justify-between items-start gap-4">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
@@ -1949,27 +2054,40 @@ const TasksPage = () => {
                               {getRelativeDays(assignment.dueDate)}
                             </span>
                           </div>
-                          <p className="text-sm mt-1 truncate">{assignment.title}</p>
+                          <p className="text-sm mt-1 truncate">
+                            {assignment.title}
+                          </p>
                         </div>
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 shrink-0">
                           <button
                             onClick={() => setEditingAssignment(assignment)}
                             className="p-1 hover:bg-white/10 rounded-lg"
                           >
-                            <Pencil size={14} className="text-purple-400 hover:text-purple-300" />
+                            <Pencil
+                              size={14}
+                              className="text-purple-400 hover:text-purple-300"
+                            />
                           </button>
 
                           <button
-                            onClick={() => handleComplete(assignment)}
+                            onClick={(e) => handleComplete(e, assignment)}
                             className="p-1 hover:bg-white/10 rounded-lg"
                           >
-                            <CheckCircle size={14} className="text-green-400 hover:text-green-300" />
+                            <CheckCircle
+                              size={14}
+                              className="text-green-400 hover:text-green-300"
+                            />
                           </button>
                           <button
-                            onClick={() => handleDeleteAssignment(assignment.id)}
+                            onClick={(e) =>
+                              handleDeleteAssignment(e, assignment.id)
+                            }
                             className="p-1 hover:bg-white/10 rounded-lg"
                           >
-                            <Trash2 size={14} className="text-red-400 hover:text-red-300" />
+                            <Trash2
+                              size={14}
+                              className="text-red-400 hover:text-red-300"
+                            />
                           </button>
                         </div>
                       </div>
@@ -1991,6 +2109,80 @@ const TasksPage = () => {
             />
           )}
         </div>
+
+        {/* Add the Assignment Details Modal */}
+        {selectedAssignment && (
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setSelectedAssignment(null);
+            }}
+          >
+            <div className="bg-zinc-900 rounded-xl w-full max-w-md border border-white/10">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h2 className="text-xl font-semibold">
+                      {
+                        courses.find(
+                          (c) => c.id === selectedAssignment.courseId
+                        )?.name
+                      }
+                    </h2>
+                    <p className="text-zinc-400 text-sm">
+                      Due:{" "}
+                      {new Date(selectedAssignment.dueDate).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedAssignment(null)}
+                    className="p-1 hover:bg-white/10 rounded-lg"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-zinc-800/50 rounded-lg p-4 border border-white/5">
+                    <h3 className="text-lg mb-2">{selectedAssignment.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm px-2 py-1 bg-purple-500/20 text-purple-400 rounded">
+                        {selectedAssignment.type}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        setEditingAssignment(selectedAssignment);
+                        setSelectedAssignment(null);
+                      }}
+                      className="px-4 py-2 text-sm hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <Pencil size={14} />
+                      Edit
+                    </button>
+                    <button
+                      onClick={(e) => handleComplete(e, selectedAssignment)}
+                      className="px-4 py-2 text-sm bg-green-500 hover:bg-green-600 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <CheckCircle size={14} />
+                      Mark Complete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {editingAssignment && (
           <EditAssignmentModal
@@ -2185,7 +2377,9 @@ const TasksPage = () => {
               className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[45%] overflow-hidden flex flex-col"
             >
               <div className="flex justify-between items-center mb-2 flex-shrink-0 border-b border-white/10 pb-2">
-                <h2 className="text-lg font-semibold tracking-tight">Calendar</h2>
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Calendar
+                </h2>
                 <span className="text-sm tracking-tight text-zinc-400">
                   {new Date().toLocaleString("default", {
                     month: "long",
@@ -2193,16 +2387,18 @@ const TasksPage = () => {
                   })}
                 </span>
               </div>
-              
+
               {/* Calendar grid container */}
               <div className="flex-1 flex flex-col min-h-0">
                 {/* Day headers */}
                 <div className="grid grid-cols-7 gap-1 text-center text-xs mb-1">
-                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                    <div key={`header-${day}`} className="text-zinc-400 py-1">
-                      {day[0]}
-                    </div>
-                  ))}
+                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                    (day) => (
+                      <div key={`header-${day}`} className="text-zinc-400 py-1">
+                        {day[0]}
+                      </div>
+                    )
+                  )}
                 </div>
 
                 {/* Calendar days */}
@@ -2243,8 +2439,16 @@ const TasksPage = () => {
                             <div
                               onClick={() => setSelectedDate(currentDate)}
                               className={`p-1 flex flex-col items-center justify-center rounded relative
-                                ${isToday ? "bg-purple-500/20 text-purple-400 font-semibold" : "hover:bg-white/5"}
-                                ${dayAssignments.length > 0 ? "cursor-pointer" : ""}
+                                ${
+                                  isToday
+                                    ? "bg-purple-500/20 text-purple-400 font-semibold"
+                                    : "hover:bg-white/5"
+                                }
+                                ${
+                                  dayAssignments.length > 0
+                                    ? "cursor-pointer"
+                                    : ""
+                                }
                               `}
                             >
                               {dayNumber}
@@ -2255,7 +2459,9 @@ const TasksPage = () => {
                                     dayAssignments.length === 1
                                       ? {
                                           backgroundColor: courses.find(
-                                            (c) => c.id === dayAssignments[0].courseId
+                                            (c) =>
+                                              c.id ===
+                                              dayAssignments[0].courseId
                                           )?.color,
                                         }
                                       : { backgroundColor: "rgb(239, 68, 68)" }
@@ -2331,21 +2537,25 @@ const TasksPage = () => {
 
       {isAddCourseOpen && <AddCourseModal />}
       {showTour && <TourOverlay onFinish={handleTourEnd} />}
-      {isAddAssignmentOpen && <AddAssignmentModal prefilledDate={selectedDate || undefined} />}
+      {isAddAssignmentOpen && (
+        <AddAssignmentModal prefilledDate={selectedDate || undefined} />
+      )}
       {selectedDate && (
         <DayDetailsModal
           date={selectedDate}
           onClose={() => setSelectedDate(null)}
         />
       )}
-      
+
       {isCompletedAssignmentsOpen && (
         <CompletedAssignmentsModal
           onClose={() => setIsCompletedAssignmentsOpen(false)}
           assignments={completedAssignments}
           onRestore={(assignment) => {
-            setAssignments(prev => [...prev, assignment]);
-            setCompletedAssignments(prev => prev.filter(a => a.id !== assignment.id));
+            setAssignments((prev) => [...prev, assignment]);
+            setCompletedAssignments((prev) =>
+              prev.filter((a) => a.id !== assignment.id)
+            );
           }}
           setAssignments={setAssignments}
           setCompletedAssignments={setCompletedAssignments}
@@ -2433,30 +2643,61 @@ const QuickNotes = () => {
     };
   }, [newNote]);
 
+  const handleClear = async () => {
+    try {
+      // This clears the textarea
+      setNewNote("");
+
+      // Update this in the database
+      await axios.put("/api/quickNotes", { content: "" });
+
+      setAutoSaveStatus("saved");
+      setTimeout(() => setAutoSaveStatus("idle"), 2000);
+    } catch (error) {
+      console.error("Failed to clear quick note:", error);
+      setAutoSaveStatus("error");
+    }
+  };
+
   return (
     <div className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[calc(55%-1.5rem)] overflow-hidden flex flex-col">
       <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
         <h2 className="text-lg font-semibold tracking-tight">Quick Notes</h2>
         {/* Replace the old status indicator with the new one */}
-        <div className="text-xs">
-          {autoSaveStatus === "saving" && (
-            <div className="flex items-center gap-1.5 text-yellow-500/80">
-              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
-              Saving...
-            </div>
-          )}
-          {autoSaveStatus === "saved" && (
-            <div className="flex items-center gap-1.5 text-green-500/80">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              Saved
-            </div>
-          )}
-          {autoSaveStatus === "error" && (
-            <div className="flex items-center gap-1.5 text-red-500/80">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-              Error saving
-            </div>
-          )}
+        <div className="flex gap-2">
+          <div className="text-xs pt-0.5">
+            {autoSaveStatus === "saving" && (
+              <div className="flex items-center gap-1.5 text-yellow-500/80">
+                <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
+                Saving...
+              </div>
+            )}
+            {autoSaveStatus === "saved" && (
+              <div className="flex items-center gap-1.5 text-green-500/80">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Saved
+              </div>
+            )}
+            {autoSaveStatus === "error" && (
+              <div className="flex items-center gap-1.5 text-red-500/80">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                Error saving
+              </div>
+            )}
+          </div>
+          <div className="flex">
+            <button
+              className={`p-1 rounded-lg transition-colors ${
+                newNote
+                  ? "hover:bg-white/10 text-zinc-400 hover:text-zinc-300"
+                  : "text-zinc-700 cursor-not-allowed"
+              }`}
+              onClick={handleClear}
+              disabled={!newNote}
+            >
+              <XCircle size={14} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2493,13 +2734,15 @@ const CompletedAssignmentsModal = ({
     try {
       // Update the assignment in the database
       await axios.patch(`/api/assignments/${assignment.id}`, {
-        completed: false
+        completed: false,
       });
 
       // Update local state
-      setAssignments(prev => [...prev, assignment]);
-      setCompletedAssignments(prev => prev.filter(a => a.id !== assignment.id));
-      
+      setAssignments((prev) => [...prev, assignment]);
+      setCompletedAssignments((prev) =>
+        prev.filter((a) => a.id !== assignment.id)
+      );
+
       toast.success("Assignment restored!", {
         style: {
           background: "#18181b",
@@ -2521,14 +2764,14 @@ const CompletedAssignmentsModal = ({
     try {
       // Delete all completed assignments from the database
       await Promise.all(
-        assignments.map(assignment => 
+        assignments.map((assignment) =>
           axios.delete(`/api/assignments/${assignment.id}`)
         )
       );
 
       // Update local state
       setCompletedAssignments([]);
-      
+
       toast.success("All completed assignments cleared!", {
         style: {
           background: "#18181b",
@@ -2559,40 +2802,47 @@ const CompletedAssignmentsModal = ({
           <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-2">
             <div className="">
               <h2 className="text-xl font-semibold">Completed Assignments</h2>
-              <p className="text-sm text-zinc-400">{assignments.length} completed</p>
+              <p className="text-sm text-zinc-400">
+                {assignments.length} completed
+              </p>
             </div>
             <div className="flex items-center gap-2">
               {/* Add Clear All button */}
               {assignments.length > 0 && (
                 <button
                   onClick={() => {
-                    toast((t) => (
-                      <div className="flex flex-col items-center gap-2 bg-zinc-900 rounded-xl p-4 border border-white/10">
-                        <span className="text-white text-sm">Clear all completed assignments?</span>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              toast.dismiss(t.id);
-                              handleClearCompleted();
-                            }}
-                            className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 rounded-md transition-colors text-white"
-                          >
-                            Clear All
-                          </button>
-                          <button
-                            onClick={() => toast.dismiss(t.id)}
-                            className="px-3 py-1 text-sm bg-white/10 hover:bg-white/20 rounded-md transition-colors text-white"
-                          >
-                            Cancel
-                          </button>
+                    toast(
+                      (t) => (
+                        <div className="flex flex-col items-center gap-2 bg-zinc-900 rounded-xl p-4 border border-white/10">
+                          <span className="text-white text-sm">
+                            Clear all completed assignments?
+                          </span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                toast.dismiss(t.id);
+                                handleClearCompleted();
+                              }}
+                              className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 rounded-md transition-colors text-white"
+                            >
+                              Clear All
+                            </button>
+                            <button
+                              onClick={() => toast.dismiss(t.id)}
+                              className="px-3 py-1 text-sm bg-white/10 hover:bg-white/20 rounded-md transition-colors text-white"
+                            >
+                              Cancel
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ), {
-                      style: {
-                        background: "transparent",
-                        boxShadow: "none",
-                      },
-                    });
+                      ),
+                      {
+                        style: {
+                          background: "transparent",
+                          boxShadow: "none",
+                        },
+                      }
+                    );
                   }}
                   className="p-1.5 hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300"
                   title="Clear all completed assignments"
@@ -2619,16 +2869,19 @@ const CompletedAssignmentsModal = ({
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-sm text-zinc-400 mt-1">
-                        {courses.find(c => c.id === assignment.courseId)?.name || "Unknown Course"}
+                        {courses.find((c) => c.id === assignment.courseId)
+                          ?.name || "Unknown Course"}
                       </p>
-                      <p className="font-medium text-sm mt-1">{assignment.title}</p>
+                      <p className="font-medium text-sm mt-1">
+                        {assignment.title}
+                      </p>
                       <p className="text-sm text-zinc-400 mt-1">
                         Due: {new Date(assignment.dueDate).toLocaleDateString()}
                       </p>
                     </div>
                     <button
                       onClick={() => handleRestore(assignment)}
-                      className="p-1.5 hover:bg-white/10 rounded-lg text-green-400 hover:text-green-300"
+                      className="p-1.5 hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300"
                     >
                       <Undo2 size={14} />
                     </button>
@@ -2636,9 +2889,11 @@ const CompletedAssignmentsModal = ({
                 </div>
               ))
             ) : (
-              <div className="text-center py-4 text-zinc-400 flex flex-col items-center gap-2">
-                <Ban size={56} className="text-red-500 mb-4" />
-                <p className="text-md text-red-500">No completed assignments yet</p>
+              <div className="text-center py-2 text-zinc-400 flex flex-col items-center gap-2">
+                <NoAssignments className="text-red-500 mb-2 scale-150" />
+                <p className="text-md text-red-500">
+                  No completed assignments yet
+                </p>
               </div>
             )}
           </div>

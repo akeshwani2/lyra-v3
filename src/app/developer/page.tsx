@@ -104,7 +104,16 @@ export default function Page() {
 
               {/* Added TypeAnimation for role */}
               <div className="text-xl text-center sm:text-xl pb-4 pt-1 md:text-2xl text-white/80 flex items-center justify-center gap-2">
-                Building the future of Lyra<span className="flex items-center gap-2"><Image src={lyraLogo.src} alt="Lyra Logo" width={32} height={32} className="inline-block border border-white/15 rounded-lg p-1" /></span>
+                Building the future of Lyra
+                <span className="flex items-center gap-2">
+                  <Image
+                    src={lyraLogo.src}
+                    alt="Lyra Logo"
+                    width={32}
+                    height={32}
+                    className="inline-block border border-white/15 rounded-lg p-1"
+                  />
+                </span>
               </div>
 
               {/* Added bio section */}
@@ -179,26 +188,30 @@ export default function Page() {
                     date: "Nov 2024 - Present",
                     title: "Founder/CEO & Lead Developer",
                     company: "Lyra",
-                    description: "Built a productivity platform for students with AI-driven tools for task organization and note enhancement. Secured $5,000 pre-seed funding and led full-stack development."
+                    description:
+                      "Built a productivity/organization platform for students with AI-driven tools helping them elevate their academic workflows. Backed by $5,000 pre-seed funding, Lyra is currently streamlining the academic lives of 100+ users, achieving this growth in just 6 weeks, solely through word of mouth.",
                   },
                   {
                     date: "Sep 2024 - Oct 2024",
                     title: "Software Engineer Intern",
                     company: "Cita Marketplace",
-                    description: "Enhanced backend systems, implemented API integrations, and developed monitoring tools. Improved platform stability and scalability."
+                    description:
+                      "Enhanced backend systems, implemented API integrations, and developed monitoring tools. Improved platform stability and scalability.",
                   },
                   {
                     date: "June 2024 - Aug 2024",
                     title: "Remote Software Engineer Intern",
                     company: "JPMorgan Chase & Co.",
-                    description: "Implemented JP Morgan's Perspective library for real-time data visualization. Optimized web application and resolved repository issues."
+                    description:
+                      "Implemented JP Morgan's Perspective library for real-time data visualization. Optimized web application and resolved repository issues.",
                   },
                   {
                     date: "Feb 2024 - May 2024",
                     title: "Freelance Software Developer",
                     company: "Roast",
-                    description: "Developed React Native coffee shop app with Apple Pay, Face ID, and secure authentication. Enhanced customer engagement through personalized features."
-                  }
+                    description:
+                      "Developed React Native coffee shop app with Apple Pay, Face ID, and secure authentication. Enhanced customer engagement through personalized features.",
+                  },
                 ].map((exp, index) => (
                   <motion.div
                     key={index}
@@ -211,7 +224,9 @@ export default function Page() {
                     <div className="w-4 h-4 rounded-full bg-purple-500 shrink-0 mt-1.5" />
                     <div className="flex flex-col gap-1">
                       <span className="text-white/50 text-sm">{exp.date}</span>
-                      <h3 className="text-white font-medium text-lg">{exp.title}</h3>
+                      <h3 className="text-white font-medium text-lg">
+                        {exp.title}
+                      </h3>
                       <p className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
                         {exp.company}
                       </p>

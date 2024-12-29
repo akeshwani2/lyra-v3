@@ -5,23 +5,18 @@ import avatar7 from "@/assets/avatar-7.png";
 import avatar3 from "@/assets/avatar-3.png";
 import avatar4 from "@/assets/avatar-4.png";
 import avatar5 from "@/assets/avatar-5.png";
-import mike1 from "@/assets/mike.png"
+import mike1 from "@/assets/mike.png";
 import avatar6 from "@/assets/image.png";
 import Image from "next/image";
-import { motion } from "framer-motion";
-const testimonials = [
+import { motion, useAnimation } from "framer-motion";
+import { useEffect } from "react";
 
+const testimonials = [
   {
     text: "“Love what Arhaan has done here. The impact was immediate - it's transformed how I work!”",
     name: "Arya Toufanian",
     title: "Founder/CEO of Cita Marketplace",
     avatarImg: avatar7,
-  },
-  {
-    text: "“The user interface is so intuitive and easy to use, it helps me organize my notes and tasks efficiently.”",
-    name: "Maria Victoria",
-    title: "Upcoming student @ Harvard University",
-    avatarImg: avatar5,
   },
   {
     text: "“I love the UI, it's very modern and I like the AI PDF reader, it's easy to use and very helpful.”",
@@ -35,6 +30,12 @@ const testimonials = [
     name: "Jamie Lee",
     title: "Student @ UC Berkeley",
     avatarImg: avatar2,
+  },
+  {
+    text: "“The user interface is so intuitive and easy to use, it helps me organize my notes and tasks efficiently.”",
+    name: "Maria Victoria",
+    title: "Upcoming student @ Harvard University",
+    avatarImg: avatar5,
   },
   {
     text: "“Lyra has been a game changer for me and my friends. It's easy to use and has saved us countless hours.”",
@@ -51,6 +52,19 @@ const testimonials = [
 ];
 
 export const Testimonials = () => {
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start({
+      translateX: "0%",
+      transition: {
+        duration: 45,
+        ease: "linear",
+        repeat: Infinity,
+      },
+    });
+  }, [controls]);
+
   return (
     <section className="py-20 md:py-24">
       <div className="container">
@@ -58,18 +72,42 @@ export const Testimonials = () => {
           Beyond Expectations.
         </h2>
         <p className="text-white/70 md:text-xl text-lg max-w-sm mx-auto text-center mt-5 tracking-tight">
-        Our revolutionary AI-powered tools are redefining how students and professionals organize, learn, and achieve their goals
+          Our revolutionary AI-powered tools are redefining how students and
+          professionals organize, learn, and achieve their goals
         </p>
         <div className="flex overflow-hidden mt-10 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]">
           <motion.div
             initial={{ translateX: "-50%" }}
-            animate={{ translateX: "0%" }}
-            transition={{
-              duration: 45,
-              ease: "linear",
-              repeat: Infinity,
+            animate={controls}
+            drag="x"
+            dragConstraints={{ left: -1500, right: 0 }}
+            dragElastic={0.2}
+            dragMomentum={false}
+            whileDrag={{ cursor: "grabbing" }}
+            whileHover={{ cursor: "grab" }}
+            onMouseDown={() => controls.stop()}
+            onMouseUp={() => {
+              controls.start({
+                translateX: "0%",
+                transition: {
+                  duration: 45,
+                  ease: "linear",
+                  repeat: Infinity,
+                },
+              });
             }}
-            className="flex gap-5 pr-5 flex-none"
+            onTouchStart={() => controls.stop()}
+            onTouchEnd={() => {
+              controls.start({
+                translateX: "0%",
+                transition: {
+                  duration: 45,
+                  ease: "linear",
+                  repeat: Infinity,
+                },
+              });
+            }}
+            className="flex gap-5 pr-5 flex-none touch-none"
           >
             {[...testimonials, ...testimonials].map((testimonial, index) => (
               <div

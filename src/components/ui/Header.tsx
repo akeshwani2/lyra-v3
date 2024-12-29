@@ -86,6 +86,12 @@ const Header = () => {
               >
                 Contact
               </a>
+              {/* <Link 
+                href="/careers" 
+                className={`hover:text-white transition ${isActive("/careers")}`}
+              >
+                Careers
+              </Link> */}
             </nav>
           </div>
 

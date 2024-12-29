@@ -11,6 +11,7 @@ import noteImage from "@/assets/notemate.png";
 import Footer from "@/components/ui/Footer";
 import scribeImageUi from "../../../public/assets/test.png";
 import Logo from "@/assets/logo.svg";
+import scribeT from "@/assets/scribeTime.png"
 import userImage from "@/assets/users3.png";
 import dashImage from "@/assets/ui.png";
 import productImage from "../../../public/assets/product-image.png";
@@ -127,6 +128,36 @@ export default function ChangelogPage() {
             </article>
 
             <hr className="border-t border-white/20 my-12" /> */}
+            <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+              <div className="space-y-6">
+                <time className="block text-base text-white/50">
+                  December 29, 2024
+                </time>
+                <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text ">
+                  Scribe time limit increased to 30 minutes
+                </h2>
+                <p className="text-white/70 leading-relaxed">
+                  I have increased the time limit for Scribe to 30 minutes.
+                  While this is an upgrade from the previous 5 minute limit, I
+                  understand it still might not be enough time for some users.
+                  I will be increasing it to 60 minutes in the future. This is
+                  to prevent users from using it for too long and getting
+                  overwhelmed.
+                </p>
+              </div>
+              <div
+                className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
+                onClick={() => setSelectedImage(scribeT.src)}
+              >
+                <Image
+                  src={scribeT.src}
+                  alt="ScribeUIImage"
+                  width={800}
+                  height={600}
+                />
+              </div>
+            </article>
+            <hr className="border-t border-white/20 my-12" />
             <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">

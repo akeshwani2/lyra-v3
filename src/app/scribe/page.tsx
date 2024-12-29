@@ -89,7 +89,7 @@ const ScribePage = () => {
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "saved" | "saving" | "error" | ""
   >("");
-  const MAX_RECORDING_TIME = 300; // 5 minutes in seconds
+  const MAX_RECORDING_TIME = 1800; // 30 minutes in seconds
   const [recordingTime, setRecordingTime] = useState(0);
   const recordingTimerRef = useRef<NodeJS.Timeout>();
   const [notesHistory, setNotesHistory] = useState<Note[]>([]);
@@ -1360,7 +1360,7 @@ const ScribePage = () => {
                 )}
 
                 {/* User button container */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 border border-white/20 rounded-xl px-1 py-1">
                   <span className="bg-gradient-to-t from-zinc-600 tracking-tight via-zinc-300 to-white text-transparent bg-clip-text text-lg md:text-xl font-bold">
                     {user?.username || user?.firstName || ""}
                   </span>
@@ -1761,7 +1761,7 @@ const ScribePage = () => {
 
                   {/* Timer */}
                   <div className="text-sm text-white/70 min-w-[80px]">
-                    {formatTime(recordingTime)}
+                    {formatTime(recordingTime)}/30:00
                   </div>
 
                   {/* Control buttons */}
@@ -1793,6 +1793,14 @@ const ScribePage = () => {
                                hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
                     >
                       <Square className="w-4 h-4 text-red-500" />
+                    </button>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="w-8 h-8 rounded-lg bg-gray-500/20 hover:bg-gray-500/30 
+                               flex items-center justify-center transition-all duration-300
+                               hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                    >
+                      <X className="w-4 h-4 text-red-500" />
                     </button>
                   </div>
                 </div>
