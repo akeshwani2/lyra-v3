@@ -1,17 +1,14 @@
 "use client";
 import React from "react";
 import acmeLogo from "@/assets/logo-acme.png";
-import apexLogo from "@/assets/logo-apex.png";
-import celestialLogo from "@/assets/logo-celestial.png";
-import quantumLogo from "@/assets/logo-quantum.png";
 import pulseLogo from "@/assets/logo-pulse.png";
-import echoLogo from "@/assets/logo-echo.png";
 import denverlogo from "@/assets/duLogo.png";
-import berkleylogo from "@/assets/berk2-removebg-preview.png";
-import harvardlogo from "@/assets/harvardtest.png";
+import baylologo from "@/assets/BU_BrandMark_Horz_White.png"
 import dukeLogo from "@/assets/dukelogo_white.png";
 import mitLogo from "@/assets/mit_logo_std_rgb_white.png";
-
+import gatechlogo from "@/assets/georgia-tech-yellow-jackets-2-logo-black-and-white.png"
+import gsulogo from "@/assets/Georgia State University-06.png"
+import citalogo from "@/assets/2370a047-7e9d-409d-ae44-89f3de2092e2.png"
 import { motion } from "framer-motion";
 import Image from 'next/image';
 
@@ -36,15 +33,22 @@ const LogoTicker = () => {
             >
               {[
                 mitLogo,
-                quantumLogo,
+                citalogo,
+                gatechlogo,
+                baylologo,
                 dukeLogo,
                 pulseLogo,
+                gsulogo,
                 denverlogo,
                 acmeLogo,
                 mitLogo,
+                citalogo,
+                gatechlogo,
+                baylologo,
                 dukeLogo,
-                quantumLogo,
                 pulseLogo,
+                gsulogo,
+
                 denverlogo,
                 acmeLogo,
               ].map((logo, index) => (
@@ -54,7 +58,20 @@ const LogoTicker = () => {
                     alt=""
                     width={logo === mitLogo ? 100 : 80}
                     height={0}
-                    className={`w-auto ${logo === mitLogo ? 'h-10' : 'h-8'} object-contain`}
+                    className={`w-auto ${
+                      logo === mitLogo 
+                        ? 'h-10' 
+                        : logo === gatechlogo 
+                        ? 'h-12 mt-1' 
+                        : logo === gsulogo
+                        ? 'h-24'
+                        : logo === baylologo
+                        ? 'h-10 mt-1'
+                        : logo === pulseLogo
+                        ? 'mt-2'
+                        : 'h-8'
+
+                    } object-contain`}
                   />
                 </div>
               ))}
