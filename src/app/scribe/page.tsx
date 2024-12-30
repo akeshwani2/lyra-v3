@@ -28,6 +28,7 @@ import {
   Loader2,
   BookOpenCheck,
   FileText,
+  ArrowLeft,
 } from "lucide-react";
 import NotesHistory from "@/components/ui/NotesHistory";
 import RichTextEditor from "@/components/ui/RichTextEditor";
@@ -111,30 +112,29 @@ const ScribePage = () => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const renderMobileView = () => {
     if (isMobile) {
       return (
-        <div className='min-h-screen w-full fixed inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-gray-900 to-black'>
-          <div className='space-y-6 max-w-md mx-auto'>
-            <div className='text-6xl mb-8'>
-              📱
-            </div>
-            <h1 className='text-3xl font-bold text-white mb-4'>
+        <div className="min-h-screen w-full fixed inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-gray-900 to-black">
+          <div className="space-y-6 max-w-md mx-auto">
+            <div className="text-6xl mb-8">📱</div>
+            <h1 className="text-3xl font-bold text-white mb-4">
               Lyra is not optimized for mobile screens yet
             </h1>
-            <p className='text-gray-400 text-lg'>
-              Please visit us on a desktop or laptop computer for the best experience.
+            <p className="text-gray-400 text-lg">
+              Please visit us on a desktop or laptop computer for the best
+              experience.
             </p>
-            <div className='flex justify-center'>
+            <div className="flex justify-center">
               <Link href="/">
-                <button className='bg-white text-black px-4 py-2 rounded-md'>
+                <button className="bg-white text-black px-4 py-2 rounded-md">
                   <div className="absolute inset-0">
                     <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
                     <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
@@ -603,7 +603,13 @@ const ScribePage = () => {
         await notesHistoryRef.current.loadNotes();
       }
 
-      toast.success("Notes saved successfully!");
+      toast.success("Notes saved successfully!", {
+        style: {
+          background: "rgba(147, 51, 234, 0.1)",
+          border: "1px solid rgba(147, 51, 234, 0.2)",
+          color: "#fff",
+        },
+      });
     } catch (error) {
       console.error("Error saving notes:", error);
       toast.error(
@@ -719,7 +725,10 @@ const ScribePage = () => {
                   );
                 }
               } catch (error) {
-                console.error(`Failed to update flashcard set ${set.id}:`, error);
+                console.error(
+                  `Failed to update flashcard set ${set.id}:`,
+                  error
+                );
               }
             })
           );
@@ -1402,7 +1411,15 @@ const ScribePage = () => {
                       {/* Title section - with actions aligned */}
                       <div className="flex items-center justify-between">
                         {/* Title and edit button */}
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-4">
+                          {/* Add back arrow */}
+                          <button
+                            onClick={() => window.location.reload()}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                          >
+                            <ArrowLeft className="w-5 h-5 text-gray-400" />
+                          </button>
+
                           {isEditingTitle ? (
                             <input
                               type="text"
@@ -1417,7 +1434,7 @@ const ScribePage = () => {
                           ) : (
                             <div className="flex items-center justify-center gap-2">
                               <h3
-                                className="text-white text-2xl font-medium text-center items-center cursor-pointer "
+                                className="text-white text-2xl font-medium text-center items-center cursor-pointer"
                                 onClick={() => {
                                   setIsEditingTitle(true);
                                   setIsTitleSaved(false);
@@ -1517,13 +1534,17 @@ const ScribePage = () => {
                   {isLoadingNotes ? (
                     <div className="flex flex-col items-center justify-center gap-4 py-12">
                       <Loader2 className="h-8 w-8 animate-spin text-purple-500/50" />
-                      <p className="text-sm text-gray-500">Loading your notes...</p>
+                      <p className="text-sm text-gray-500">
+                        Loading your notes...
+                      </p>
                     </div>
                   ) : notesHistory.length > 0 ? (
                     <div className="w-full space-y-4">
                       {/* Header section with gradient text and backdrop blur */}
                       <div className="flex items-center justify-between mb-4 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 py-4">
-                        <h2 className="text-3xl font-semibold text-white/90">Recent Notes</h2>
+                        <h2 className="text-3xl font-semibold text-white/90">
+                          Recent Notes
+                        </h2>
                         <div className="flex gap-2">
                           <Button
                             onClick={() => {
@@ -1586,10 +1607,18 @@ const ScribePage = () => {
                                     type="text"
                                     defaultValue={note.title}
                                     autoFocus
-                                    onBlur={(e) => handleListItemTitleUpdate(note.id, e.target.value)}
+                                    onBlur={(e) =>
+                                      handleListItemTitleUpdate(
+                                        note.id,
+                                        e.target.value
+                                      )
+                                    }
                                     onKeyDown={(e) => {
                                       if (e.key === "Enter") {
-                                        handleListItemTitleUpdate(note.id, e.currentTarget.value);
+                                        handleListItemTitleUpdate(
+                                          note.id,
+                                          e.currentTarget.value
+                                        );
                                       } else if (e.key === "Escape") {
                                         setEditingListItemId(null);
                                       }
@@ -1632,7 +1661,10 @@ const ScribePage = () => {
                                 )}
                               </div>
                               <span className="text-sm text-white/50 group-hover:text-white/70 transition-colors duration-200">
-                                {format(new Date(note.createdAt), "MMM d, yyyy")}
+                                {format(
+                                  new Date(note.createdAt),
+                                  "MMM d, yyyy"
+                                )}
                               </span>
                             </div>
                           </div>
@@ -1647,13 +1679,16 @@ const ScribePage = () => {
                           <div className="text-md font-bold text-gray-400 [text-shadow:0_0_15px_rgba(255,255,255,0.5)]">
                             Welcome to
                           </div>
-                          <span className="bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] 
-                                      text-transparent bg-clip-text text-6xl font-bold block">
+                          <span
+                            className="bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] 
+                                      text-transparent bg-clip-text text-6xl font-bold block"
+                          >
                             Scribe
                           </span>
                           <p className="text-gray-400 text-lg max-w-2xl">
-                            Your AI-powered note-taking assistant. Record your thoughts, meetings, or lectures 
-                            and let AI transform them into well-structured notes.
+                            Your AI-powered note-taking assistant. Record your
+                            thoughts, meetings, or lectures and let AI transform
+                            them into well-structured notes.
                           </p>
                         </div>
 
@@ -1695,42 +1730,71 @@ const ScribePage = () => {
                           <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
                             <MessageCircleQuestionIcon className="w-5 h-5 text-purple-400" />
                           </div>
-                          <h3 className="text-lg font-semibold text-white mb-2">Voice to Notes</h3>
-                          <p className="text-gray-400">Record your voice and watch as AI transforms it into well-structured, organized notes.</p>
+                          <h3 className="text-lg font-semibold text-white mb-2">
+                            Voice to Notes
+                          </h3>
+                          <p className="text-gray-400">
+                            Record your voice and watch as AI transforms it into
+                            well-structured, organized notes.
+                          </p>
                         </div>
 
                         <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
                           <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
                             <Wand2 className="w-5 h-5 text-blue-400" />
                           </div>
-                          <h3 className="text-lg font-semibold text-white mb-2">AI Enhancement</h3>
-                          <p className="text-gray-400">Let AI help organize, format, and enhance your notes with additional context and structure.</p>
+                          <h3 className="text-lg font-semibold text-white mb-2">
+                            AI Enhancement
+                          </h3>
+                          <p className="text-gray-400">
+                            Let AI help organize, format, and enhance your notes
+                            with additional context and structure.
+                          </p>
                         </div>
 
                         <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
                           <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4">
                             <History className="w-5 h-5 text-emerald-400" />
                           </div>
-                          <h3 className="text-lg font-semibold text-white mb-2">Note History</h3>
-                          <p className="text-gray-400">Access all your past notes with automatic saving and easy organization.</p>
+                          <h3 className="text-lg font-semibold text-white mb-2">
+                            Note History
+                          </h3>
+                          <p className="text-gray-400">
+                            Access all your past notes with automatic saving and
+                            easy organization.
+                          </p>
                         </div>
                       </div>
 
                       {/* Getting Started Guide */}
                       <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                        <h3 className="text-xl font-semibold text-white mb-4">Getting Started</h3>
+                        <h3 className="text-xl font-semibold text-white mb-4">
+                          Getting Started
+                        </h3>
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 text-gray-400">
-                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">1</div>
-                            <p>Click "Start Recording" to begin capturing your voice</p>
+                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">
+                              1
+                            </div>
+                            <p>
+                              Click "Start Recording" to begin capturing your
+                              voice
+                            </p>
                           </div>
                           <div className="flex items-center gap-3 text-gray-400">
-                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">2</div>
+                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">
+                              2
+                            </div>
                             <p>Speak clearly into your microphone</p>
                           </div>
                           <div className="flex items-center gap-3 text-gray-400">
-                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">3</div>
-                            <p>Stop recording when finished and let AI process your notes</p>
+                            <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-sm text-purple-400">
+                              3
+                            </div>
+                            <p>
+                              Stop recording when finished and let AI process
+                              your notes
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -1753,7 +1817,9 @@ const ScribePage = () => {
                       <div
                         className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-300"
                         style={{
-                          width: `${(recordingTime / MAX_RECORDING_TIME) * 100}%`,
+                          width: `${
+                            (recordingTime / MAX_RECORDING_TIME) * 100
+                          }%`,
                         }}
                       />
                     </div>
@@ -1806,7 +1872,9 @@ const ScribePage = () => {
                 </div>
 
                 {/* Recording status text */}
-                <p className="text-sm text-gray-400">Recording in progress...</p>
+                <p className="text-sm text-gray-400">
+                  Recording in progress...
+                </p>
               </div>
             </div>
           )}
@@ -1831,7 +1899,9 @@ const ScribePage = () => {
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
               <div className="flex flex-col items-center gap-4 p-6 bg-zinc-900/90 rounded-xl border border-white/10">
                 <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
-                <p className="text-sm text-gray-400">Generating flashcards...</p>
+                <p className="text-sm text-gray-400">
+                  Generating flashcards...
+                </p>
               </div>
             </div>
           )}
@@ -1841,7 +1911,9 @@ const ScribePage = () => {
               <div className="bg-zinc-900/90 rounded-xl border border-white/10 p-6 max-w-2xl w-full">
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-4">
-                    <h3 className="text-xl font-semibold text-white">Flashcards</h3>
+                    <h3 className="text-xl font-semibold text-white">
+                      Flashcards
+                    </h3>
                     <span className="text-sm text-gray-400">
                       {currentCardIndex + 1} / {flashcards.length}
                     </span>
@@ -2002,7 +2074,9 @@ const ScribePage = () => {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <h4 className="text-white font-medium">{set.title}</h4>
+                            <h4 className="text-white font-medium">
+                              {set.title}
+                            </h4>
                             <p className="text-sm text-gray-400">
                               {set.cards.length} cards • Created{" "}
                               {new Date(set.createdAt).toLocaleDateString()}
