@@ -150,10 +150,10 @@ export const Features = () => {
     <section className="py-20 md:py-24">
       <div className="container">
         <h2 className="text-5xl md:text-6xl font-medium text-center tracking-tighter">
-          Transform the Way You Learn and Organize.
+          Learn Smarter, Organize Better, Achieve More.
         </h2>
         <p className="text-white/70 text-lg md:text-xl max-w-2xl mx-auto tracking-tight text-center mt-5">
-          From students to professionals, our AI-powered platform is redefining
+          From students to professionals, Lyra is redefining
           how people organize, learn, and achieve their goals
         </p>
         <div className="mt-10 lg:flex-row flex flex-col gap-3">

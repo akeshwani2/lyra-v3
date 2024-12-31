@@ -57,9 +57,79 @@ const Hero = () => {
     >
       <div className="absolute inset-0 bg-[radial-gradient(75%_75%_at_center_center,rgb(140,69,255,.5)_15%,rgb(14,0,36,.5)_78%,transparent)]"></div>
 
-      {/* Start Planet */}
-      <div className="absolute h-64 w-64 md:h-96 md:w-96 bg-purple-500 rounded-full border border-white/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(50%_50%_at_16.8%_18.3%,white,rgb(184,148,255)_37.7%,rgb(24,0,66))] shadow-[-20px_-20px_50px_rgb(255,255,255,.5),-20px_-20px_80px_rgb(255,255,255,.1),0_0_50px_rgb(140,69,255)]"></div>
-      {/* End Planet */}
+      {/* Logo section with purple theme */}
+      <div className="absolute h-24 w-24 md:h-48 md:w-48 top-[25%] md:top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2">
+        {/* Base glow layer */}
+        <div className="absolute inset-0 rounded-full bg-[radial-gradient(50%_50%_at_center,rgb(140,69,255,0.5),transparent_70%)]"></div>
+        
+        {/* Logo with purple gradient */}
+        <svg 
+          viewBox="0 0 120 120" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full drop-shadow-[0_0_15px_rgba(140,69,255,0.5)]"
+        >
+          <path 
+            fillRule="evenodd" 
+            clipRule="evenodd" 
+            d="M0 60C38.1371 60 60 38.1371 60 0C60 38.1371 81.8629 60 120 60C81.8629 60 60 81.8629 60 120C60 81.8629 38.1371 60 0 60Z" 
+            className="fill-[url(#purple-gradient)]"
+          />
+          <defs>
+            <radialGradient id="purple-gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(60 60) rotate(45) scale(120)">
+              <stop offset="0%" stopColor="white" />
+              <stop offset="50%" stopColor="rgb(184,148,255)" />
+              <stop offset="100%" stopColor="rgb(140,69,255)" />
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+
+      {/* Text content with original gradient */}
+      <div className="container relative mt-16 md:mt-36">
+        <h1 className="text-5xl md:text-[140px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-2 md:pb-4">
+          Lyra
+        </h1>
+        <p className="text-base md:text-xl text-white/70 text-center tracking-tight max-w-xl mx-auto px-4 md:px-0">
+          Your AI companion for smarter work, faster learning,
+          and breakthrough moments – every single day
+        </p>
+        <div className="flex flex-col items-center justify-center mt-4 md:mt-6 gap-4 md:gap-6">
+          <button
+            className="relative py-2 px-3 rounded-lg font-medium text-sm bg-gradient-to-b from-[#190d2e] to-[#4a208a] shadow-[0px_0px_12px_#8c45ff] transition-all duration-300 hover:scale-105 hover:shadow-[0px_0px_16px_#8c45ff]"
+            onClick={() =>
+              isSignedIn ? router.push("/tasks") : router.push("/sign-in")
+            }
+          >
+            <div className="absolute inset-0">
+              <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+
+              <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+
+              <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+            </div>
+            <span className="relative z-10">
+              {isSignedIn ? (
+                `Welcome ${
+                  user?.username || user?.firstName
+                    ? user?.username || user?.firstName
+                    : "back"
+                }!`
+              ) : (
+                <>Explore Lyra</>
+              )}
+            </span>
+
+          </button>
+          
+          <div className="text-white/70 flex px-4 py-2 border border-white/15 rounded-full justify-center items-center gap-1 text-sm font-medium">
+            <div className="relative w-6 flex items-center justify-center">
+              <Dot className="absolute w-8 h-8 font-bold text-green-500 scale-125" />
+            </div>
+            Acquired $5,000 in pre-seed funding
+          </div>
+        </div>
+      </div>
 
       {/* Ring 1 */}
       <motion.div
@@ -112,51 +182,6 @@ const Hero = () => {
         <div className="absolute h-2 w-2 left-0 bg-white rounded-full top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute h-2 w-2 left-full bg-white rounded-full top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
       </motion.div>
-
-      <div className="container relative mt-8">
-        <h1 className="text-8xl md:text-[168px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center sm:pb-3.5 md:pb-6 lg:pb-8">
-          Lyra
-        </h1>
-        <p className="text-lg md:text-xl text-white/70 mt-5 text-center max-w-xl mx-auto">
-          Streamline your workflow effortlessly with AI-powered tools that
-          enhance productivity, optimize learning, and simplify your tasks
-        </p>
-        <div className="flex flex-col items-center justify-center mt-6">
-          <button
-            className="relative py-2 px-3 rounded-lg font-medium text-sm bg-gradient-to-b from-[#190d2e] to-[#4a208a] shadow-[0px_0px_12px_#8c45ff] transition-all duration-300 hover:scale-105 hover:shadow-[0px_0px_16px_#8c45ff]"
-            onClick={() =>
-              isSignedIn ? router.push("/tasks") : router.push("/sign-in")
-            }
-          >
-            <div className="absolute inset-0">
-              <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
-
-              <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
-
-              <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
-            </div>
-            <span className="relative z-10">
-              {isSignedIn ? (
-                `Welcome ${
-                  user?.username || user?.firstName
-                    ? user?.username || user?.firstName
-                    : "back"
-                }!`
-              ) : (
-                <>Explore Lyra</>
-              )}
-            </span>
-
-          </button>
-          <div className="text-white/70 flex mt-6 px-4 py-2 border border-white/15 rounded-full justify-center items-center gap-1 text-sm font-medium">
-            <div className="relative w-6 flex items-center justify-center">
-              <Dot className="absolute w-8 h-8 font-bold text-green-500 scale-125" />
-            </div>
-            Secured $5,000 in pre-seed funding
-          </div>
-
-        </div>
-      </div>
     </motion.section>
   );
 };

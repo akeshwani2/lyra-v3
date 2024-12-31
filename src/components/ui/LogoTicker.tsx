@@ -40,7 +40,6 @@ const LogoTicker = () => {
                 pulseLogo,
                 gsulogo,
                 denverlogo,
-                acmeLogo,
                 mitLogo,
                 citalogo,
                 gatechlogo,

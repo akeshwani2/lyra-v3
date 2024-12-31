@@ -24,13 +24,6 @@ const testimonials = [
     title: "Student @ Baylor University/CEO of TCR",
     avatarImg: mike1,
   },
-
-  {
-    text: "“This tool has greatly assisted me in organizing my tasks and staying on track.”",
-    name: "Jamie Lee",
-    title: "Student @ UC Berkeley",
-    avatarImg: avatar2,
-  },
   {
     text: "“The user interface is so intuitive and easy to use, it helps me organize my notes and tasks efficiently.”",
     name: "Maria Victoria",
@@ -39,7 +32,7 @@ const testimonials = [
   },
   {
     text: "“Lyra has been a game changer for me and my friends. It's easy to use and has saved us countless hours.”",
-    name: "Sophia Perez",
+    name: "Jenna Laine",
     title: "Student @ Georgia Tech",
     avatarImg: avatar1,
   },
@@ -72,8 +65,7 @@ export const Testimonials = () => {
           Beyond Expectations.
         </h2>
         <p className="text-white/70 md:text-xl text-lg max-w-sm mx-auto text-center mt-5 tracking-tight">
-          Our revolutionary AI-powered tools are redefining how students and
-          professionals organize, learn, and achieve their goals
+          Lyra is actively helping hundreds of users transform and streamline their academic lives
         </p>
         <div className="flex overflow-hidden mt-10 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]">
           <motion.div
