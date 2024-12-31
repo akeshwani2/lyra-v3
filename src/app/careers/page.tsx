@@ -59,11 +59,7 @@ const JobCard = ({
   </div>
 );
 
-const JobDetails = ({
-  onClose,
-}: {
-  onClose: () => void;
-}) => (
+const JobDetails = ({ onClose }: { onClose: () => void }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -106,8 +102,9 @@ const JobDetails = ({
             remote internship role where the intern will contribute to the
             development and enhancement of Lyra's platform, focusing on building
             scalable, high-performance web applications. The main focus will be
-            to redesign some pages to improve user experience and interface, and
-            to drastically improve the website's response time/speed.
+            to redesign some pages to improve user experience and interface.
+            Once that is accomplished, the focus will shift to growing the
+            company and scaling the product/adding new features.
           </p>
         </div>
 

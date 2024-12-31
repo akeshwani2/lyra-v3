@@ -3,11 +3,12 @@ import React from "react";
 import acmeLogo from "@/assets/logo-acme.png";
 import pulseLogo from "@/assets/logo-pulse.png";
 import denverlogo from "@/assets/duLogo.png";
-import baylologo from "@/assets/BU_BrandMark_Horz_White.png"
+import baylologo from "@/assets/BU_BrandMark®_Stacked_White.png"
 import dukeLogo from "@/assets/dukelogo_white.png";
 import mitLogo from "@/assets/mit_logo_std_rgb_white.png";
 import gatechlogo from "@/assets/georgia-tech-yellow-jackets-2-logo-black-and-white.png"
 import gsulogo from "@/assets/Georgia State University-06.png"
+import apexlogo from "@/assets/logo-apex.png"
 import citalogo from "@/assets/2370a047-7e9d-409d-ae44-89f3de2092e2.png"
 import { motion } from "framer-motion";
 import Image from 'next/image';
@@ -35,22 +36,21 @@ const LogoTicker = () => {
                 mitLogo,
                 citalogo,
                 gatechlogo,
-                baylologo,
                 dukeLogo,
+                baylologo,
                 pulseLogo,
                 gsulogo,
                 denverlogo,
-                acmeLogo,
+                apexlogo,
                 mitLogo,
                 citalogo,
                 gatechlogo,
-                baylologo,
                 dukeLogo,
+                baylologo,
                 pulseLogo,
                 gsulogo,
-
                 denverlogo,
-                acmeLogo,
+                apexlogo,
               ].map((logo, index) => (
                 <div key={`${logo.src}-${index}`} className="flex items-center justify-center h-20">
                   <Image
@@ -66,7 +66,7 @@ const LogoTicker = () => {
                         : logo === gsulogo
                         ? 'h-24'
                         : logo === baylologo
-                        ? 'h-10 mt-1'
+                        ? 'h-14 mb-1'
                         : logo === pulseLogo
                         ? 'mt-2'
                         : 'h-8'
