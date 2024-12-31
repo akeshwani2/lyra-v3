@@ -1535,7 +1535,7 @@ const ScribePage = () => {
                     <div className="flex flex-col items-center justify-center gap-4 py-12">
                       <Loader2 className="h-8 w-8 animate-spin text-purple-500/50" />
                       <p className="text-sm text-gray-500">
-                        Loading your notes...
+                        Checking for notes...
                       </p>
                     </div>
                   ) : notesHistory.length > 0 ? (

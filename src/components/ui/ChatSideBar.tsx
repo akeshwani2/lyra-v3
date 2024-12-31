@@ -40,7 +40,12 @@ const ChatSideBar = ({chats, chatId}: Props) => {
                 throw new Error(error.error || 'Failed to delete chat');
             }
 
-            toast.success('Chat deleted successfully');
+            toast.success('Chat deleted successfully', {
+                style: {
+                    background: '#1F2937',
+                    color: '#FFFFFF',
+                }
+            });
 
             // Trigger refresh in other components
             localStorage.setItem('chat-deleted', Date.now().toString());
