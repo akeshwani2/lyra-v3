@@ -63,15 +63,15 @@ const Footer = () => {
               Contact
             </a>
           </nav>
-          <div className="flex gap-5 lg:flex-1 lg:justify-end">
+          <div className="flex gap-5 lg:flex-1 lg:justify-end ">
             <Github
-              className=" text-white/40 hover:text-white transition"
+              className=" text-white/40 hover:text-white transition cursor-pointer"
               onClick={() =>
                 window.open("https://github.com/akeshwani2", "_blank")
               }
             />
             <Linkedin
-              className=" text-white/40 hover:text-white transition"
+              className=" text-white/40 hover:text-white transition cursor-pointer"
               onClick={() =>
                 window.open(
                   "https://www.linkedin.com/in/arhaan-keshwani",
@@ -80,7 +80,7 @@ const Footer = () => {
               }
             />
             <User
-              className=" text-white/40 hover:text-white transition"
+              className=" text-white/40 hover:text-white transition cursor-pointer"
               onClick={() =>
                 window.open("https://ak-port.vercel.app", "_blank")
               }

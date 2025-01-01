@@ -87,40 +87,39 @@ const Hero = () => {
 
       {/* Text content with original gradient */}
       <div className="container relative mt-16 md:mt-36">
-        <h1 className="text-5xl md:text-[140px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-2 md:pb-4">
+        <h1 className="text-5xl md:text-[140px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-2 mt-1 md:mt-0 md:pb-5">
           Lyra
         </h1>
         <p className="text-base md:text-xl text-white/70 text-center tracking-tight max-w-xl mx-auto px-4 md:px-0">
           Your AI companion for smarter work, faster learning,
           and breakthrough moments – every single day
         </p>
-        <div className="flex flex-col items-center justify-center mt-4 md:mt-6 gap-4 md:gap-6">
-          <button
-            className="relative py-2 px-3 rounded-lg font-medium text-sm bg-gradient-to-b from-[#190d2e] to-[#4a208a] shadow-[0px_0px_12px_#8c45ff] transition-all duration-300 hover:scale-105 hover:shadow-[0px_0px_16px_#8c45ff]"
-            onClick={() =>
-              isSignedIn ? router.push("/tasks") : router.push("/sign-in")
-            }
-          >
-            <div className="absolute inset-0">
-              <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+        <div className="flex flex-col items-center justify-center mt-4 md:mt-6 gap-4 md:gap-6 cursor-pointer">
+        <button
+              className="relative py-2 px-3 rounded-lg font-medium text-sm bg-gradient-to-b from-[#190d2e] to-[#4a208a] shadow-[0px_0px_12px_#8c45ff] transition-all duration-300 hover:scale-105 hover:shadow-[0px_0px_16px_#8c45ff]"
+              onClick={() =>
+                isSignedIn ? router.push("/tasks") : router.push("/sign-in")
+              }
+            >
+              <div className="absolute inset-0">
+                <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
 
-              <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+                <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
 
-              <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
-            </div>
-            <span className="relative z-10">
-              {isSignedIn ? (
-                `Welcome ${
-                  user?.username || user?.firstName
-                    ? user?.username || user?.firstName
-                    : "back"
-                }!`
-              ) : (
-                <>Explore Lyra</>
-              )}
-            </span>
-
-          </button>
+                <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+              </div>
+              <span className="relative z-10 text-white">
+                {isSignedIn ? (
+                  `Welcome ${
+                    user?.username || user?.firstName
+                      ? user?.username || user?.firstName
+                      : "back"
+                  }!`
+                ) : (
+                  <>Explore Lyra</>
+                )}
+              </span>
+            </button>
           
           <div className="text-white/70 flex px-4 py-2 border border-white/15 rounded-full justify-center items-center gap-1 text-sm font-medium">
             <div className="relative w-6 flex items-center justify-center">

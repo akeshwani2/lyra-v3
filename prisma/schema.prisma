@@ -78,6 +78,7 @@ model Assignment {
   @@index([userId])
 }
 
+
 model QuickNotes {
   id        String   @id @default(cuid())
   content   String   @db.Text

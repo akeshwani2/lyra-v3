@@ -21,6 +21,7 @@ import {
   CircleSlash,
   Ban,
   XCircle,
+  Link as LinkIcon,
 } from "lucide-react";
 import NoAssignments from "@/assets/zzz.svg";
 import { dark } from "@clerk/themes";
@@ -1481,6 +1482,18 @@ const TasksPage = () => {
                     </div>
                   </div>
                 </div>
+                {/* <div>
+                  <label className="text-sm text-zinc-400">
+                    Add Link (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
+                        appearance-none text-base
+                        border border-white/5 cursor-pointer
+                        focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  />
+                </div> */}
 
                 <div className="flex justify-end gap-3 mt-6">
                   <button
@@ -2151,12 +2164,19 @@ const TasksPage = () => {
 
                 <div className="space-y-4">
                   <div className="bg-zinc-800/50 rounded-lg p-4 border border-white/5">
-                    <h3 className="text-lg mb-2">{selectedAssignment.title}</h3>
                     <div className="flex items-center gap-2">
                       <span className="text-sm px-2 py-1 bg-purple-500/20 text-purple-400 rounded">
                         {selectedAssignment.type}
                       </span>
                     </div>
+                    <h3 className="text-lg mt-2">{selectedAssignment.title}</h3>
+
+                    {/* <div className="text-sm mt-3">
+                      <LinkIcon
+                        size={14}
+                        className="text-purple-400 hover:text-purple-300"
+                      />
+                    </div> */}
                   </div>
 
                   <div className="flex justify-end gap-3">
