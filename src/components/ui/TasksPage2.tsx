@@ -1937,7 +1937,16 @@ const TasksPage = () => {
           )
         );
         
-        toast.success("Assignment updated successfully!");
+        toast.success("Assignment updated successfully!", {
+          style: {
+            background: "#18181b",
+            boxShadow: "none",
+            fontSize: "14px",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.1)",
+            textAlign: "center",
+          },
+        });
         setEditingAssignment(null);
       } catch (error) {
         console.error("Failed to update assignment:", error);
