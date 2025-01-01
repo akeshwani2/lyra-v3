@@ -12,7 +12,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { title, dueDate, type, courseId, completed } = body;
+    const { title, dueDate, type, courseId, completed, link } = body;
 
     // Extract assignmentId from the URL
     const url = new URL(req.url);
@@ -42,6 +42,7 @@ export async function PATCH(
         ...(type && { type }),
         ...(courseId && { courseId }),
         ...(completed !== undefined && { completed }),
+        ...(link && { link }),
       }
     });
 

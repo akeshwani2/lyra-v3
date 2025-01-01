@@ -73,9 +73,9 @@ interface Assignment {
   title: string;
   dueDate: string;
   type: "Assignment" | "Exam" | "Quiz" | "Other";
-  completed?: boolean; // Add this field
-  userId: string; // Add this field
-  link?: string; // Add this field
+  completed?: boolean;
+  userId: string;
+  link: string | null; // Change this to explicitly allow null
 }
 
 interface EditAssignmentModalProps {
@@ -1282,38 +1282,17 @@ const TasksPage = () => {
         title,
         dueDate,
         type,
-        link, // Add this line
+        link, // Add this line to include the link
       };
-
-      console.log("Submitting assignment data:", assignmentData);
 
       try {
         const response = await axios.post("/api/assignments", assignmentData);
-        console.log("Assignment response:", response.data);
-
         setAssignments((prev) => [...prev, response.data]);
-
-        toast.success("Assignment added successfully!", {
-          style: {
-            background: "#18181b",
-            boxShadow: "none",
-            fontSize: "14px",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.1)",
-          },
-        });
-
+        toast.success("Assignment added successfully!");
         setIsAddAssignmentOpen(false);
       } catch (error) {
         console.error("Failed to add assignment:", error);
-        if (axios.isAxiosError(error)) {
-          const errorMessage =
-            error.response?.data || "Failed to add assignment";
-          console.error("Error details:", error.response?.data);
-          toast.error(errorMessage);
-        } else {
-          toast.error("An unexpected error occurred");
-        }
+        toast.error("Failed to add assignment");
       } finally {
         setIsSubmitting(false);
       }
@@ -1486,15 +1465,28 @@ const TasksPage = () => {
                   <label className="text-sm text-zinc-400">
                     Add Link (Optional)
                   </label>
-                  <input
-                    type="url"
-                    value={link}
-                    onChange={(e) => setLink(e.target.value)}
-                    className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
-                      appearance-none text-sm
-                      border border-white/5
-                      focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                  />
+                  <div className="relative">
+                    <input
+                      type="url"
+                      value={link}
+                      onChange={(e) => setLink(e.target.value)}
+                      className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
+                        appearance-none text-sm
+                        border border-white/5
+                        focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                    />
+                    {link && (
+                      <button
+                        onClick={() => setLink("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2
+                          p-1 hover:bg-white/10 rounded-lg
+                          text-zinc-400 hover:text-zinc-300"
+                        type="button"
+                      >
+                        <XCircle size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 mt-6">
@@ -1810,20 +1802,32 @@ const TasksPage = () => {
                 </select>
               </div>
 
-              <div>
+              <div className="mb-6">
                 <label className="text-sm text-zinc-400">
-                  Link (Optional)
+                  Add Link (Optional)
                 </label>
-                <input
-                  type="url"
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  // placeholder="https://..."
-                  className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
-                    appearance-none text-sm
-                    border border-white/5
-                    focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                />
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={link}
+                    onChange={(e) => setLink(e.target.value)}
+                    className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
+                      appearance-none text-sm
+                      border border-white/5
+                      focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  />
+                  {link && (
+                    <button
+                      onClick={() => setLink("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2
+                        p-1 hover:bg-white/10 rounded-lg
+                        text-zinc-400 hover:text-zinc-300"
+                      type="button"
+                    >
+                      <XCircle size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 mt-6">
@@ -1918,35 +1922,26 @@ const TasksPage = () => {
 
     const handleEditSave = async (id: string, updates: Partial<Assignment>) => {
       try {
-        const response = await axios.patch(`/api/assignments/${id}`, updates);
+        // Create the update payload, explicitly handling the link field
+        const updatePayload = {
+          ...updates,
+          link: updates.link?.trim() || null
+        };
+
+        const response = await axios.patch(`/api/assignments/${id}`, updatePayload);
+        
+        // Ensure we're using the response data to update the state
         setAssignments((prev) =>
           prev.map((assignment) =>
-            assignment.id === id ? response.data : assignment
+            assignment.id === id ? { ...assignment, ...response.data } : assignment
           )
         );
-        toast.success("Assignment updated successfully!", {
-          style: {
-            background: "#18181b",
-            boxShadow: "none",
-            fontSize: "14px",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.1)",
-            textAlign: "center",
-          },
-        });
+        
+        toast.success("Assignment updated successfully!");
         setEditingAssignment(null);
       } catch (error) {
         console.error("Failed to update assignment:", error);
-        toast.error("Failed to update assignment", {
-          style: {
-            background: "#18181b",
-            boxShadow: "none",
-            fontSize: "14px",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.1)",
-            textAlign: "center",
-          },
-        });
+        toast.error("Failed to update assignment");
       }
     };
 
@@ -2191,12 +2186,19 @@ const TasksPage = () => {
                     </div>
                     <h3 className="text-lg mt-2">{selectedAssignment.title}</h3>
 
-                    {/* <div className="text-sm mt-3">
-                      <LinkIcon
-                        size={14}
-                        className="text-purple-400 hover:text-purple-300"
-                      />
-                    </div> */}
+                    {selectedAssignment.link && selectedAssignment.link.trim() !== "" && (
+                      <div className="text-sm mt-3 flex items-center gap-2">
+                        <LinkIcon size={14} className="text-purple-400 shrink-0" />
+                        <a 
+                          href={selectedAssignment.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-400 hover:text-purple-300 truncate"
+                        >
+                          {selectedAssignment.link}
+                        </a>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-end gap-3">

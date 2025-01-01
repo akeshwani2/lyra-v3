@@ -46,17 +46,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    console.log('Received assignment data:', body); // Debug log
-    
-    const { courseId, title, dueDate, type } = body;
+    const { courseId, title, dueDate, type, link } = body;
 
     // Validate required fields
     if (!courseId || !title || !dueDate || !type) {
-      console.log('Missing fields:', { courseId, title, dueDate, type }); // Debug log
       return new NextResponse('Missing required fields', { status: 400 });
     }
 
-    // Verify that the course belongs to the user
     const course = await prisma.course.findFirst({
       where: {
         id: courseId,
@@ -65,11 +61,8 @@ export async function POST(req: Request) {
     });
 
     if (!course) {
-      console.log('Course not found:', { courseId, userId }); // Debug log
       return new NextResponse('Course not found', { status: 404 });
     }
-
-    console.log('Creating assignment with:', { courseId, title, dueDate, type, userId }); // Debug log
 
     const assignment = await prisma.assignment.create({
       data: {
@@ -77,25 +70,14 @@ export async function POST(req: Request) {
         title,
         dueDate,
         type,
-        userId
+        userId,
+        link: link || null
       }
     });
 
     return NextResponse.json(assignment);
   } catch (error) {
-    console.error('Assignment creation error:', error);
-    // Return more detailed error information
-    return new NextResponse(
-      JSON.stringify({ 
-        error: 'Internal Server Error', 
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }), 
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    console.error('Error creating assignment:', error);
+    return new NextResponse('Internal error', { status: 500 });
   }
 }
