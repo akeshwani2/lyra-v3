@@ -75,6 +75,7 @@ interface Assignment {
   type: "Assignment" | "Exam" | "Quiz" | "Other";
   completed?: boolean; // Add this field
   userId: string; // Add this field
+  link?: string; // Add this field
 }
 
 interface EditAssignmentModalProps {
@@ -1096,11 +1097,7 @@ const TasksPage = () => {
   };
 
   // First, modify the AddAssignmentModal props to accept a prefilled date
-  const AddAssignmentModal = ({
-    prefilledDate,
-  }: {
-    prefilledDate?: string;
-  }) => {
+  const AddAssignmentModal = ({ prefilledDate }: { prefilledDate?: string }) => {
     const [importMethod, setImportMethod] = useState<
       "manual" | "paste" | "upload"
     >("manual");
@@ -1113,6 +1110,7 @@ const TasksPage = () => {
     );
     const [selectedCourse, setSelectedCourse] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [link, setLink] = useState(""); // Add this line
 
     // Add these state variables
     const [parsedAssignments, setParsedAssignments] = useState<
@@ -1284,6 +1282,7 @@ const TasksPage = () => {
         title,
         dueDate,
         type,
+        link, // Add this line
       };
 
       console.log("Submitting assignment data:", assignmentData);
@@ -1421,6 +1420,7 @@ const TasksPage = () => {
                   <input
                     type="text"
                     value={title}
+                    placeholder="Your Assignment"
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
                         appearance-none text-base
@@ -1482,18 +1482,20 @@ const TasksPage = () => {
                     </div>
                   </div>
                 </div>
-                {/* <div>
+                <div className="mb-6">
                   <label className="text-sm text-zinc-400">
                     Add Link (Optional)
                   </label>
                   <input
-                    type="text"
+                    type="url"
+                    value={link}
+                    onChange={(e) => setLink(e.target.value)}
                     className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
-                        appearance-none text-base
-                        border border-white/5 cursor-pointer
-                        focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                      appearance-none text-sm
+                      border border-white/5
+                      focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                   />
-                </div> */}
+                </div>
 
                 <div className="flex justify-end gap-3 mt-6">
                   <button
@@ -1711,6 +1713,7 @@ const TasksPage = () => {
     const [type, setType] = useState(assignment.type);
     const [courseId, setCourseId] = useState(assignment.courseId);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [link, setLink] = useState(assignment.link || ""); // Add this line
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -1721,6 +1724,7 @@ const TasksPage = () => {
         dueDate,
         type,
         courseId,
+        link, // Add this line
       };
 
       await onSave(assignment.id, updates);
@@ -1804,6 +1808,22 @@ const TasksPage = () => {
                   <option value="Quiz">Quiz</option>
                   <option value="Other">Other</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="text-sm text-zinc-400">
+                  Link (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  // placeholder="https://..."
+                  className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
+                    appearance-none text-sm
+                    border border-white/5
+                    focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                />
               </div>
 
               <div className="flex justify-end gap-3 mt-6">
