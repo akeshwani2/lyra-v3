@@ -1,7 +1,7 @@
-// app/api/quickNotes/route.ts
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/app/lib/prisma";
+import { JournalEntryType } from "@prisma/client";
 
 export async function GET(req: Request) {
   try {
@@ -9,18 +9,20 @@ export async function GET(req: Request) {
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
+    console.log("Attempting to fetch gratitude entry for user:", userId);
 
-    console.log("Attempting to fetch quick note for user:", userId);
-
-    const note = await prisma.quickNotes.findFirst({
-      where: { userId },
+    const entry = await prisma.journalEntry.findFirst({
+      where: { 
+        userId,
+        type: JournalEntryType.GRATITUDE 
+      },
       orderBy: { updatedAt: "desc" },
     });
 
-    console.log("Quick note fetch result:", note);
-    return NextResponse.json(note);
+    console.log("Journal Entry fetch results:", entry);
+    return NextResponse.json(entry);
   } catch (error) {
-    console.error("[QUICKNOTES_GET] Detailed error:", error);
+    console.error("Detailed error:", error);
     return new NextResponse(
       JSON.stringify({
         error: "Internal error",
@@ -39,11 +41,14 @@ export async function PUT(req: Request) {
     }
 
     const { content } = await req.json();
-    console.log("Attempting to save quick note for user:", userId);
+    console.log("Attempting to save gratitude entry for user:", userId);
 
-    const note = await prisma.quickNotes.upsert({
+    const entry = await prisma.journalEntry.upsert({
       where: {
-        userId: userId,
+        userId_type: {
+          userId,
+          type: JournalEntryType.GRATITUDE,
+        },
       },
       update: {
         content,
@@ -51,13 +56,14 @@ export async function PUT(req: Request) {
       create: {
         userId,
         content,
+        type: JournalEntryType.GRATITUDE,
       },
     });
 
-    console.log("Quick note save result:", note);
-    return NextResponse.json(note);
+    console.log("Journal entry save result:", entry);
+    return NextResponse.json(entry);
   } catch (error) {
-    console.error("[QUICKNOTES_PUT] Detailed error:", error);
+    console.error("PUT Detailed error:", error);
     return new NextResponse(
       JSON.stringify({
         error: "Internal error",

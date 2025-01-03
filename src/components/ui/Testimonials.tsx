@@ -18,14 +18,9 @@ const testimonials = [
     title: "Founder/CEO of Cita Marketplace",
     avatarImg: avatar7,
   },
+
   {
-    text: "“I love the UI, it's very modern and I like the AI PDF reader, it's easy to use and very helpful.”",
-    name: "Michael Pressman",
-    title: "Student @ Baylor University/CEO of TCR",
-    avatarImg: mike1,
-  },
-  {
-    text: "“The user interface is so intuitive and easy to use, it helps me organize my notes and tasks efficiently.”",
+    text: "“This feels like a combination of Notion and Obsidian, except everything is in one place and free!”",
     name: "Maria Victoria",
     title: "Upcoming student @ Harvard University",
     avatarImg: avatar5,
@@ -35,6 +30,12 @@ const testimonials = [
     name: "Jenna Laine",
     title: "Student @ Georgia Tech",
     avatarImg: avatar1,
+  },
+  {
+    text: "“I love the UI, it's very modern and I like the AI PDF reader, it's easy to use and very helpful.”",
+    name: "Michael Pressman",
+    title: "Student @ Baylor University/CEO of TCR",
+    avatarImg: mike1,
   },
   {
     text: "“I love the Scribe feature! I don't have to worry about taking notes anymore.”",

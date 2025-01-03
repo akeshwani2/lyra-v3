@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Calendar, CalendarClock, FileText, ListTodo, Brain, LogOut, FileAudio, Feather, FilePen } from "lucide-react"
+import { Calendar, CalendarClock, FileText, ListTodo, Brain, LogOut, FileAudio, Feather, FilePen, Book } from "lucide-react"
 import { useClerk } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
@@ -37,6 +37,13 @@ const items = [
     hoverColor: "hover:bg-amber-500/5 hover:text-white",
   },
   {
+    title: "Journal",
+    url: "/journal",
+    icon: Book,
+    activeColor: "bg-green-500/10 text-white",
+    hoverColor: "hover:bg-green-500/5 hover:text-white",
+  },
+  {
     title: "PDF Reader",
     url: "/ai-pdf",
     icon: FileText,
@@ -44,13 +51,14 @@ const items = [
     hoverColor: "hover:bg-green-500/5 hover:text-white",
   },
 
-  {
-    title: "Note Mate",
-    url: "/ai-resume",
-    icon: FilePen,
-    activeColor: "bg-purple-500/10 text-white",
-    hoverColor: "hover:bg-purple-500/5 hover:text-white",
-  },
+
+  // {
+  //   title: "AI Resume",
+  //   url: "/ai-resume",
+  //   icon: FilePen,
+  //   activeColor: "bg-purple-500/10 text-white",
+  //   hoverColor: "hover:bg-purple-500/5 hover:text-white",
+  // },
   // {
   //   title: "Scheduler",
   //   url: "/scheduler",

@@ -79,6 +79,24 @@ model Assignment {
   @@index([userId])
 }
 
+enum JournalEntryType {
+  REFLECTION
+  GRATITUDE
+  CHALLENGES
+  HIGHLIGHTS
+  GOALS
+}
+
+model JournalEntry {
+  id        String           @id @default(cuid())
+  userId    String
+  content   String          @db.Text
+  type      JournalEntryType
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([userId, type])
+}
 
 model QuickNotes {
   id        String   @id @default(cuid())

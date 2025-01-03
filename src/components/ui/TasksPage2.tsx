@@ -172,13 +172,11 @@ const TasksPage = () => {
   >([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Add these state variables at the top of your component
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [selectedAssignments, setSelectedAssignments] = useState<Set<number>>(
     new Set()
   );
 
-  // Add this function at the beginning of your TasksPage component
   const initializeUserResources = async () => {
     try {
       // Initialize Quick Notes
@@ -1288,11 +1286,27 @@ const TasksPage = () => {
       try {
         const response = await axios.post("/api/assignments", assignmentData);
         setAssignments((prev) => [...prev, response.data]);
-        toast.success("Assignment added successfully!");
+        toast.success("Assignment added successfully!", {
+          style: {
+            background: "#18181b",
+            boxShadow: "none",
+            fontSize: "14px",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.1)",
+          },
+        });
         setIsAddAssignmentOpen(false);
       } catch (error) {
         console.error("Failed to add assignment:", error);
-        toast.error("Failed to add assignment");
+        toast.error("Failed to add assignment", {
+          style: {
+            background: "#18181b",
+            boxShadow: "none",
+            fontSize: "14px",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.1)",
+          },
+        });
       } finally {
         setIsSubmitting(false);
       }
