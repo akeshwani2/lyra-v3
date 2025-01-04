@@ -88,18 +88,18 @@ const Hero = () => {
 
       {/* Text content with original gradient */}
       <div className="container relative mt-16 md:mt-36">
-        <h1 className="text-5xl md:text-[140px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-2 mt-1 md:mt-0 md:pb-5">
+        <h1 className="text-5xl md:text-[140px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-2 mt-1 md:mt-0 md:pb-6">
           Lyra
         </h1>
-        <p className="text-base md:text-xl text-white/70 text-center tracking-tight max-w-xl mx-auto px-4 md:px-0">
+        <p className="text-base md:text-xl text-white/70 text-center tracking-tight max-w-xl mx-auto px-4 md:px-0 mb-4 md:mb-6">
           Your AI companion for smarter work, faster learning,
           and breakthrough moments – every single day
         </p>
-        <div className="flex flex-col items-center justify-center mt-4 md:mt-6 gap-4 md:gap-6">
 
-          
-          <div className="text-white/70 flex px-4 py-2 border border-white/15 rounded-full justify-center items-center gap-1 text-sm font-medium">
-            <div className="relative w-6 flex items-center justify-center">
+        {/* Adjusted spacing above and below the funding notice */}
+        <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
+          <div className="text-white/70 flex px-6 py-3 border border-white/15 rounded-full justify-center items-center gap-2 text-sm font-medium">
+            <div className="relative w-4 flex items-center justify-center">
               <Dot className="absolute w-8 h-8 font-bold text-green-500 scale-125 animate-pulse duration-0.5" />
             </div>
             Acquired $5,000 in pre-seed funding
