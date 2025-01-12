@@ -44,7 +44,7 @@ To start using Lyra and revolutionize your workflow:
 3. Begin exploring and taking advantage of Lyra’s features to boost your productivity.
 
 ## Contact & Support
-If you have any questions, feedback, or need support, please reach out through our email: **lyraafy@gmail.com**
+If you have any questions, feedback, or need support, please reach out through our email: **ak@lyra.services**
 
 ---
 **Lyra** – Elevate Your Work with Intelligent Automation.
