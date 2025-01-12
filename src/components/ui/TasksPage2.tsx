@@ -36,6 +36,8 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import PomodoroTimer from "@/components/ui/PomodoroTimer";
 import MiniKanban from "@/components/ui/MiniKanban";
 import PDFViewer from "@/components/ui/PDFViewer";
+import Image from "next/image";
+import lyraLogo from "@/assets/logo-copy.png";
 
 interface Task {
   id: string;
@@ -2174,20 +2176,17 @@ const TasksPage = () => {
                 <div className="flex justify-between items-center mb-6">
                   <div>
                     <h2 className="text-xl font-semibold">
-                      {
-                        courses.find(
-                          (c) => c.id === selectedAssignment.courseId
-                        )?.name
-                      }
+                      {courses.find((c) => c.id === selectedAssignment.courseId)?.name}
                     </h2>
                     <p className="text-zinc-400 text-sm">
                       Due:{" "}
-                      {new Date(selectedAssignment.dueDate).toLocaleDateString(
+                      {new Date(`${selectedAssignment.dueDate}T00:00:00`).toLocaleDateString(
                         "en-US",
                         {
                           month: "long",
                           day: "numeric",
                           year: "numeric",
+                          timeZone: 'UTC'  // Add this to prevent timezone shifting
                         }
                       )}
                     </p>
@@ -2343,8 +2342,15 @@ const TasksPage = () => {
   // Add loading screen component
   const LoadingScreen = () => (
     <div className="h-screen flex items-center justify-center bg-zinc-950">
-      <div className="space-y-4 text-center">
-        <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mx-auto" />
+      <div className="flex flex-col items-center space-y-4">
+        <Image 
+          src={lyraLogo} 
+          alt="Lyra Logo" 
+          width={48} 
+          height={48} 
+          className="animate-pulse"
+          priority
+        />
         <p className="text-zinc-400 text-sm">Assembling your workspace...</p>
       </div>
     </div>
@@ -2519,7 +2525,7 @@ const TasksPage = () => {
                               {dayNumber}
                               {dayAssignments.length > 0 && (
                                 <div
-                                  className="absolute bottom-0.5 w-1.5 h-1.5 rounded-full"
+                                  className="absolute bottom-1.5 w-1.5 h-1.5 rounded-full"
                                   style={
                                     dayAssignments.length === 1
                                       ? {
