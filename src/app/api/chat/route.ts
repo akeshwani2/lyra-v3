@@ -1,4 +1,4 @@
-import {Configuration, OpenAIApi} from 'openai-edge'
+import OpenAI from 'openai'
 import {Message, OpenAIStream, StreamingTextResponse} from 'ai'
 import { getContext } from '@/app/lib/context'
 import { db } from '@/app/lib/db'
@@ -7,11 +7,11 @@ import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 export const runtime = 'edge'
 
-const config = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-})
+const openai = new OpenAI({
+    baseURL: 'https://api.deepseek.com',
+    apiKey: process.env.DEEPSEEK_API_KEY,
+});
 
-const openai = new OpenAIApi(config)
 export async function POST(req: Request) {
     try {
         const {messages, chatId} = await req.json()
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
                 You are an intelligent and adaptive AI assistant designed to analyze, interpret, and interact with users based on the provided context: ${context}
                 
                 Your role:
-
+                        Do not say "Hello" or "Hi" if you've already said it.
                         Process the provided ${context} thoroughly to extract and utilize all relevant information for user queries. Your responses should always be based on this context.
                         Deliver accurate, concise, and actionable insights in a clean, structured, and neatly formatted manner to ensure user understanding. Where applicable, use formatting elements like:
                         Headings for sections
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
                         Bold or italicized text to emphasize key points.
                         Your interaction style:
 
-                        If the user greets you (e.g., "Hi" or "Hello"), reply warmly and naturally, as if you are a friendly and approachable human.
+                        If the user greets you (e.g., "Hi" or "Hello"), reply warmly and naturally, as if you are a friendly and approachable human, but don't repeat yourself.
                         If information is missing or unclear in the ${context}, ask clarifying questions or respond with: "I don't have enough information to answer that question. Could you please provide more details?"
                         And any other question the user asks, even if it's not related to the ${context}, respond with a friendly and helpful tone.
                         Your rules:
@@ -59,21 +59,20 @@ export async function POST(req: Request) {
                         Emphasize readability: Use logical structure and formatting to make your responses user-friendly and visually appealing.
                         Example response formatting:
 
-                        Overview: Provide a concise summary of the main point.
+                        Overview: Provide a concise summary of the main point, but don't repeat yourself or the entire information for every question.
                         Details: Expand on key points using bullet points, lists, or tables where applicable.
                         Additional Notes: Include clarifications or suggestions for next steps if needed.`
         }
-        const response = await openai.createChatCompletion({
-            model: 'gpt-4o-mini',
+        const response = await openai.chat.completions.create({
+            model: 'deepseek-chat',
             messages: [
                 prompt, 
                 ...messages.filter((message: Message) => message.role === 'user'),
             ],
-            stream: true, // This is so that the moment it starts generating, it sends the response back to the client instead of waiting for the whole response
+            stream: true,
         })
         const stream = OpenAIStream(response, {
             onStart: async() => {
-                // save user message into db
                 await db.insert(_messages).values({
                     chatId,
                     content: lastMessage.content,
@@ -81,7 +80,6 @@ export async function POST(req: Request) {
                 })
             },
             onCompletion: async (completion) => {
-                // save completion into db
                 await db.insert(_messages).values({
                     chatId,
                     content: completion,

@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+// Initialize OpenAI with DeepSeek's base URL
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: 'https://api.deepseek.com',
+  apiKey: process.env.DEEPSEEK_API_KEY, // Update your environment variable name
 });
 
 export async function POST(req: Request) {
@@ -30,7 +32,7 @@ export async function POST(req: Request) {
          - Fixed grammar issues`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "deepseek-chat", // Use the appropriate DeepSeek model
       messages: [
         {
           role: "system",
