@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/app/lib/prisma";
+import { NextRequest } from "next/server";
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest
 ) {
   try {
     const { userId } = await auth();
@@ -12,10 +12,14 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const body = await req.json();
+    const body = await request.json();
     const { name, startTime, endTime, location, days } = body;
 
-    // Ensure all days exist
+    // Extract id from the URL
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop() || '';
+
+    // First, ensure all necessary days exist
     await Promise.all(
       days.map(async (dayName: string) => {
         await prisma.day.upsert({
@@ -26,11 +30,10 @@ export async function PATCH(
       })
     );
 
-    // Update the class schedule
     const updatedClass = await prisma.classSchedule.update({
       where: {
-        id: params.id,
-        userId,
+        id,
+        userId
       },
       data: {
         name,
@@ -38,8 +41,8 @@ export async function PATCH(
         endTime,
         location,
         days: {
-          set: [], // First disconnect all days
-          connect: days.map((dayName: string) => ({ name: dayName })) // Then connect new days
+          set: [],  // First clear existing connections
+          connect: days.map((dayName: string) => ({ name: dayName }))  // Then connect new days
         }
       },
       include: {
@@ -50,6 +53,9 @@ export async function PATCH(
     return NextResponse.json(updatedClass);
   } catch (error) {
     console.error("[CLASSES_PATCH]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update class" },
+      { status: 500 }
+    );
   }
 }
