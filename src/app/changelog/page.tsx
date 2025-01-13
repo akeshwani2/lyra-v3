@@ -128,7 +128,7 @@ export default function ChangelogPage() {
             </article>
 
             <hr className="border-t border-white/20 my-12" /> */}
-            <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+            {/* <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">
                   December 29, 2024
@@ -157,7 +157,7 @@ export default function ChangelogPage() {
                 />
               </div>
             </article>
-            <hr className="border-t border-white/20 my-12" />
+            <hr className="border-t border-white/20 my-12" /> */}
             <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">
