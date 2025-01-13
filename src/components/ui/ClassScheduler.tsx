@@ -14,6 +14,25 @@ interface ClassSchedule {
   userId: string;
 }
 
+const convertTo12Hour = (time24: string) => {
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes} ${ampm}`;
+};
+
+const convertTo24Hour = (time12: string) => {
+  const [time, period] = time12.split(' ');
+  const [hours, minutes] = time.split(':');
+  let hour = parseInt(hours);
+  
+  if (period === 'PM' && hour !== 12) hour += 12;
+  if (period === 'AM' && hour === 12) hour = 0;
+  
+  return `${hour.toString().padStart(2, '0')}:${minutes}`;
+};
+
 const ClassScheduler = () => {
   const { user } = useUser();
   
@@ -167,7 +186,7 @@ const ClassScheduler = () => {
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-sm truncate">{cls.name}</h3>
                     <span className="text-xs text-zinc-500 shrink-0">
-                      {cls.startTime} - {cls.endTime}
+                      {convertTo12Hour(cls.startTime)} - {convertTo12Hour(cls.endTime)}
                     </span>
                   </div>
                   {cls.location && (
@@ -241,8 +260,8 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
     e.preventDefault();
     onSubmit({
       name,
-      startTime,
-      endTime,
+      startTime: convertTo24Hour(startTime),
+      endTime: convertTo24Hour(endTime),
       location,
       days: selectedDays
     });
@@ -281,7 +300,10 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
               <input
                 type="time"
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={(e) => {
+                  const time24 = e.target.value;
+                  setStartTime(convertTo12Hour(time24));
+                }}
                 className="w-full bg-zinc-800 rounded px-3 py-2 text-sm border border-zinc-700 
                   focus:outline-none focus:border-zinc-600"
               />
@@ -291,7 +313,10 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
               <input
                 type="time"
                 value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
+                onChange={(e) => {
+                  const time24 = e.target.value;
+                  setEndTime(convertTo12Hour(time24));
+                }}
                 className="w-full bg-zinc-800 rounded px-3 py-2 text-sm border border-zinc-700 
                   focus:outline-none focus:border-zinc-600"
               />
@@ -369,8 +394,8 @@ interface EditClassFormProps {
 
 const EditClassForm = ({ class: classToEdit, onSubmit, onClose }: EditClassFormProps) => {
   const [name, setName] = useState(classToEdit.name);
-  const [startTime, setStartTime] = useState(classToEdit.startTime);
-  const [endTime, setEndTime] = useState(classToEdit.endTime);
+  const [startTime, setStartTime] = useState(convertTo12Hour(classToEdit.startTime));
+  const [endTime, setEndTime] = useState(convertTo12Hour(classToEdit.endTime));
   const [location, setLocation] = useState(classToEdit.location || '');
   const [selectedDays, setSelectedDays] = useState<string[]>(
     classToEdit.days.map(day => day.name)
@@ -382,8 +407,8 @@ const EditClassForm = ({ class: classToEdit, onSubmit, onClose }: EditClassFormP
     e.preventDefault();
     onSubmit(classToEdit.id, {
       name,
-      startTime,
-      endTime,
+      startTime: convertTo24Hour(startTime),
+      endTime: convertTo24Hour(endTime),
       location,
       days: selectedDays
     });
@@ -422,7 +447,10 @@ const EditClassForm = ({ class: classToEdit, onSubmit, onClose }: EditClassFormP
               <input
                 type="time"
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={(e) => {
+                  const time24 = e.target.value;
+                  setStartTime(convertTo12Hour(time24));
+                }}
                 className="w-full bg-zinc-800 rounded px-3 py-2 text-sm border border-zinc-700 
                   focus:outline-none focus:border-zinc-600"
               />
@@ -432,7 +460,10 @@ const EditClassForm = ({ class: classToEdit, onSubmit, onClose }: EditClassFormP
               <input
                 type="time"
                 value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
+                onChange={(e) => {
+                  const time24 = e.target.value;
+                  setEndTime(convertTo12Hour(time24));
+                }}
                 className="w-full bg-zinc-800 rounded px-3 py-2 text-sm border border-zinc-700 
                   focus:outline-none focus:border-zinc-600"
               />
