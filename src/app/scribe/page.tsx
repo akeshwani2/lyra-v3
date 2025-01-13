@@ -90,7 +90,7 @@ const ScribePage = () => {
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "saved" | "saving" | "error" | ""
   >("");
-  const MAX_RECORDING_TIME = 600; // 10 minutes in seconds
+  const MAX_RECORDING_TIME = 300; // 10 minutes in seconds
   const [recordingTime, setRecordingTime] = useState(0);
   const recordingTimerRef = useRef<NodeJS.Timeout>();
   const [notesHistory, setNotesHistory] = useState<Note[]>([]);
@@ -1827,7 +1827,7 @@ const ScribePage = () => {
 
                   {/* Timer */}
                   <div className="text-sm text-white/70 min-w-[80px]">
-                    {formatTime(recordingTime)}/10:00
+                    {formatTime(recordingTime)}/5:00
                   </div>
 
                   {/* Control buttons */}
