@@ -129,3 +129,25 @@ model Flashcard {
   @@index([setId])
 }
 
+model ClassSchedule {
+  id        String   @id @default(cuid())
+  name      String
+  startTime String
+  endTime   String
+  location  String?
+  userId    String
+  days      Day[]    // Relation to days
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Day {
+  id        String         @id @default(cuid())
+  name      String        @unique
+  classes   ClassSchedule[] // Many-to-many relation with ClassSchedule
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+

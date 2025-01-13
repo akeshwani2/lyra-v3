@@ -33,7 +33,7 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import PomodoroTimer from "@/components/ui/PomodoroTimer";
+import ClassScheduler from "@/components/ui/ClassScheduler";
 import MiniKanban from "@/components/ui/MiniKanban";
 import PDFViewer from "@/components/ui/PDFViewer";
 import Image from "next/image";
@@ -2595,11 +2595,11 @@ const TasksPage = () => {
             >
               <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
                 <h2 className="text-lg font-semibold tracking-tight flex-shrink-0">
-                  Focus Session
+                  Classes
                 </h2>
               </div>
               <div className="flex-1 flex items-center justify-center">
-                <PomodoroTimer />
+                <ClassScheduler />
               </div>
             </div>
           </div>
