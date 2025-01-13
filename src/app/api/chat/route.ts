@@ -8,8 +8,7 @@ import { NextResponse } from 'next/server'
 export const runtime = 'edge'
 
 const openai = new OpenAI({
-    baseURL: 'https://api.deepseek.com',
-    apiKey: process.env.DEEPSEEK_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(req: Request) {
@@ -64,7 +63,7 @@ export async function POST(req: Request) {
                         Additional Notes: Include clarifications or suggestions for next steps if needed.`
         }
         const response = await openai.chat.completions.create({
-            model: 'deepseek-chat',
+            model: 'gpt-4',
             messages: [
                 prompt, 
                 ...messages.filter((message: Message) => message.role === 'user'),

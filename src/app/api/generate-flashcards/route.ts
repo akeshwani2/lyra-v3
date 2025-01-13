@@ -3,8 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const openai = new OpenAI({
-  baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.DEEPSEEK_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(req: Request) {
@@ -26,7 +25,7 @@ ${content}
 Format your response as a JSON object with a "cards" array containing objects with "question" and "answer" properties.`;
 
     const response = await openai.chat.completions.create({
-      model: "deepseek-chat",
+      model: "gpt-4",
       messages: [
         {
           role: "system",

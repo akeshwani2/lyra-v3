@@ -1493,7 +1493,7 @@ const ScribePage = () => {
                           )}
 
                           {/* Flashcard button */}
-                          {notes && !isProcessing && (
+                          {/* {notes && !isProcessing && (
                             <Button
                               onClick={generateFlashcards}
                               className="group relative bg-gradient-to-r from-orange-500 to-amber-500 
@@ -1506,7 +1506,7 @@ const ScribePage = () => {
                                 Generate Flashcards
                               </span>
                             </Button>
-                          )}
+                          )} */}
                         </div>
                       </div>
                     </div>
