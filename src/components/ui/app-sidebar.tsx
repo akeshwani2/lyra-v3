@@ -37,19 +37,20 @@ const items = [
     hoverColor: "hover:bg-amber-500/5 hover:text-white",
   },
   {
-    title: "Journal",
-    url: "/journal",
-    icon: Book,
-    activeColor: "bg-green-500/10 text-white",
-    hoverColor: "hover:bg-green-500/5 hover:text-white",
-  },
-  {
     title: "PDF Reader",
     url: "/ai-pdf",
     icon: FileText,
     activeColor: "bg-green-500/10 text-white",
     hoverColor: "hover:bg-green-500/5 hover:text-white",
   },
+  {
+    title: "Journal",
+    url: "/journal",
+    icon: Book,
+    activeColor: "bg-green-500/10 text-white",
+    hoverColor: "hover:bg-green-500/5 hover:text-white",
+  },
+
 
 
   // {

@@ -3,7 +3,6 @@ import {
   DotLottieCommonPlayer,
   DotLottiePlayer,
 } from "@dotlottie/react-player";
-import Image from "next/image";
 import productImage from "../../../public/assets/product-image.png";
 import { ComponentPropsWithoutRef, useEffect, useRef, useState } from "react";
 import { ValueAnimationTransition } from "framer-motion";
