@@ -3,8 +3,8 @@ import OpenAI from "openai";
 
 // Initialize OpenAI with DeepSeek's base URL
 const openai = new OpenAI({
-  baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.DEEPSEEK_API_KEY, // Update your environment variable name
+  baseURL: 'https://api.deepseek.ai/v1',
+  apiKey: process.env.DEEPSEEK_API_KEY,
 });
 
 export async function POST(req: Request) {
