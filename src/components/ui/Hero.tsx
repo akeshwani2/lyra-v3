@@ -5,6 +5,8 @@ import React, { useEffect, useRef } from "react";
 import starsBg from "@/assets/stars.png";
 import { motion, useScroll, useMotionValueEvent, useTransform } from "framer-motion";
 import { Dot } from "lucide-react";
+import Image from "next/image";
+import nvidiaImage from "@/assets/nvidia.png"
 
 const Hero = () => {
   const sectionRef = useRef(null);
@@ -56,7 +58,7 @@ const Hero = () => {
         ease: "linear",
       }}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(75%_75%_at_center_center,rgb(140,69,255,.5)_15%,rgb(14,0,36,.5)_78%,transparent)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(75%_75%_at_center_center,rgb(140,69,255,.5)_15%,rgb(14,0,36,.5)_78%,transparent)] pointer-events-none"></div>
 
       {/* Logo section with purple theme */}
       <div className="absolute h-24 w-24 md:h-48 md:w-48 top-[25%] md:top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -88,7 +90,7 @@ const Hero = () => {
 
       {/* Text content with original gradient */}
       <div className="container relative mt-16 md:mt-36">
-        <h1 className="text-5xl md:text-[140px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-2 mt-1 md:mt-0 md:pb-6">
+        <h1 className="text-5xl md:text-[140px] md:leading-none font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text text-center pb-2 md:mt-0 md:pb-6">
           Lyra
         </h1>
         <p className="text-base md:text-xl text-white/70 text-center tracking-tight max-w-xl mx-auto px-4 md:px-0 mb-4 md:mb-6">
@@ -98,12 +100,24 @@ const Hero = () => {
 
         {/* Adjusted spacing above and below the funding notice */}
         <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
-          <div className="text-white/70 flex px-6 py-3 border border-white/15 rounded-full justify-center items-center gap-2 text-sm font-medium">
-            <div className="relative w-4 flex items-center justify-center">
-              <Dot className="absolute w-8 h-8 font-bold text-green-500 scale-125 animate-pulse duration-0.5" />
+          {/* NVIDIA Achievement Badge */}
+          <button 
+            onClick={() => window.open('https://www.nvidia.com/en-us/startups/', '_blank', 'noopener,noreferrer')}
+            className="relative group cursor-pointer transition-transform duration-300 hover:scale-105 pointer-events-auto"
+          >
+            <div className="relative flex items-center gap-3 px-6 py-3 bg-black/40 border border-white/10 rounded-full backdrop-blur-sm group-hover:border-white/20 group-hover:shadow-[0_0_20px_rgba(140,69,255,0.3)] transition-all duration-300">
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Image 
+                  src={nvidiaImage} 
+                  alt="nvidia" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <span className="text-sm font-medium bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                Backed by NVIDIA's Inception
+              </span>
             </div>
-            Acquired $5,000 in pre-seed funding
-          </div>
+          </button>
         </div>
       </div>
 
@@ -119,7 +133,7 @@ const Hero = () => {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute h-[344px] w-[344px] md:h-[580px] md:w-[580px] border rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"
+        className="absolute h-[344px] w-[344px] md:h-[580px] md:w-[580px] border rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 pointer-events-none"
       >
         {/* Blob 1, 2 and 3*/}
         <div className="absolute h-2 w-2 left-0 bg-white rounded-full top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
@@ -139,7 +153,7 @@ const Hero = () => {
           ease: "linear",
         }}
         style={{ translateY: "-50%", translateX: "-50%" }}
-        className="absolute h-[444px] md:h-[780px] rounded-full w-[444px] md:w-[780px] border border-white/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-dashed "
+        className="absolute h-[444px] md:h-[780px] rounded-full w-[444px] md:w-[780px] border border-white/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-dashed pointer-events-none"
       ></motion.div>
 
       {/* Ring 3 */}
@@ -153,7 +167,7 @@ const Hero = () => {
           ease: "linear",
         }}
         style={{ translateY: "-50%", translateX: "-50%" }}
-        className="absolute h-[544px] md:h-[980px] rounded-full w-[544px] md:w-[980px] border border-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"
+        className="absolute h-[544px] md:h-[980px] rounded-full w-[544px] md:w-[980px] border border-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 pointer-events-none"
       >
         <div className="absolute h-2 w-2 left-0 bg-white rounded-full top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute h-2 w-2 left-full bg-white rounded-full top-1/2 -translate-x-1/2 -translate-y-1/2"></div>

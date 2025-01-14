@@ -11,10 +11,11 @@ import noteImage from "@/assets/notemate.png";
 import Footer from "@/components/ui/Footer";
 import scribeImageUi from "../../../public/assets/test.png";
 import Logo from "@/assets/logo.svg";
-import scribeT from "@/assets/scribeTime.png"
+import scribeT from "@/assets/scribeTime.png";
 import userImage from "@/assets/users3.png";
 import dashImage from "@/assets/ui.png";
 import productImage from "../../../public/assets/product-image.png";
+import lyraxnvid from "@/assets/lyraxnvid.png";
 import scribeImage2 from "@/assets/scribe-ui.png";
 import flashcardImage from "@/assets/flash.png";
 import { Heart } from "lucide-react";
@@ -128,37 +129,43 @@ export default function ChangelogPage() {
             </article>
 
             <hr className="border-t border-white/20 my-12" /> */}
-            {/* <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+            <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">
-                  December 29, 2024
+                  January 13, 2025
                 </time>
                 <h2 className="text-3xl font-semibold tracking-tighter bg-white bg-[radial-gradient(100%_100%_at_top_left,white,white,rgb(74,72,138,.5))] text-transparent bg-clip-text ">
-                  Scribe time limit increased to 30 minutes
+                  Lyra x NVIDIA
                 </h2>
                 <p className="text-white/70 leading-relaxed">
-                  I have increased the time limit for Scribe to 30 minutes.
-                  While this is an upgrade from the previous 5 minute limit, I
-                  understand it still might not be enough time for some users.
-                  I will be increasing it to 60 minutes in the future. This is
-                  to prevent users from using it for too long and getting
-                  overwhelmed.
+                  I'm thrilled to share that Lyra has officially been accepted
+                  into NVIDIA for Startups Program! This marks a major
+                  milestone for Lyra, my passion project turned productivity
+                  powerhouse. As part of this program, we'll gain access to
+                  NVIDIA's cutting-edge resources, mentorship, and support,
+                  which will help us scale and refine our AI-driven solutions to
+                  empower students and professionals. Lyra started with a simple
+                  idea: to make productivity effortless and intuitive. Today,
+                  with the backing of NVIDIA, we're taking one more step toward
+                  turning that vision into a reality. I'm beyond grateful to
+                  everyone who has supported this journey so far—this is just
+                  the beginning!
                 </p>
               </div>
               <div
                 className="border border-white/20 p-4 rounded-xl mt-3 lg:mt-0 cursor-pointer hover:border-white/40 transition-colors"
-                onClick={() => setSelectedImage(scribeT.src)}
+                onClick={() => setSelectedImage(lyraxnvid.src)}
               >
                 <Image
-                  src={scribeT.src}
-                  alt="ScribeUIImage"
+                  src={lyraxnvid.src}
+                  alt="LyraxNvidia"
                   width={800}
                   height={600}
                 />
               </div>
             </article>
-            <hr className="border-t border-white/20 my-12" /> */}
-            <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+            <hr className="border-t border-white/20 my-12" />
+            {/* <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">
                   December 27, 2024
@@ -186,7 +193,7 @@ export default function ChangelogPage() {
                 />
               </div>
             </article>
-            <hr className="border-t border-white/20 my-12" />
+            <hr className="border-t border-white/20 my-12" /> */}
             <article className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
               <div className="space-y-6">
                 <time className="block text-base text-white/50">

@@ -10,6 +10,7 @@ import gatechlogo from "@/assets/georgia-tech-yellow-jackets-2-logo-black-and-wh
 import gsulogo from "@/assets/Georgia State University-06.png"
 import apexlogo from "@/assets/logo-apex.png"
 import citalogo from "@/assets/2370a047-7e9d-409d-ae44-89f3de2092e2.png"
+import nvidiaImage from "@/assets/nvidia.png"
 import { motion } from "framer-motion";
 import Image from 'next/image';
 
@@ -34,6 +35,7 @@ const LogoTicker = () => {
             >
               {[
                 mitLogo,
+                nvidiaImage,
                 citalogo,
                 gatechlogo,
                 dukeLogo,
@@ -42,6 +44,7 @@ const LogoTicker = () => {
                 gsulogo,
                 denverlogo,
                 mitLogo,
+                nvidiaImage,
                 citalogo,
                 gatechlogo,
                 dukeLogo,

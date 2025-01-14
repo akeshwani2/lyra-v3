@@ -2705,7 +2705,7 @@ const QuickNotes = () => {
         console.error("Failed to save quick note:", error);
         setAutoSaveStatus("error");
       }
-    }, 500);
+    }, 1000);
 
     return () => {
       if (saveTimeout.current) {
