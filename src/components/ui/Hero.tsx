@@ -113,7 +113,7 @@ const Hero = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-sm font-medium bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+              <span className="text-sm font-medium text-white">
                 Backed by NVIDIA's Inception
               </span>
             </div>
