@@ -139,17 +139,17 @@ export default function ChangelogPage() {
                 </h2>
                 <p className="text-white/70 leading-relaxed">
                   I'm thrilled to share that Lyra has officially been accepted
-                  into NVIDIA for Startups Program! This marks a major
-                  milestone for Lyra, my passion project turned productivity
-                  powerhouse. As part of this program, we'll gain access to
-                  NVIDIA's cutting-edge resources, mentorship, and support,
-                  which will help us scale and refine our AI-driven solutions to
-                  empower students and professionals. Lyra started with a simple
-                  idea: to make productivity effortless and intuitive. Today,
-                  with the backing of NVIDIA, we're taking one more step toward
-                  turning that vision into a reality. I'm beyond grateful to
-                  everyone who has supported this journey so far—this is just
-                  the beginning!
+                  into NVIDIA for Startups Program! This marks a major milestone
+                  for Lyra, my passion project turned productivity powerhouse.
+                  As part of this program, we'll gain access to NVIDIA's
+                  cutting-edge resources, mentorship, and support, which will
+                  help us scale and refine our AI-driven solutions to empower
+                  students and professionals. Lyra started with a simple idea:
+                  to make productivity effortless and intuitive. Today, with the
+                  backing of NVIDIA, we're taking one more step toward turning
+                  that vision into a reality. I'm beyond grateful to everyone
+                  who has supported this journey so far—this is just the
+                  beginning!
                 </p>
               </div>
               <div

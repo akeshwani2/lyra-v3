@@ -249,8 +249,8 @@ interface AddClassFormProps {
 
 const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
   const [name, setName] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [startTime, setStartTime] = useState('00:00');
+  const [endTime, setEndTime] = useState('00:00');
   const [location, setLocation] = useState('');
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
@@ -299,7 +299,7 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
               <label className="block text-sm text-zinc-400 mb-1">Start Time</label>
               <input
                 type="time"
-                value={startTime}
+                defaultValue="00:00"
                 onChange={(e) => {
                   const time24 = e.target.value;
                   setStartTime(convertTo12Hour(time24));
@@ -312,7 +312,7 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
               <label className="block text-sm text-zinc-400 mb-1">End Time</label>
               <input
                 type="time"
-                value={endTime}
+                defaultValue="00:00"
                 onChange={(e) => {
                   const time24 = e.target.value;
                   setEndTime(convertTo12Hour(time24));
@@ -446,7 +446,7 @@ const EditClassForm = ({ class: classToEdit, onSubmit, onClose }: EditClassFormP
               <label className="block text-sm text-zinc-400 mb-1">Start Time</label>
               <input
                 type="time"
-                value={startTime}
+                value={classToEdit.startTime}
                 onChange={(e) => {
                   const time24 = e.target.value;
                   setStartTime(convertTo12Hour(time24));
@@ -459,7 +459,7 @@ const EditClassForm = ({ class: classToEdit, onSubmit, onClose }: EditClassFormP
               <label className="block text-sm text-zinc-400 mb-1">End Time</label>
               <input
                 type="time"
-                value={endTime}
+                value={classToEdit.endTime}
                 onChange={(e) => {
                   const time24 = e.target.value;
                   setEndTime(convertTo12Hour(time24));
