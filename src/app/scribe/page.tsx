@@ -1345,7 +1345,7 @@ const ScribePage = () => {
                         New Note
                       </span>
                     </Button>
-                    {/* <button
+                    <button
                       onClick={() => {
                         setShowFlashcards(false);
                         setShowFlashcardSets(true);
@@ -1355,7 +1355,7 @@ const ScribePage = () => {
                     >
                       <BookOpenCheck className="w-4 h-4" />
                       View Sets
-                    </button> */}
+                    </button>
                     <Button
                       onClick={() => notesHistoryRef.current?.setIsOpen(true)}
                       className="group relative bg-white/5 hover:bg-white/10 transition-all duration-300 ease-in-out rounded-xl px-6 py-2 text-base font-medium"
@@ -1480,7 +1480,7 @@ const ScribePage = () => {
                           </div>
 
                           {/* Enhance button */}
-                          {/* {notes && !isProcessing && (
+                          {notes && !isProcessing && (
                             <Button
                               onClick={enhanceNotes}
                               className="group relative bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 transition-all duration-300 ease-in-out rounded-xl px-4 py-2 text-sm font-medium shadow-lg hover:shadow-[0_0_2rem_-0.5rem_rgba(167,139,250,0.8)]"
@@ -1490,7 +1490,7 @@ const ScribePage = () => {
                                 Enhance with AI
                               </span>
                             </Button>
-                          )} */}
+                          )}
 
                           {/* Flashcard button */}
                           {/* {notes && !isProcessing && (
@@ -1574,7 +1574,7 @@ const ScribePage = () => {
                               New Note
                             </span>
                           </Button>
-                          {/* <button
+                          <button
                             onClick={() => {
                               setShowFlashcards(false);
                               setShowFlashcardSets(true);
@@ -1584,7 +1584,7 @@ const ScribePage = () => {
                           >
                             <BookOpenCheck className="w-4 h-4" />
                             View Sets
-                          </button> */}
+                          </button>
                         </div>
                       </div>
 
