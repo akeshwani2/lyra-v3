@@ -185,6 +185,13 @@ export default function Page() {
                 {/* Experience Items */}
                 {[
                   {
+                    date: "Jan 2025 - Present",
+                    title: "Founder & Lead Developer",
+                    company: "Sunday",
+                    description:
+                      "Sunday is an AI-powered assistant with Gmail syncing, AI-powered search, automated email drafting, web browsing, and calendar scheduling into a seamless platform. Raised $6,000 to accelerate development and refine the product. Gained 100+ active users, with 23+ paying customers, solely through word of mouth in just 3 weeks, even before an official launch.",
+                  },
+                  {
                     date: "Nov 2024 - Present",
                     title: "Founder/CEO & Lead Developer",
                     company: "Lyra",
@@ -200,7 +207,7 @@ export default function Page() {
                   },
                   {
                     date: "June 2024 - Aug 2024",
-                    title: "Remote Software Engineer Intern",
+                    title: "Software Engineer Intern",
                     company: "JPMorgan Chase & Co.",
                     description:
                       "Implemented JP Morgan's Perspective library for real-time data visualization. Optimized web application and resolved repository issues.",
