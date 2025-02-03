@@ -212,13 +212,6 @@ export default function Page() {
                     description:
                       "Implemented JP Morgan's Perspective library for real-time data visualization. Optimized web application and resolved repository issues.",
                   },
-                  {
-                    date: "Feb 2024 - May 2024",
-                    title: "Freelance Software Developer",
-                    company: "Roast",
-                    description:
-                      "Developed React Native coffee shop app with Apple Pay, Face ID, and secure authentication. Enhanced customer engagement through personalized features.",
-                  },
                 ].map((exp, index) => (
                   <motion.div
                     key={index}
