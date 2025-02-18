@@ -223,7 +223,7 @@ const ClassScheduler = () => {
             text-xs text-zinc-400 hover:bg-zinc-900 hover:border-white/10 
             hover:text-zinc-300 transition-all"
         >
-          Add Class
+          Add Event
         </button>
       </div>
 
@@ -272,7 +272,7 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
       <div className="bg-zinc-900 rounded-lg w-full max-w-md border border-zinc-800">
         <div className="p-6 border-b border-zinc-800">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-medium">Add New Class</h2>
+            <h2 className="text-lg font-medium">Add New Event</h2>
             <button 
               onClick={onClose}
               className="p-1 hover:bg-zinc-800 rounded"
@@ -371,7 +371,7 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
               disabled={!name || !startTime || !endTime || selectedDays.length === 0}
               className="px-4 py-2 text-sm bg-white text-black rounded disabled:opacity-50"
             >
-              Add Class
+              Add Event
             </button>
           </div>
         </form>
