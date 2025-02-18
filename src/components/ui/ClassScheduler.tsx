@@ -95,10 +95,10 @@ const ClassScheduler = () => {
     try {
       await axios.delete(`/api/classes?id=${id}`);
       setClasses(prev => prev.filter(cls => cls.id !== id));
-      toast.success("Class deleted successfully");
+      toast.success("Event deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete class");
-      console.error('Failed to delete class:', error);
+      toast.error("Failed to delete event");
+      console.error('Failed to delete event:', error);
     }
   };
 
@@ -151,8 +151,8 @@ const ClassScheduler = () => {
               {selectedDay}
               <span className="text-zinc-500 ml-2">
                 {todaysClasses.length === 0 
-                  ? "No classes" 
-                  : `${todaysClasses.length} ${todaysClasses.length === 1 ? 'class' : 'classes'}`}
+                  ? "No events" 
+                  : `${todaysClasses.length} ${todaysClasses.length === 1 ? 'event' : 'events'}`}
               </span>
             </h3>
             <button
@@ -166,7 +166,7 @@ const ClassScheduler = () => {
           <button
             onClick={() => setShowAddForm(true)}
             className="p-1 hover:bg-white/10 rounded-lg transition-colors"
-            title="Add class"
+            title="Add event"
           >
             <Plus size={14} className="text-zinc-400" />
           </button>
@@ -284,7 +284,7 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm text-zinc-400 mb-1">Class Name</label>
+            <label className="block text-sm text-zinc-400 mb-1">Event Name</label>
             <input
               type="text"
               value={name}
@@ -431,7 +431,7 @@ const EditClassForm = ({ class: classToEdit, onSubmit, onClose }: EditClassFormP
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm text-zinc-400 mb-1">Class Name</label>
+            <label className="block text-sm text-zinc-400 mb-1">Event Name</label>
             <input
               type="text"
               value={name}
