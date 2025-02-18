@@ -190,13 +190,13 @@ const GradesPage = () => {
             ) : (
               <div className="text-center py-12">
                 <Target className="w-12 h-12 mx-auto mb-4 text-zinc-600" />
-                <h3 className="text-lg font-medium mb-2">No courses yet</h3>
-                <p className="text-zinc-400 mb-6">Add your first course to start tracking grades</p>
+                <h3 className="text-lg font-medium mb-2">No items yet</h3>
+                <p className="text-zinc-400 mb-6">Add your first item to start tracking grades</p>
                 <button
                   onClick={() => router.push('/')}
                   className="text-purple-400 hover:text-purple-300 transition-colors"
                 >
-                  Set up courses
+                  Set up items
                 </button>
               </div>
             )}

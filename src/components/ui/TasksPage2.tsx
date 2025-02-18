@@ -949,10 +949,10 @@ const TasksPage = () => {
             </div>
           ) : (
             <EmptyState
-              title="No courses yet"
-              description="Add your first course to get started tracking your academic progress"
+              title="No items yet"
+              description="Add your first item to get started tracking your academic progress"
               icon={<BookOpen className="w-6 h-6" />}
-              action="Add Course"
+              action="Add Item"
               onClick={() => setIsAddCourseOpen(true)}
             />
           )}
