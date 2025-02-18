@@ -271,7 +271,7 @@ const TasksPage = () => {
         className="p-2 hover:bg-white/10 rounded-lg text-sm flex items-center gap-2"
       >
         <PlusCircle size={16} />
-        Add Course
+        Add Item
       </button>
 
       <button
@@ -287,8 +287,8 @@ const TasksPage = () => {
       >
         <CheckCircle size={16} />
         {completedAssignments.length > 0
-          ? `Completed Assignments: ${completedAssignments.length}`
-          : "Completed Assignments"}
+          ? `Completed Deadlines: ${completedAssignments.length}`
+          : "Completed Deadlines"}
       </button>
       {/* <button
         onClick={handleStartTour}
@@ -640,10 +640,10 @@ const TasksPage = () => {
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 border-b border-white/40" />
             <div className="absolute top-4 left-6 ">
               <h2 className="text-xl font-semibold tracking-tight">
-                Add New Course
+                Add New Item
               </h2>
               <p className="text-sm text-zinc-400 ">
-                Create a new course to track
+                Create a new item
               </p>
             </div>
             <button
@@ -658,13 +658,13 @@ const TasksPage = () => {
             {/* Course name input */}
             <div className="space-y-2 mb-6">
               <label className="text-sm text-zinc-400 tracking-tight">
-                Course Name
+                Name
               </label>
               <input
                 type="text"
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
-                placeholder="e.g. Accounting"
+                placeholder="e.g. Meetings"
                 className="w-full bg-zinc-800/50 rounded-lg px-4 py-2.5 
                   focus:outline-none focus:ring-0
                   border border-white/5 placeholder:text-zinc-600 text-sm"
@@ -704,7 +704,7 @@ const TasksPage = () => {
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: selectedColor }}
                 />
-                <span className="text-sm">{courseName || "Course Name"}</span>
+                <span className="text-sm">{courseName || "Name"}</span>
               </div>
             </div>
 
@@ -730,7 +730,7 @@ const TasksPage = () => {
                         : "bg-zinc-700 cursor-not-allowed text-zinc-400"
                     }`}
                 >
-                  Add Course
+                  Add Item
                 </button>
               </div>
             </div>
@@ -787,7 +787,7 @@ const TasksPage = () => {
           );
 
           toast.success(
-            "Course and associated assignments deleted successfully!",
+            "Item and associated deadlines deleted successfully!",
             {
               style: {
                 background: "#18181b",
@@ -801,8 +801,8 @@ const TasksPage = () => {
           );
         }
       } catch (error) {
-        console.error("Delete course error:", error);
-        toast.error("Failed to delete course");
+        console.error("Delete item error:", error);
+        toast.error("Failed to delete item");
       }
     };
 
@@ -812,7 +812,7 @@ const TasksPage = () => {
           <div className="flex flex-col items-center gap-2 bg-zinc-900 rounded-xl p-4 border border-white/10">
             <span className="text-white text-sm">Are you sure?</span>
             <span className="text-muted-foreground text-xs text-center items-center mb-3">
-              The associated assignments will be deleted!
+              The associated deadlines will be deleted!
             </span>
             <div className="flex gap-2">
               <button
@@ -847,10 +847,10 @@ const TasksPage = () => {
       newName: string,
       newColor: string
     ) => {
-      console.log("Attempting to edit course:", { id, newName, newColor });
+      console.log("Attempting to edit item:", { id, newName, newColor });
       if (!showDemoData) {
         try {
-          console.log("Sending edit request for course:", id);
+          console.log("Sending edit request for item:", id);
           const response = await axios.patch(`/api/courses/${id}`, {
             name: newName,
             color: newColor,
@@ -860,7 +860,7 @@ const TasksPage = () => {
           setCourses((prev) =>
             prev.map((course) => (course.id === id ? response.data : course))
           );
-          toast.success("Course updated successfully!", {
+          toast.success("Item updated successfully!", {
             style: {
               background: "#18181b",
               boxShadow: "none",
@@ -870,7 +870,7 @@ const TasksPage = () => {
             },
           });
         } catch (error) {
-          console.error("Edit course error details:", error);
+          console.error("Edit item error details:", error);
           if (axios.isAxiosError(error)) {
             console.error("Response data:", error.response?.data);
             const errorMessage =
@@ -890,7 +890,7 @@ const TasksPage = () => {
         className="bg-zinc-900/50 rounded-xl p-4 border border-white/10 h-[45%] overflow-hidden flex flex-col"
       >
         <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
-          <h2 className="text-lg font-semibold tracking-tight">My Courses</h2>
+          <h2 className="text-lg font-semibold tracking-tight">My Schedule</h2>
 
           <button
             onClick={() => setIsAddCourseOpen(true)}
@@ -1018,9 +1018,9 @@ const TasksPage = () => {
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20" />
             <div className="absolute top-4 left-6">
               <h2 className="text-xl font-semibold tracking-tight">
-                Edit Course
+                Edit Item
               </h2>
-              <p className="text-sm text-zinc-400">Update course details</p>
+              <p className="text-sm text-zinc-400">Update item details</p>
             </div>
             <button
               onClick={onClose}
@@ -1033,7 +1033,7 @@ const TasksPage = () => {
           <form onSubmit={handleSubmit} className="p-6 pt-4">
             <div className="space-y-2 mb-6">
               <label className="text-sm text-zinc-400 tracking-tight">
-                Course Name
+                Item Name
               </label>
               <input
                 type="text"
@@ -1299,8 +1299,8 @@ const TasksPage = () => {
         });
         setIsAddAssignmentOpen(false);
       } catch (error) {
-        console.error("Failed to add assignment:", error);
-        toast.error("Failed to add assignment", {
+        console.error("Failed to add deadline:", error);
+        toast.error("Failed to add deadline", {
           style: {
             background: "#18181b",
             boxShadow: "none",
@@ -1334,9 +1334,9 @@ const TasksPage = () => {
           ref={modalRef}
           className="bg-zinc-900 rounded-xl w-full max-w-md border border-white/10"
         >
-          <div className="p-6">
+          <div className="p-6 ">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Add Assignments</h2>
+              <h2 className="text-xl font-semibold">Add Deadlines</h2>
               <button
                 onClick={() => setIsAddAssignmentOpen(false)}
                 className="p-1 hover:bg-white/10 rounded-lg"
@@ -1347,7 +1347,7 @@ const TasksPage = () => {
 
             {/* Course Selection */}
             <div className="mb-6">
-              <label className="text-sm text-zinc-400">Course</label>
+              <label className="text-sm text-zinc-400">Item</label>
               <div className="relative mt-1">
                 <select
                   value={selectedCourse}
@@ -1359,7 +1359,7 @@ const TasksPage = () => {
                   required
                 >
                   <option value="" className="text-zinc-400">
-                    Select a course
+                    Select an item
                   </option>
                   {courses.map((course) => (
                     <option key={course.id} value={course.id} className="py-2">
@@ -1383,7 +1383,7 @@ const TasksPage = () => {
             </div>
 
             {/* Import Method Tabs */}
-            <div className="flex gap-4 mb-6">
+            {/* <div className="flex gap-4 mb-6">
               {[
                 { id: "manual", label: "Manual Entry", icon: Pencil },
                 // { id: "upload", label: "Upload Syllabus", icon: BookOpen },
@@ -1404,7 +1404,7 @@ const TasksPage = () => {
                   {label}
                 </button>
               ))}
-            </div>
+            </div> */}
 
             {/* Import Method Content */}
             {importMethod === "manual" && (
@@ -1415,7 +1415,7 @@ const TasksPage = () => {
                   <input
                     type="text"
                     value={title}
-                    placeholder="Your Assignment"
+                    placeholder="Name"
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full bg-zinc-800/50 rounded-lg px-4 py-3
                         appearance-none text-base
@@ -1522,7 +1522,7 @@ const TasksPage = () => {
                         : "hover:bg-purple-600"
                     }`}
                   >
-                    {isSubmitting ? "Adding..." : "Add Assignment"}
+                    {isSubmitting ? "Adding..." : "Add Deadline"}
                   </button>
                 </div>
               </form>
@@ -1744,7 +1744,7 @@ const TasksPage = () => {
         <div className="bg-zinc-900 rounded-xl w-full max-w-md border border-white/10">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Edit Assignment</h2>
+              <h2 className="text-xl font-semibold">Edit Deadline</h2>
               <button
                 onClick={onClose}
                 className="p-1 hover:bg-white/10 rounded-lg"
@@ -1756,15 +1756,15 @@ const TasksPage = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Course Selection Dropdown */}
               <div>
-                <label className="text-sm text-zinc-400">Course</label>
+                <label className="text-sm text-zinc-400">Item</label>
                 <select
                   value={courseId}
                   onChange={(e) => setCourseId(e.target.value)}
                   className="w-full bg-zinc-800/50 rounded-lg px-4 py-2.5 mt-1
-                    border border-white/5"
+                    border border-white/5 text-sm"
                   required
                 >
-                  <option value="">Select a course</option>
+                  <option value="">Select an item</option>
                   {courses.map((course) => (
                     <option key={course.id} value={course.id}>
                       {course.name}
@@ -1780,7 +1780,7 @@ const TasksPage = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full bg-zinc-800/50 rounded-lg px-4 py-2.5 mt-1
-                    border border-white/5"
+                    border border-white/5 text-sm"
                   required
                 />
               </div>
@@ -1794,7 +1794,7 @@ const TasksPage = () => {
                   className="w-full bg-zinc-800/50 rounded-lg px-4 py-2.5 mt-1
                     border border-white/5 text-white
                     focus:outline-none focus:ring-0
-                    [color-scheme:dark]"
+                    [color-scheme:dark] text-sm"
                   required
                 />
               </div>
@@ -1809,7 +1809,7 @@ const TasksPage = () => {
                     )
                   }
                   className="w-full bg-zinc-800/50 rounded-lg px-4 py-2.5 mt-1
-                    border border-white/5"
+                    border border-white/5 text-sm"
                 >
                   <option value="Assignment">Assignment</option>
                   <option value="Exam">Exam</option>
@@ -2157,7 +2157,7 @@ const TasksPage = () => {
               title="No deadlines yet"
               description="Add your important dates and assignments"
               icon={<Calendar className="w-6 h-6" />}
-              action="Add Assignment"
+              action="Add Deadline"
               onClick={() => setIsAddAssignmentOpen(true)}
             />
           )}
@@ -2595,7 +2595,7 @@ const TasksPage = () => {
             >
               <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2 flex-shrink-0">
                 <h2 className="text-lg font-semibold tracking-tight flex-shrink-0">
-                  Classes
+                  Events
                 </h2>
               </div>
               <div className="flex-1 flex items-center justify-center">
@@ -2777,7 +2777,8 @@ const QuickNotes = () => {
         onChange={(e) => setNewNote(e.target.value)}
         placeholder="Type your notes here..."
         className="flex-1 w-full bg-transparent resize-none text-sm 
-          placeholder:text-zinc-600 focus:outline-none"
+          placeholder:text-zinc-600 focus:outline-none [&:not(:placeholder-shown)]:spelling-none" // Add this line
+  spellCheck="false"
       />
     </div>
   );
@@ -2843,7 +2844,7 @@ const CompletedAssignmentsModal = ({
       // Update local state
       setCompletedAssignments([]);
 
-      toast.success("All completed assignments cleared!", {
+      toast.success("All completed deadlines cleared!", {
         style: {
           background: "#18181b",
           boxShadow: "none",
@@ -2856,8 +2857,8 @@ const CompletedAssignmentsModal = ({
 
       onClose();
     } catch (error) {
-      console.error("Failed to clear completed assignments:", error);
-      toast.error("Failed to clear assignments");
+      console.error("Failed to clear completed deadlines:", error);
+      toast.error("Failed to clear deadlines");
     }
   };
 
@@ -2872,7 +2873,7 @@ const CompletedAssignmentsModal = ({
         <div className="p-6">
           <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-2">
             <div className="">
-              <h2 className="text-xl font-semibold">Completed Assignments</h2>
+              <h2 className="text-xl font-semibold">Completed Deadlines</h2>
               <p className="text-sm text-zinc-400">
                 {assignments.length} completed
               </p>
@@ -2886,7 +2887,7 @@ const CompletedAssignmentsModal = ({
                       (t) => (
                         <div className="flex flex-col items-center gap-2 bg-zinc-900 rounded-xl p-4 border border-white/10">
                           <span className="text-white text-sm">
-                            Clear all completed assignments?
+                            Clear all completed deadlines?
                           </span>
                           <div className="flex gap-2">
                             <button
@@ -2916,7 +2917,7 @@ const CompletedAssignmentsModal = ({
                     );
                   }}
                   className="p-1.5 hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300"
-                  title="Clear all completed assignments"
+                  title="Clear all completed deadlines"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -2941,7 +2942,7 @@ const CompletedAssignmentsModal = ({
                     <div>
                       <p className="text-sm text-zinc-400 mt-1">
                         {courses.find((c) => c.id === assignment.courseId)
-                          ?.name || "Unknown Course"}
+                          ?.name || "Unknown Item"}
                       </p>
                       <p className="font-medium text-sm mt-1">
                         {assignment.title}
@@ -2963,7 +2964,7 @@ const CompletedAssignmentsModal = ({
               <div className="text-center py-2 text-zinc-400 flex flex-col items-center gap-2">
                 <NoAssignments className="text-red-500 mb-2 scale-150" />
                 <p className="text-md text-red-500">
-                  No completed assignments yet
+                  No completed deadlines yet
                 </p>
               </div>
             )}

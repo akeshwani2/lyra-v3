@@ -1,32 +1,237 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import UserSection from "@/components/ui/UserSection";
-import { ArrowUpRight, Upload } from "lucide-react";
-import { TypeAnimation } from "react-type-animation";
-import FileUpload from "@/components/ui/FileUpload";
-import ChatPreview from "@/components/ui/ChatPreview";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import { Message } from "ai";
-import toast from "react-hot-toast";
-import PreviousSessionPreview from "@/components/ui/PreviousSessionPreview";
-import Link from "next/link";
+// "use client";
+// import { Button } from "@/components/ui/button";
+// import UserSection from "@/components/ui/UserSection";
+// import { ArrowUpRight, Upload } from "lucide-react";
+// import { TypeAnimation } from "react-type-animation";
+// import FileUpload from "@/components/ui/FileUpload";
+// import ChatPreview from "@/components/ui/ChatPreview";
+// import { useRouter } from "next/navigation";
+// import { useEffect, useState, useRef } from "react";
+// import { Message } from "ai";
+// import toast from "react-hot-toast";
+// import PreviousSessionPreview from "@/components/ui/PreviousSessionPreview";
+// import Link from "next/link";
 
-type FileUploadRef = {
-  click: () => void;
-};
+// type FileUploadRef = {
+//   click: () => void;
+// };
 
-export default function AiPdf() {
-  const router = useRouter();
+// export default function AiPdf() {
+//   const router = useRouter();
+//   const [isMobile, setIsMobile] = useState(false);
+//   const [hasChats, setHasChats] = useState<boolean>(false);
+//   const [firstChatId, setFirstChatId] = useState<number | null>(null);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [previewMessages, setPreviewMessages] = useState<Message[]>([]);
+//   const [pdfName, setPdfName] = useState<string>("");
+//   const [pdfUrl, setPdfUrl] = useState<string>("");
+//   const [refreshKey, setRefreshKey] = useState(0);
+//   const fileInputRef = useRef<FileUploadRef>(null);
+
+//   useEffect(() => {
+//     const checkMobile = () => {
+//       setIsMobile(window.innerWidth < 768);
+//     };
+    
+//     checkMobile();
+//     window.addEventListener('resize', checkMobile);
+    
+//     return () => window.removeEventListener('resize', checkMobile);
+//   }, []);
+
+//   useEffect(() => {
+//     const fetchPreview = async () => {
+//       setIsLoading(true);
+//       try {
+//         console.log("Starting fetch preview...");
+//         const response = await fetch("/api/check-chats");
+//         const data = await response.json();
+//         console.log("check-chats response:", data);
+
+//         if (data.hasChats) {
+//           console.log("Has chats, fetching messages for chatId:", data.firstChatId);
+//           const messagesResponse = await fetch("/api/get-messages", {
+//             method: "POST",
+//             headers: {
+//               'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ chatId: data.firstChatId }),
+//           });
+          
+//           const messagesData = await messagesResponse.json();
+//           console.log("Messages response:", messagesData);
+
+//           setPreviewMessages(messagesData || []);
+//           setPdfName(data.pdfName || "");
+//           setPdfUrl(data.pdfUrl || "");
+//           setHasChats(true);
+//           setFirstChatId(data.firstChatId);
+          
+//           console.log("States updated:", {
+//             messages: messagesData,
+//             pdfName: data.pdfName,
+//             pdfUrl: data.pdfUrl,
+//             hasChats: true,
+//             firstChatId: data.firstChatId
+//           });
+//         } else {
+//           console.log("No chats found");
+//           setPreviewMessages([]);
+//           setPdfName("");
+//           setPdfUrl("");
+//           setHasChats(false);
+//           setFirstChatId(null);
+//         }
+//       } catch (error) {
+//         console.error("Error in fetchPreview:", error);
+//         toast.error("Failed to load chat preview");
+//       } finally {
+//         setIsLoading(false);
+//         console.log("Loading finished");
+//       }
+//     };
+
+//     fetchPreview();
+//   }, [refreshKey]);
+
+//   useEffect(() => {
+//     console.log("Current state:", {
+//       isLoading,
+//       hasChats,
+//       previewMessages,
+//       pdfName,
+//       pdfUrl,
+//       firstChatId
+//     });
+//   }, [isLoading, hasChats, previewMessages, pdfName, pdfUrl, firstChatId]);
+
+//   useEffect(() => {
+//     const handleStorageChange = (e: StorageEvent) => {
+//       if (e.key === "chat-deleted") {
+//         setRefreshKey((prev) => prev + 1);
+//       }
+//     };
+
+//     window.addEventListener("storage", handleStorageChange);
+//     return () => window.removeEventListener("storage", handleStorageChange);
+//   }, []);
+
+//   const handleChatNavigation = () => {
+//     if (hasChats && firstChatId) {
+//       router.push(`/chat/${firstChatId}`);
+//     } else {
+//       fileInputRef.current?.click();
+//     }
+//   };
+
+//   if (isMobile) {
+//     return (
+//       <div className='min-h-screen w-full fixed inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-gray-900 to-black'>
+//         <div className='space-y-6 max-w-md mx-auto'>
+//           {/* Mobile Icon */}
+//           <div className='text-6xl mb-8'>
+//             📱
+//           </div>
+//           <h1 className='text-3xl font-bold text-white mb-4'>
+//             Lyra is not optimized for mobile screens yet
+//           </h1>
+//           <p className='text-gray-400 text-lg'>
+//             Please visit us on a desktop or laptop computer for the best experience.
+//           </p>
+//           <div className='flex justify-center'>
+//             <Link href="/">
+//               <button className='bg-white text-black px-4 py-2 rounded-md' >
+//               <div className="absolute inset-0">
+//                 <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+
+//                 <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+
+//                   <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+//                 </div>
+//                 Go back
+//               </button>
+//             </Link>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <>
+//         <UserSection />
+//       <div className="flex flex-col items-center bg-gradient-to-b from-zinc-950 to-black justify-center min-h-screen p-6">
+//         <div className="max-w-4xl text-center space-y-6">
+//           <h1 className="text-6xl font-bold tracking-tight">
+//             <span className="bg-gradient-to-r from-violet-400 to-blue-400 text-transparent bg-clip-text">
+//               Chat with any PDF
+//             </span>
+//           </h1>
+          
+//           <p className="text-xl text-gray-400 font-light">
+//             <TypeAnimation
+//               sequence={[
+//                 "Effortlessly analyze documents using AI",
+//                 2000,
+//                 "Get instant answers from your PDFs",
+//                 2000,
+//               ]}
+//               wrapper="span"
+//               speed={50}
+//               repeat={Infinity}
+//             />
+//           </p>
+//         </div>
+
+//         {!isLoading && hasChats && previewMessages.length > 0 && (
+//           <PreviousSessionPreview
+//             messages={previewMessages}
+//             pdfName={pdfName}
+//             pdfUrl={pdfUrl}
+//           />
+//         )}
+
+//         <div className="flex mt-10">
+//           <button
+//             className="relative py-2 px-4 flex flex-row items-center justify-center text-white w-full rounded-lg font-medium text-sm bg-gradient-to-b from-[#190d2e] to-[#4a208a] shadow-[0px_0px_12px_#8c45ff] transition-all duration-300 hover:scale-105 hover:shadow-[0px_0px_16px_#8c45ff]"
+//             onClick={handleChatNavigation}
+//             disabled={isLoading}
+//           >
+//             <div className="absolute inset-0">
+//               <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+
+//               <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+
+//               <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+//             </div>
+//             {isLoading ? (
+//               "Loading..."
+//             ) : hasChats ? (
+//               <>
+//                 Go to Chats
+//                 <ArrowUpRight className="w-4 h-4 ml-1" />
+//               </>
+//             ) : (
+//               <>
+//                 You haven&apos;t started any chats yet
+//               </>
+//             )}
+//           </button>
+//         </div>
+
+
+//       </div>
+//     </>
+//   );
+// }
+
+
+"use client"
+import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
+
+const AiPdfPage = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const [hasChats, setHasChats] = useState<boolean>(false);
-  const [firstChatId, setFirstChatId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [previewMessages, setPreviewMessages] = useState<Message[]>([]);
-  const [pdfName, setPdfName] = useState<string>("");
-  const [pdfUrl, setPdfUrl] = useState<string>("");
-  const [refreshKey, setRefreshKey] = useState(0);
-  const fileInputRef = useRef<FileUploadRef>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -39,188 +244,84 @@ export default function AiPdf() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    const fetchPreview = async () => {
-      setIsLoading(true);
-      try {
-        console.log("Starting fetch preview...");
-        const response = await fetch("/api/check-chats");
-        const data = await response.json();
-        console.log("check-chats response:", data);
-
-        if (data.hasChats) {
-          console.log("Has chats, fetching messages for chatId:", data.firstChatId);
-          const messagesResponse = await fetch("/api/get-messages", {
-            method: "POST",
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ chatId: data.firstChatId }),
-          });
-          
-          const messagesData = await messagesResponse.json();
-          console.log("Messages response:", messagesData);
-
-          setPreviewMessages(messagesData || []);
-          setPdfName(data.pdfName || "");
-          setPdfUrl(data.pdfUrl || "");
-          setHasChats(true);
-          setFirstChatId(data.firstChatId);
-          
-          console.log("States updated:", {
-            messages: messagesData,
-            pdfName: data.pdfName,
-            pdfUrl: data.pdfUrl,
-            hasChats: true,
-            firstChatId: data.firstChatId
-          });
-        } else {
-          console.log("No chats found");
-          setPreviewMessages([]);
-          setPdfName("");
-          setPdfUrl("");
-          setHasChats(false);
-          setFirstChatId(null);
-        }
-      } catch (error) {
-        console.error("Error in fetchPreview:", error);
-        toast.error("Failed to load chat preview");
-      } finally {
-        setIsLoading(false);
-        console.log("Loading finished");
-      }
-    };
-
-    fetchPreview();
-  }, [refreshKey]);
-
-  useEffect(() => {
-    console.log("Current state:", {
-      isLoading,
-      hasChats,
-      previewMessages,
-      pdfName,
-      pdfUrl,
-      firstChatId
-    });
-  }, [isLoading, hasChats, previewMessages, pdfName, pdfUrl, firstChatId]);
-
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "chat-deleted") {
-        setRefreshKey((prev) => prev + 1);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  const handleChatNavigation = () => {
-    if (hasChats && firstChatId) {
-      router.push(`/chat/${firstChatId}`);
-    } else {
-      fileInputRef.current?.click();
+  const renderMobileView = () => {
+    if (isMobile) {
+      return (
+        <div className='min-h-screen w-full fixed inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-gray-900 to-black'>
+          <div className='space-y-6 max-w-md mx-auto'>
+            <div className='text-6xl mb-8'>
+              📱
+            </div>
+            <h1 className='text-3xl font-bold text-white mb-4'>
+              Lyra is not optimized for mobile screens yet
+            </h1>
+            <p className='text-gray-400 text-lg'>
+              Please visit us on a desktop or laptop computer for the best experience.
+            </p>
+            <div className='flex justify-center'>
+              <Link href="/">
+                <button className='bg-white text-black px-4 py-2 rounded-md'>
+                  <div className="absolute inset-0">
+                    <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+                    <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
+                    <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+                  </div>
+                  Go back
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
     }
+    return null;
   };
 
-  if (isMobile) {
-    return (
-      <div className='min-h-screen w-full fixed inset-0 flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-gray-900 to-black'>
-        <div className='space-y-6 max-w-md mx-auto'>
-          {/* Mobile Icon */}
-          <div className='text-6xl mb-8'>
-            📱
-          </div>
-          <h1 className='text-3xl font-bold text-white mb-4'>
-            Lyra is not optimized for mobile screens yet
-          </h1>
-          <p className='text-gray-400 text-lg'>
-            Please visit us on a desktop or laptop computer for the best experience.
-          </p>
-          <div className='flex justify-center'>
-            <Link href="/">
-              <button className='bg-white text-black px-4 py-2 rounded-md' >
-              <div className="absolute inset-0">
-                <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
-
-                <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
-
-                  <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
-                </div>
-                Go back
-              </button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <>
-        <UserSection />
-      <div className="flex flex-col items-center bg-gradient-to-b from-zinc-950 to-black justify-center min-h-screen p-6">
-        <div className="max-w-4xl text-center space-y-6">
-          <h1 className="text-6xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-violet-400 to-blue-400 text-transparent bg-clip-text">
-              Chat with any PDF
-            </span>
-          </h1>
+    <div className="relative min-h-screen bg-zinc-950 w-full">
+      {renderMobileView() || (
+        <>
+          {/* Original content (blurred) */}
+          <div className='blur-sm'>
+            <div className='text-white text-2xl font-bold'></div>
+          </div>
           
-          <p className="text-xl text-gray-400 font-light">
-            <TypeAnimation
-              sequence={[
-                "Effortlessly analyze documents using AI",
-                2000,
-                "Get instant answers from your PDFs",
-                2000,
-              ]}
-              wrapper="span"
-              speed={50}
-              repeat={Infinity}
-            />
-          </p>
-        </div>
-
-        {!isLoading && hasChats && previewMessages.length > 0 && (
-          <PreviousSessionPreview
-            messages={previewMessages}
-            pdfName={pdfName}
-            pdfUrl={pdfUrl}
+          {/* Striped background overlay with gradient fade */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: `
+                linear-gradient(
+                  to top,
+                  rgba(28, 28, 28, 1) 0%,
+                  rgba(28, 28, 28, 0) 100%
+                ),
+                repeating-linear-gradient(
+                  -45deg,
+                  transparent,
+                  transparent 10px,
+                  rgba(255, 107, 0, 0.05) 10px,
+                  rgba(255, 107, 0, 0.05) 20px
+                )
+              `
+            }}
           />
-        )}
-
-        <div className="flex mt-10">
-          <button
-            className="relative py-2 px-4 flex flex-row items-center justify-center text-white w-full rounded-lg font-medium text-sm bg-gradient-to-b from-[#190d2e] to-[#4a208a] shadow-[0px_0px_12px_#8c45ff] transition-all duration-300 hover:scale-105 hover:shadow-[0px_0px_16px_#8c45ff]"
-            onClick={handleChatNavigation}
-            disabled={isLoading}
-          >
-            <div className="absolute inset-0">
-              <div className="rounded-lg border border-white/20 absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
-
-              <div className="rounded-lg border absolute inset-0 border-white/40 [mask-image:linear-gradient(to_top,black,transparent)]"></div>
-
-              <div className="absolute inset-0 shadow-[0_0_10px_rgb(140,69,255.7)_inset] rounded-lg"></div>
+          
+          {/* Centered text */}
+          <div className='absolute inset-0 flex items-center'>
+            <div className='px-8 py-4 rounded-lg'>
+              <p className='text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-500 text-transparent bg-clip-text'>
+                PDF Reader is being redesigned!
+              </p>
+              <p className='text-sm text-gray-500'>
+                Apologies for the inconvenience.
+              </p>
             </div>
-            {isLoading ? (
-              "Loading..."
-            ) : hasChats ? (
-              <>
-                Go to Chats
-                <ArrowUpRight className="w-4 h-4 ml-1" />
-              </>
-            ) : (
-              <>
-                You haven&apos;t started any chats yet
-              </>
-            )}
-          </button>
-        </div>
-
-
-      </div>
-    </>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
+
+export default AiPdfPage;

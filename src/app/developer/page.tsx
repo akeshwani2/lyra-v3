@@ -196,7 +196,7 @@ export default function Page() {
                     title: "Founder/CEO & Lead Developer",
                     company: "Lyra",
                     description:
-                      "Built a productivity/organization platform for students with AI-driven tools helping them elevate their academic workflows. Backed by $5,000 pre-seed funding, Lyra is currently streamlining the academic lives of 100+ users, achieving this growth in just 6 weeks, solely through word of mouth.",
+                      "Built a productivity/organization platform for students with AI-driven tools helping them elevate their academic workflows. Backed by $5,000 pre-seed funding, Lyra is currently streamlining the academic lives of 300+ users, achieving this growth in just 6 weeks, solely through word of mouth.",
                   },
                   {
                     date: "Sep 2024 - Oct 2024",

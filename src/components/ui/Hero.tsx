@@ -113,8 +113,8 @@ const Hero = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-sm font-medium text-white">
-                Backed by NVIDIA's Inception
+              <span className="text-xs md:text-sm font-medium text-white">
+                Backed by NVIDIA's Inception Program
               </span>
             </div>
           </button>
