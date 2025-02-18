@@ -12,7 +12,7 @@ import {
   useMotionTemplate,
   useMotionValue,
 } from "framer-motion";
-import { Dot } from "lucide-react";
+// import { Dot } from "lucide-react";
 
 const tabs = [
 
@@ -31,7 +31,7 @@ const tabs = [
     description: "Beautiful analytics and insights, designed for focus.",
     isNew: false,
     backgroundPositionX: 0,
-    backgroundPositionY: 0,
+    backgroundPositionY: 30,
     backgroundSizeX: 100,
   },
   {
@@ -40,8 +40,8 @@ const tabs = [
     description: "Effortlessly manage your workflow with smart automation.",
     isNew: true,
     backgroundPositionX: 50,
-    backgroundPositionY: 75,
-    backgroundSizeX: 160,
+    backgroundPositionY: 0,
+    backgroundSizeX: 150,
   },
 ];
 
