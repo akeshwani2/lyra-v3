@@ -18,7 +18,7 @@ const tabs = [
 
   {
     icon: "/assets/lottie/stars.lottie",
-    title: "Assignment Tracking",
+    title: "Event Tracking",
     description: "Real-time progress tracking with powerful filtering.",
     isNew: false,
     backgroundPositionX: 100,

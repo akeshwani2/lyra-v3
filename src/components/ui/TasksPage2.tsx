@@ -311,7 +311,7 @@ const TasksPage = () => {
     {
       target: "#upcoming-deadlines",
       title: "Upcoming Deadlines",
-      description: "Track assignment due dates and important deadlines.",
+      description: "Track event due dates and important deadlines.",
       position: "right",
     },
     // {
@@ -1288,7 +1288,7 @@ const TasksPage = () => {
       try {
         const response = await axios.post("/api/assignments", assignmentData);
         setAssignments((prev) => [...prev, response.data]);
-        toast.success("Assignment added successfully!", {
+        toast.success("Deadline added successfully!", {
           style: {
             background: "#18181b",
             boxShadow: "none",
@@ -1889,7 +1889,7 @@ const TasksPage = () => {
       toast(
         (t) => (
           <div className="flex flex-col items-center gap-2 bg-zinc-900 rounded-xl p-4 border border-white/10">
-            <span className="text-white text-sm">Delete this assignment?</span>
+            <span className="text-white text-sm">Delete this deadline?</span>
             <div className="flex gap-2">
               <button
                 onClick={async () => {
@@ -1898,7 +1898,7 @@ const TasksPage = () => {
                     setAssignments((prev) =>
                       prev.filter((a) => a.id !== assignmentId)
                     );
-                    toast.success("Assignment deleted", {
+                    toast.success("Deadline deleted", {
                       style: {
                         background: "#18181b",
                         boxShadow: "none",
@@ -1909,8 +1909,8 @@ const TasksPage = () => {
                       },
                     });
                   } catch (error) {
-                    console.error("Failed to delete assignment:", error);
-                    toast.error("Failed to delete assignment");
+                    console.error("Failed to delete deadline:", error);
+                    toast.error("Failed to delete deadline");
                   }
                   toast.dismiss(t.id);
                 }}
@@ -1953,7 +1953,7 @@ const TasksPage = () => {
           )
         );
         
-        toast.success("Assignment updated successfully!", {
+        toast.success("Deadline updated successfully!", {
           style: {
             background: "#18181b",
             boxShadow: "none",
@@ -1965,8 +1965,8 @@ const TasksPage = () => {
         });
         setEditingAssignment(null);
       } catch (error) {
-        console.error("Failed to update assignment:", error);
-        toast.error("Failed to update assignment");
+        console.error("Failed to update deadline:", error);
+        toast.error("Failed to update deadline");
       }
     };
 
@@ -2014,7 +2014,7 @@ const TasksPage = () => {
           setCompletedAssignments((prev) => [...prev, assignment]);
           setAssignments((prev) => prev.filter((a) => a.id !== assignment.id));
 
-          toast.success("Assignment marked as completed!", {
+          toast.success("Deadline marked as completed!", {
             style: {
               background: "#18181b",
               boxShadow: "none",
@@ -2026,8 +2026,8 @@ const TasksPage = () => {
           });
         }
       } catch (error) {
-        console.error("Failed to mark assignment as completed:", error);
-        toast.error("Failed to update assignment status", {
+        console.error("Failed to mark deadline as completed:", error);
+        toast.error("Failed to update deadline status", {
           style: {
             background: "#18181b",
             boxShadow: "none",
@@ -2815,7 +2815,7 @@ const CompletedAssignmentsModal = ({
         prev.filter((a) => a.id !== assignment.id)
       );
 
-      toast.success("Assignment restored!", {
+      toast.success("Deadline restored!", {
         style: {
           background: "#18181b",
           boxShadow: "none",
