@@ -254,7 +254,7 @@ const AddClassForm = ({ onSubmit, onClose }: AddClassFormProps) => {
   const [location, setLocation] = useState('');
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

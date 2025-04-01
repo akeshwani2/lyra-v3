@@ -23,7 +23,6 @@ export async function getEmbeddings(text: string) {
 
     const result = await response.json();
 
-    // Add error checking
     if (!result.data || !result.data[0] || !result.data[0].embedding) {
       console.log('Unexpected API response:', result);
       throw new Error('Invalid response from OpenAI API');

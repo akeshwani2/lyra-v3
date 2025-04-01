@@ -107,6 +107,10 @@
 //   const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
 //   const [showFlashcardSets, setShowFlashcardSets] = useState(false);
 //   const [currentSetId, setCurrentSetId] = useState<string | null>(null);
+//   const [liveTranscription, setLiveTranscription] = useState<string>("");
+//   const [isTranscribing, setIsTranscribing] = useState(false);
+//   const transcriptionIntervalRef = useRef<NodeJS.Timeout>();
+//   const accumulatedChunksRef = useRef<Blob[]>([]);
 
 //   useEffect(() => {
 //     const checkMobile = () => {
@@ -243,7 +247,9 @@
 //     try {
 //       setIsCancelled(false);
 //       chunksRef.current = [];
+//       accumulatedChunksRef.current = [];
 //       setRecordingTime(0);
+//       setLiveTranscription("");
 
 //       // Start the recording timer
 //       recordingTimerRef.current = setInterval(() => {
@@ -274,20 +280,25 @@
 //       audioContextRef.current = new AudioContext();
 //       const source = audioContextRef.current.createMediaStreamSource(stream);
 //       const analyser = audioContextRef.current.createAnalyser();
-//       // Increase sensitivity by adjusting these values
-//       analyser.fftSize = 128; // Smaller FFT size for more rapid updates
-//       analyser.smoothingTimeConstant = 0.5; // Lower value = more reactive (0-1)
-//       analyser.minDecibels = -90; // Lower value = more sensitive to quiet sounds
-//       analyser.maxDecibels = -10; // Upper limit of sensitivity
+//       analyser.fftSize = 128;
+//       analyser.smoothingTimeConstant = 0.5;
+//       analyser.minDecibels = -90;
+//       analyser.maxDecibels = -10;
 
 //       source.connect(analyser);
 //       analyserRef.current = analyser;
 
 //       visualizeAudio();
 
-//       mediaRecorder.ondataavailable = (e) => {
+//       mediaRecorder.ondataavailable = async (e) => {
 //         if (!isCancelled && e.data.size > 0) {
 //           chunksRef.current.push(e.data);
+//           accumulatedChunksRef.current.push(e.data);
+
+//           // Process accumulated chunks every 3 seconds
+//           if (accumulatedChunksRef.current.length >= 3) {
+//             await processChunkForTranscription();
+//           }
 //         }
 //       };
 
@@ -297,6 +308,11 @@
 //             streamRef.current.getTracks().forEach((track) => track.stop());
 //           }
 //           return;
+//         }
+
+//         // Process any remaining chunks
+//         if (accumulatedChunksRef.current.length > 0) {
+//           await processChunkForTranscription(true);
 //         }
 
 //         if (chunksRef.current.length > 0) {
@@ -313,8 +329,53 @@
 //       setIsRecording(true);
 //       setIsPaused(false);
 //       setIsCancelled(false);
+//       setIsTranscribing(true);
 //     } catch (err) {
 //       console.error("Error accessing microphone:", err);
+//     }
+//   };
+
+//   const processChunkForTranscription = async (isFinal: boolean = false) => {
+//     try {
+//       const audioBlob = new Blob(accumulatedChunksRef.current, { type: "audio/webm" });
+      
+//       // Clear accumulated chunks after creating blob
+//       if (!isFinal) {
+//         accumulatedChunksRef.current = [];
+//       }
+
+//       const formData = new FormData();
+//       formData.append("file", audioBlob, "chunk.webm");
+//       formData.append("isPartial", (!isFinal).toString());
+
+//       const response = await fetch("/api/transcribe-stream", {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (!response.ok) {
+//         throw new Error("Failed to transcribe chunk");
+//       }
+
+//       const { text } = await response.json();
+      
+//       setLiveTranscription(prev => {
+//         // If this is the final chunk, just append the text
+//         if (isFinal) {
+//           return prev + " " + text;
+//         }
+        
+//         // For intermediate chunks, try to handle sentence boundaries
+//         const newText = prev + " " + text;
+//         const sentences = newText.match(/[^.!?]+[.!?]+/g) || [];
+        
+//         // Keep the last incomplete sentence if any
+//         const incompleteSentence = newText.match(/[^.!?]+$/) || [""];
+        
+//         return sentences.join(" ") + " " + incompleteSentence[0];
+//       });
+//     } catch (error) {
+//       console.error("Error processing audio chunk:", error);
 //     }
 //   };
 
@@ -322,6 +383,7 @@
 //     if (mediaRecorderRef.current && isRecording) {
 //       mediaRecorderRef.current.pause();
 //       setIsPaused(true);
+//       setIsTranscribing(false);
 
 //       // Stop the recording timer
 //       if (recordingTimerRef.current) {
@@ -339,6 +401,7 @@
 //     if (mediaRecorderRef.current && isRecording) {
 //       mediaRecorderRef.current.resume();
 //       setIsPaused(false);
+//       setIsTranscribing(true);
 
 //       // Resume the recording timer
 //       recordingTimerRef.current = setInterval(() => {
@@ -373,6 +436,7 @@
 //       mediaRecorderRef.current.stop();
 //       setIsRecording(false);
 //       setIsPaused(false);
+//       setIsTranscribing(false);
 
 //       // Clean up audio visualization
 //       if (animationFrameRef.current) {
@@ -380,10 +444,7 @@
 //       }
 
 //       // Add check before closing AudioContext
-//       if (
-//         audioContextRef.current &&
-//         audioContextRef.current.state !== "closed"
-//       ) {
+//       if (audioContextRef.current && audioContextRef.current.state !== "closed") {
 //         audioContextRef.current.close();
 //       }
 
@@ -916,9 +977,12 @@
 //     setIsCancelled(true);
 //     setIsProcessing(false); // Immediately clear processing state
 //     setProcessingStatus(""); // Clear any status message
+//     setIsTranscribing(false);
+//     setLiveTranscription("");
 
-//     // Clear the chunks array
+//     // Clear the chunks arrays
 //     chunksRef.current = [];
+//     accumulatedChunksRef.current = [];
 
 //     // Stop the media recorder
 //     if (mediaRecorderRef.current) {
@@ -1817,9 +1881,7 @@
 //                       <div
 //                         className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-300"
 //                         style={{
-//                           width: `${
-//                             (recordingTime / MAX_RECORDING_TIME) * 100
-//                           }%`,
+//                           width: `${(recordingTime / MAX_RECORDING_TIME) * 100}%`,
 //                         }}
 //                       />
 //                     </div>
@@ -1868,6 +1930,18 @@
 //                     >
 //                       <X className="w-4 h-4 text-red-500" />
 //                     </button>
+//                   </div>
+//                 </div>
+
+//                 {/* Live transcription display */}
+//                 <div className="w-full max-w-2xl mt-4">
+//                   <div className="bg-white/5 rounded-lg p-4 backdrop-blur-sm">
+//                     <p className="text-sm text-gray-400 mb-2">Live Transcription:</p>
+//                     <div className="max-h-32 overflow-y-auto">
+//                       <p className="text-white text-sm whitespace-pre-wrap">
+//                         {liveTranscription || "Listening..."}
+//                       </p>
+//                     </div>
 //                   </div>
 //                 </div>
 
@@ -2115,7 +2189,6 @@
 // };
 // export default ScribePage;
 
-
 "use client"
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -2201,7 +2274,7 @@ const ScribePage = () => {
           <div className='absolute inset-0 flex items-center'>
             <div className='px-8 py-4 rounded-lg'>
               <p className='text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-500 text-transparent bg-clip-text'>
-                Scribe is under going some major changes!
+                PDF Reader is being redesigned!
               </p>
               <p className='text-sm text-gray-500'>
                 Apologies for the inconvenience.

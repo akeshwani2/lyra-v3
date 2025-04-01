@@ -9,22 +9,21 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const isPartial = formData.get('isPartial') === 'true';
 
-    // Split audio into chunks if it's too large (Whisper has a 25MB limit)
-    if (file.size > 25 * 1024 * 1024) {
-      // For large files, we'll use streaming transcription
-      // This will be handled by the frontend's Web Speech API
-      return NextResponse.json({ error: 'File too large, using browser transcription' }, { status: 413 });
+    if (!file) {
+      return NextResponse.json({ error: 'No audio file provided' }, { status: 400 });
     }
 
     const transcription = await openai.audio.transcriptions.create({
       file: file,
       model: 'whisper-1',
+      prompt: isPartial ? 'This is a continuation of a previous transcription.' : undefined,
     });
 
     return NextResponse.json({ text: transcription.text });
   } catch (error) {
-    console.error('Transcription error:', error);
+    console.error('Streaming transcription error:', error);
     return NextResponse.json({ error: 'Transcription failed' }, { status: 500 });
   }
-}
+} 
